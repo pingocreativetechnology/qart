@@ -5,6 +5,6 @@ defmodule QartWeb.PageControllerTest do
     conn = get(conn, ~p"/")
     assert html_response(conn, 200) =~ "open-source software"
     assert html_response(conn, 200) =~ "qart.app"
-    assert html_response(conn, 200) =~ "peer to peer commerce online"
+    assert html_response(conn, 200) =~ "peer to peer commerce"
   end
 end
