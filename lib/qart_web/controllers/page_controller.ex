@@ -6,4 +6,8 @@ defmodule QartWeb.PageController do
     # so skip the default app layout.
     render(conn, :home, layout: false)
   end
+
+  def start(conn, _params) do
+    render(conn, :start)
+  end
 end

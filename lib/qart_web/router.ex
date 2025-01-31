@@ -17,6 +17,7 @@ defmodule QartWeb.Router do
   scope "/", QartWeb do
     pipe_through :browser
 
+    get "/start", PageController, :start
     get "/", PageController, :home
   end
 
