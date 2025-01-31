@@ -8,6 +8,7 @@ defmodule Qart.Inventory.Item do
     field :description, :string
     field :price, :decimal
     field :tags, {:array, :string}, default: []
+    field :images, {:array, :string}, default: []
 
     timestamps(type: :utc_datetime)
   end

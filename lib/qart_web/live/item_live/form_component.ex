@@ -4,31 +4,12 @@ defmodule QartWeb.ItemLive.FormComponent do
   alias Qart.Inventory
 
   @impl true
-  def render(assigns) do
-    ~H"""
-    <div>
-      <.header>
-        {@title}
-        <:subtitle>Use this form to manage item records in your database.</:subtitle>
-      </.header>
+  def mount(socket) do
+    socket =
+      socket
+      |> allow_upload(:images, accept: ~w(.jpg .jpeg .png), max_entries: 5)
 
-      <.simple_form
-        for={@form}
-        id="item-form"
-        phx-target={@myself}
-        phx-change="validate"
-        phx-submit="save"
-      >
-        <.input field={@form[:name]} type="text" label="Name" />
-        <.input field={@form[:description]} type="text" label="Description" />
-        <.input field={@form[:price]} type="number" label="Price" step="any" />
-        <.input field={@form[:status]} type="text" label="Status" />
-        <:actions>
-          <.button phx-disable-with="Saving...">Save Item</.button>
-        </:actions>
-      </.simple_form>
-    </div>
-    """
+    {:ok, socket}
   end
 
   @impl true
@@ -48,6 +29,15 @@ defmodule QartWeb.ItemLive.FormComponent do
   end
 
   def handle_event("save", %{"item" => item_params}, socket) do
+    uploaded_files =
+      consume_uploaded_entries(socket, :images, fn %{path: path}, _entry ->
+        dest = Path.join(["priv/static/uploads", Path.basename(path)])
+        File.cp!(path, dest)
+        {:ok, "/uploads/#{Path.basename(path)}"}
+      end)
+
+    updated_params = Map.put(item_params, "images", uploaded_files)
+
     save_item(socket, socket.assigns.action, item_params)
   end
 

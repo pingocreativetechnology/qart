@@ -1,0 +1,28 @@
+<div>
+  <.header>
+    {@title}
+    <:subtitle>Use this form to manage item records in your database.</:subtitle>
+  </.header>
+
+  <.simple_form for={@form} id="item-form" phx-target={@myself} phx-change="validate" phx-submit="save">
+    <.input field={@form[:name]} type="text" label="Name" />
+    <.input field={@form[:description]} type="text" label="Description" />
+    <.input field={@form[:price]} type="number" label="Price" step="any" />
+    <.input field={@form[:status]} type="text" label="Status" />
+
+    <label>Upload Images</label>
+    <.live_file_input upload={@uploads.images} />
+    <ul>
+      <%= for entry <- @uploads.images.entries do %>
+        <li>
+          <%= entry.client_name %>
+            <button type="button" phx-click="cancel-upload" phx-value-ref={entry.ref}>Cancel</button>
+        </li>
+        <% end %>
+    </ul>
+
+    <:actions>
+      <.button phx-disable-with="Saving...">Save Item</.button>
+    </:actions>
+  </.simple_form>
+</div>

@@ -7,6 +7,7 @@ defmodule Qart.Repo.Migrations.CreateItems do
       add :description, :text
       add :price, :decimal
       add :tags, :map
+      add :images, :map
       add :status, :string
 
       timestamps(type: :utc_datetime)
