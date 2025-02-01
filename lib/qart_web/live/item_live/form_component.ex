@@ -38,7 +38,7 @@ defmodule QartWeb.ItemLive.FormComponent do
 
     updated_params = Map.put(item_params, "images", uploaded_files)
 
-    save_item(socket, socket.assigns.action, item_params)
+    save_item(socket, socket.assigns.action, updated_params)
   end
 
   defp save_item(socket, :edit, item_params) do

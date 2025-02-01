@@ -21,14 +21,14 @@ defmodule Qart.InventoryTest do
     end
 
     test "create_item/1 with valid data creates a item" do
-      valid_attrs = %{name: "some name", status: "some status", description: "some description", price: "120.5", tags: %{}}
+      valid_attrs = %{name: "some name", status: "some status", description: "some description", price: "120.5", tags: ["hello", "there"]}
 
       assert {:ok, %Item{} = item} = Inventory.create_item(valid_attrs)
       assert item.name == "some name"
       assert item.status == "some status"
       assert item.description == "some description"
       assert item.price == Decimal.new("120.5")
-      assert item.tags == %{}
+      assert item.tags == ["hello", "there"]
     end
 
     test "create_item/1 with invalid data returns error changeset" do
@@ -37,14 +37,14 @@ defmodule Qart.InventoryTest do
 
     test "update_item/2 with valid data updates the item" do
       item = item_fixture()
-      update_attrs = %{name: "some updated name", status: "some updated status", description: "some updated description", price: "456.7", tags: %{}}
+      update_attrs = %{name: "some updated name", status: "some updated status", description: "some updated description", price: "456.7", tags: []}
 
       assert {:ok, %Item{} = item} = Inventory.update_item(item, update_attrs)
       assert item.name == "some updated name"
       assert item.status == "some updated status"
       assert item.description == "some updated description"
       assert item.price == Decimal.new("456.7")
-      assert item.tags == %{}
+      assert item.tags == []
     end
 
     test "update_item/2 with invalid data returns error changeset" do

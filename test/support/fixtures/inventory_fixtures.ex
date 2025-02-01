@@ -15,7 +15,7 @@ defmodule Qart.InventoryFixtures do
         name: "some name",
         price: "120.5",
         status: "some status",
-        tags: %{}
+        tags: ["this", "that"]
       })
       |> Qart.Inventory.create_item()
 
