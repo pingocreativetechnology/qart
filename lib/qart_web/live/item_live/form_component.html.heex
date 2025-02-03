@@ -9,7 +9,8 @@
     <.input field={@form[:description]} type="text" label="Description" />
     <.input field={@form[:price]} type="number" label="Price" step="any" />
     <.input field={@form[:status]} type="text" label="Status" />
-    <.input field={@form[:tags]} type="text" label="Tags" />
+
+    <.input field={@form[:tags]} type="text" label="Tags" value={Enum.join(@form.source.data.tags || [], ", " )} />
 
     <label>Upload Images</label>
     <.live_file_input upload={@uploads.images} />
