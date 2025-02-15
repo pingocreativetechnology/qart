@@ -6,9 +6,19 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
-    <.live_title suffix=" · Phoenix Framework">
+    <.live_title suffix=" · Qart">
       <%= assigns[:page_title] || "Qart" %>
     </.live_title>
+    <meta property="og:type" content="website">
+    <meta property="og:title" content={assigns[:page_title] || "Qart"}>
+    <meta property="og:description" content={assigns[:page_description] || "Peer to peer commerce"}>
+    <meta property="og:image" content={url(~p"/images/qart-preview.png")}>
+    <meta property="og:url" content={QartWeb.Endpoint.url}>
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content={assigns[:page_title] || "Qart"}>
+    <meta name="twitter:description" content={assigns[:page_description] || "Peer to peer commerce"}>
+    <meta name="twitter:image" content={url(~p"/images/qart-preview.png")}>
+
     <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
     </script>
