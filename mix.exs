@@ -32,6 +32,7 @@ defmodule Qart.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:bcrypt_elixir, "~> 3.0"},
       {:bandit, "~> 1.6.7"},
       {:ecto_sql, "~> 3.10"},
       {:esbuild, "~> 0.9", runtime: Mix.env() == :dev},
