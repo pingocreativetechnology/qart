@@ -1,9 +1,16 @@
-<.back navigate={~p"/items"}>Back to items
-  &middot;
-</.back>
-<.link patch={~p"/items/#{@item}/show/edit"} class="text-sm" phx-click={JS.push_focus()}>
-  Edit
-</.link>
+<div class="mt-16 flex justify-between items-center w-full">
+  <div>
+    &larr;
+    <.link navigate={~p"/items"}>Back to items</.link>
+  </div>
+
+  <.link patch={~p"/items/#{@item}/show/edit"}
+    class="text-sm"
+    phx-click={JS.push_focus()}>
+    Edit
+  </.link>
+</div>
+
 
 <main class="mx-auto max-w-7xl sm:px-6 sm:pt-16 lg:px-8">
   <div class="mx-auto max-w-2xl lg:max-w-none">
