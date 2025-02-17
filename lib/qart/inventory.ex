@@ -21,6 +21,13 @@ defmodule Qart.Inventory do
     Repo.all(Item)
   end
 
+  def list_items_by_tag(tag_name) do
+    from(i in Item,
+      where: ^tag_name in i.tags
+    )
+    |> Repo.all()
+  end
+
   @doc """
   Gets a single item.
 

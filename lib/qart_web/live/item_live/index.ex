@@ -5,8 +5,16 @@ defmodule QartWeb.ItemLive.Index do
   alias Qart.Inventory.Item
 
   @impl true
-  def mount(_params, _session, socket) do
-    {:ok, stream(socket, :items, Inventory.list_items())}
+  def mount(params, _session, socket) do
+    case params do
+      %{"tag" => tag_name} ->
+        items = Inventory.list_items_by_tag(tag_name)
+        {:ok, stream(socket, :items, items)}
+
+      _ ->
+        items = Inventory.list_items()
+        {:ok, stream(socket, :items, items)}
+    end
   end
 
   @impl true
