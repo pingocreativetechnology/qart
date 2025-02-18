@@ -22,8 +22,23 @@ defmodule Qart.Accounts do
       nil
 
   """
+  defp maybe_compute_display_name(nil), do: nil
+  defp maybe_compute_display_name(user) do
+    %{user | display_name: Qart.Accounts.User.display_name(user), try_handle: Qart.Accounts.User.try_handle(user)}
+  end
+
   def get_user_by_email(email) when is_binary(email) do
     Repo.get_by(User, email: email)
+  end
+
+  def get_user_by_handle(handle) when is_binary(handle) do
+    case Integer.parse(handle) do
+      {id, ""} -> Repo.get(User, id)
+        |> maybe_compute_display_name
+
+      _ -> Repo.get_by(User, handle: handle)
+        |> maybe_compute_display_name
+    end
   end
 
   @doc """

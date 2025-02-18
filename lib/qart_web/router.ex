@@ -21,8 +21,9 @@ defmodule QartWeb.Router do
     pipe_through :browser
 
     live "/items", ItemLive.Index, :index
-
     get "/start", PageController, :start
+
+    get "/:handle", PageController, :profile
     get "/", PageController, :home
   end
 

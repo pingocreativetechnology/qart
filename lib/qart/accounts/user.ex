@@ -10,8 +10,18 @@ defmodule Qart.Accounts.User do
     field :current_password, :string, virtual: true, redact: true
     field :confirmed_at, :utc_datetime
 
+    field :display_name, :string, virtual: true
+    field :try_handle, :string, virtual: true
+
     timestamps(type: :utc_datetime)
   end
+
+  # Compute the display_name dynamically
+  def display_name(%__MODULE__{handle: nil, email: email}), do: email
+  def display_name(%__MODULE__{handle: handle}), do: handle
+
+  def try_handle(%__MODULE__{handle: nil, id: id}), do: id
+  def try_handle(%__MODULE__{handle: handle}), do: handle
 
   @doc """
   A user changeset for registration.
@@ -124,12 +134,15 @@ defmodule Qart.Accounts.User do
   end
 
   def handle_changeset(user, attrs) do
+    forbidden_handles = ~w(start item items user users handle home fuck)
+
     user
     |> cast(attrs, [:handle])
     |> validate_required([:handle])
     |> update_change(:handle, &String.downcase/1) # force lowercase
     |> validate_length(:handle, min: 3, max: 20)
     |> validate_format(:handle, ~r/^[a-z0-9_-]+$/, message: "Only lowercase letters, numbers, - and _ allowed")
+    |> validate_exclusion(:handle, forbidden_handles, message: "This handle is reserved")
     |> unique_constraint(:handle)
   end
 
