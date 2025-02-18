@@ -69,6 +69,7 @@ defmodule QartWeb.Router do
 
     live_session :require_authenticated_user,
       on_mount: [{QartWeb.UserAuth, :ensure_authenticated}] do
+      live "/handle/set", HandleLive, :index
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
     end

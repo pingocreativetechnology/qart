@@ -1,0 +1,23 @@
+<div class="max-w-md mx-auto">
+  <h1 class="text-xl font-bold">Set Your Handle</h1>
+
+  <.simple_form for={@changeset}
+    id="item-form"
+    phx-change="validate"
+    phx-submit="save">
+    <div class="mt-4">
+      <.input
+        field={@changeset.data.handle}
+        class="mt-1 block w-full px-3 py-2 border rounded-md"
+        label="Handle"
+        name="handle"
+        value={@changeset.data.handle} />
+    </div>
+
+    <div class="mt-4">
+      <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+        Save
+      </button>
+    </div>
+  </.simple_form>
+</div>

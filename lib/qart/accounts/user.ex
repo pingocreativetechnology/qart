@@ -4,6 +4,7 @@ defmodule Qart.Accounts.User do
 
   schema "users" do
     field :email, :string
+    field :handle, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :current_password, :string, virtual: true, redact: true
@@ -120,6 +121,16 @@ defmodule Qart.Accounts.User do
     |> cast(attrs, [:password])
     |> validate_confirmation(:password, message: "does not match password")
     |> validate_password(opts)
+  end
+
+  def handle_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:handle])
+    |> validate_required([:handle])
+    |> update_change(:handle, &String.downcase/1) # force lowercase
+    |> validate_length(:handle, min: 3, max: 20)
+    |> validate_format(:handle, ~r/^[a-z0-9_-]+$/, message: "Only lowercase letters, numbers, - and _ allowed")
+    |> unique_constraint(:handle)
   end
 
   @doc """

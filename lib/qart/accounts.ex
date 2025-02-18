@@ -108,6 +108,16 @@ defmodule Qart.Accounts do
     User.email_changeset(user, attrs, validate_email: false)
   end
 
+  def change_user_handle(user) do
+    User.handle_changeset(user, %{})
+  end
+
+  def update_user_handle(user, attrs) do
+    user
+    |> User.handle_changeset(attrs)
+    |> Repo.update()
+  end
+
   @doc """
   Emulates that the email will change without actually changing
   it in the database.
