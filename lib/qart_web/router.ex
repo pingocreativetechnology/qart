@@ -21,11 +21,6 @@ defmodule QartWeb.Router do
     pipe_through :browser
 
     live "/items", ItemLive.Index, :index
-    live "/items/new", ItemLive.Index, :new
-    live "/items/:id/edit", ItemLive.Index, :edit
-
-    live "/items/:id", ItemLive.Show, :show
-    live "/items/:id/show/edit", ItemLive.Show, :edit
 
     get "/start", PageController, :start
     get "/", PageController, :home
@@ -86,6 +81,11 @@ defmodule QartWeb.Router do
 
     live_session :current_user,
       on_mount: [{QartWeb.UserAuth, :mount_current_user}] do
+      live "/items/new", ItemLive.Index, :new
+      live "/items/:id/edit", ItemLive.Index, :edit
+      live "/items/:id", ItemLive.Show, :show
+      live "/items/:id/show/edit", ItemLive.Show, :edit
+
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
     end
