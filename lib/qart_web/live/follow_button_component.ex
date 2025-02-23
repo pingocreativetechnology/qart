@@ -29,7 +29,10 @@ defmodule QartWeb.FollowButtonComponent do
 
   def render(assigns) do
     ~H"""
-      <button type="button" phx-click="follow" phx-target={@myself} value={@profile_user_id}
+      <button type="button"
+        phx-click="follow"
+        phx-target={@myself}
+        value={@profile_user_id}
         class="inline-flex justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 items-center">
       <%= if @is_following do %>
         <div class="flex-none rounded-full p-1 bg-green-400/10 text-green-400 mr-2">

@@ -3,8 +3,8 @@ defmodule Qart.Accounts.Favorite do
   import Ecto.Changeset
 
   schema "favorites" do
-    field :user_id, :id
-    field :item_id, :id
+    belongs_to :user, Qart.Accounts.User
+    belongs_to :item, Qart.Inventory.Item
 
     timestamps()
   end

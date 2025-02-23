@@ -20,10 +20,8 @@ defmodule QartWeb.Router do
   scope "/", QartWeb do
     pipe_through :browser
 
-    live "/items", ItemLive.Index, :index
     get "/start", PageController, :start
-
-    get "/:handle", PageController, :profile
+    # get "/:handle", PageController, :profile
     get "/", PageController, :home
   end
 
@@ -83,13 +81,20 @@ defmodule QartWeb.Router do
 
     live_session :current_user,
       on_mount: [{QartWeb.UserAuth, :mount_current_user}] do
+
+      live "/users/confirm/:token", UserConfirmationLive, :edit
+      live "/users/confirm", UserConfirmationInstructionsLive, :new
+
+      live "/items", ItemLive.Index, :index
       live "/items/new", ItemLive.Index, :new
       live "/items/:id/edit", ItemLive.Index, :edit
       live "/items/:id", ItemLive.Show, :show
       live "/items/:id/show/edit", ItemLive.Show, :edit
+      live "/invite", HandleLive.Invite, :invite
 
-      live "/users/confirm/:token", UserConfirmationLive, :edit
-      live "/users/confirm", UserConfirmationInstructionsLive, :new
+      # these routes go last, due to the wilcard for `handle`
+      live "/:handle", HandleLive.Show, :show
+      live "/:handle/shop", HandleLive.Shop, :shop
     end
   end
 end

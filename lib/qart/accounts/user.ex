@@ -1,6 +1,7 @@
 defmodule Qart.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
+  import QartWeb.Helpers, only: [get_gradient: 1]
 
   schema "users" do
     field :email, :string
@@ -12,6 +13,19 @@ defmodule Qart.Accounts.User do
 
     field :display_name, :string, virtual: true
     field :try_handle, :string, virtual: true
+    field :gradient, :string, virtual: true
+    field :role, :string, virtual: true
+
+    has_many :favorites, Qart.Accounts.Favorite
+    has_many :favorited_items, through: [:favorites, :item]
+
+    # Users this user follows
+    has_many :outgoing_follows, Qart.Accounts.Follow, foreign_key: :user_id
+    has_many :following, through: [:outgoing_follows, :followed_user]
+
+    # Users who follow this user
+    has_many :incoming_follows, Qart.Accounts.Follow, foreign_key: :followed_user_id
+    has_many :followers, through: [:incoming_follows, :user]
 
     timestamps(type: :utc_datetime)
   end
@@ -22,6 +36,9 @@ defmodule Qart.Accounts.User do
 
   def try_handle(%__MODULE__{handle: nil, id: id}), do: id
   def try_handle(%__MODULE__{handle: handle}), do: handle
+
+  def gradient(%__MODULE__{email: email}), do: get_gradient(email)
+  def role(%__MODULE__{email: email}), do: "Role"
 
   @doc """
   A user changeset for registration.

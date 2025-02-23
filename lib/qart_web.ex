@@ -54,6 +54,8 @@ defmodule QartWeb do
       use Phoenix.LiveView,
         layout: {QartWeb.Layouts, :app}
 
+      import Phoenix.LiveView.Helpers
+
       unquote(html_helpers())
     end
   end

@@ -7,6 +7,8 @@ defmodule Qart.Accounts do
   alias Qart.Repo
 
   alias Qart.Accounts.{User, UserToken, UserNotifier}
+  alias Qart.Accounts.{Favorite}
+  alias Qart.Inventory.Item
 
   ## Database getters
 
@@ -22,9 +24,60 @@ defmodule Qart.Accounts do
       nil
 
   """
+  def list_users do
+    Repo.all(User)
+      |> Enum.map(&maybe_compute_display_name/1)
+  end
+
+  def get_favorited_items(user_id) do
+    user = Repo.get(User, user_id) |> Repo.preload(:favorited_items)
+    user.favorited_items # Returns the list of items
+  end
+
+  def get_following(user_id) do
+    user = Repo.get(User, user_id)
+      |> Repo.preload(:following)
+
+    following_users =
+      Enum.map(user.following, fn follow ->
+        follow |> maybe_compute_display_name
+      end)
+
+    following_users
+  end
+
+  def get_followers(user_id) do
+    user = Repo.get(User, user_id)
+      |> Repo.preload(:followers)
+
+    follower_users =
+      Enum.map(user.followers, fn follower ->
+        follower |> maybe_compute_display_name
+      end)
+
+    Qart.debug(follower_users |> length)
+
+    follower_users
+  end
+
+  def get_joined_favorited_items(user_id) do
+    from(i in Item,
+      join: f in Favorite, on: f.item_id == i.id,
+      where: f.user_id == ^user_id,
+      select: i
+    )
+    |> Repo.all()
+  end
+
+
   defp maybe_compute_display_name(nil), do: nil
   defp maybe_compute_display_name(user) do
-    %{user | display_name: Qart.Accounts.User.display_name(user), try_handle: Qart.Accounts.User.try_handle(user)}
+    %{user |
+      display_name: Qart.Accounts.User.display_name(user),
+      try_handle: Qart.Accounts.User.try_handle(user),
+      gradient: Qart.Accounts.User.gradient(user),
+      role: Qart.Accounts.User.role(user)
+    }
   end
 
   def get_user_by_email(email) when is_binary(email) do
@@ -33,10 +86,10 @@ defmodule Qart.Accounts do
 
   def get_user_by_handle(handle) when is_binary(handle) do
     case Integer.parse(handle) do
-      {id, ""} -> Repo.get(User, id)
+      {id, ""} -> Repo.get!(User, id)
         |> maybe_compute_display_name
 
-      _ -> Repo.get_by(User, handle: handle)
+      _ -> Repo.get_by!(User, handle: handle)
         |> maybe_compute_display_name
     end
   end
@@ -257,6 +310,7 @@ defmodule Qart.Accounts do
   def get_user_by_session_token(token) do
     {:ok, query} = UserToken.verify_session_token_query(token)
     Repo.one(query)
+      |> maybe_compute_display_name
   end
 
   @doc """
@@ -298,6 +352,11 @@ defmodule Qart.Accounts do
   If the token matches, the user account is marked as confirmed
   and the token is deleted.
   """
+
+  def confirm_user(user) do
+    Repo.update!(User.confirm_changeset(user))
+  end
+
   def confirm_user(token) do
     with {:ok, query} <- UserToken.verify_email_token_query(token, "confirm"),
          %User{} = user <- Repo.one(query),
@@ -325,6 +384,10 @@ defmodule Qart.Accounts do
       {:ok, %{to: ..., body: ...}}
 
   """
+  def deliver_user_reset_password_instructions(_user, _url_fun) do
+    {:ok, :skipped_email}
+  end
+
   def deliver_user_reset_password_instructions(%User{} = user, reset_password_url_fun)
       when is_function(reset_password_url_fun, 1) do
     {encoded_token, user_token} = UserToken.build_email_token(user, "reset_password")

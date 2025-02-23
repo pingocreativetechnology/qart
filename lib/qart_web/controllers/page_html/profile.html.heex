@@ -1,9 +1,7 @@
-<.flash_group flash={@flash} />
-
 <div>
   <div>
     <img class="h-32 w-full object-cover lg:h-48"
-      src="https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80"
+      src={~p"/images/profile-bg.jpg"}
       alt="">
   </div>
   <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
@@ -28,6 +26,10 @@
             </div>
             <span>Follow</span>
           </button>
+
+          <%= live_render(@conn, QartWeb.UserLive.Follow, session: %{"profile_user_id" => 123, "current_user_id" =>
+            @current_user && @current_user.id}) %>
+
           <button type="button"
             class="inline-flex justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
             <svg

@@ -6,7 +6,7 @@ defmodule QartWeb.ItemLive.Show do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, socket}
+    {:ok, assign(socket, payment_request: false)}
   end
 
   @impl true
@@ -41,6 +41,15 @@ defmodule QartWeb.ItemLive.Show do
       Favorites.favorite_item(user_id, item_id)
       {:noreply, assign(socket, is_favorited: true)}
     end
+  end
+
+  @impl true
+  def handle_event("buy_now", %{"value" => item_id}, socket) do
+    # payment_address = "Payments.generate_payment_request()"
+    payment_address = "1J12o2k964mJPTuS53Un7oJ2Hxo5ksYf4L"
+    {:noreply, assign(socket, payment_request: "true",
+      payment_address: payment_address)
+    }
   end
 
   defp page_title(:show), do: "Show Item"

@@ -55,6 +55,18 @@ defmodule QartWeb.UserRegistrationLive do
 
   def handle_event("save", %{"user" => user_params}, socket) do
     case Accounts.register_user(user_params) do
+      # temporary
+      {:ok, user} ->
+        # Auto-confirm the user by skipping email verification
+        user = Accounts.confirm_user(user)
+        {:noreply, socket |> assign(user: user)}
+
+        {:noreply,
+          socket
+          |> put_flash(:info, "Account created successfully.")
+          |> redirect(to: "/")}
+
+      # original
       {:ok, user} ->
         {:ok, _} =
           Accounts.deliver_user_confirmation_instructions(

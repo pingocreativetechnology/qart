@@ -21,11 +21,59 @@ import "phoenix_html"
 import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
+import QRCode from 'qrcode';
+
+let Hooks = {};
+
+Hooks.QRCode = {
+  mounted() {
+    let paymentAddress = this.el.dataset.address;
+    QRCode.toCanvas(this.el, paymentAddress, { width: 150 }, function (error) {
+      if (error) console.error("QR Code generation error:", error);
+    });
+  }
+};
+
+Hooks.DownloadFollowing = {
+  mounted() {
+    this.handleEvent("download_following_json", ({ filename, content }) => {
+      const blob = new Blob([content], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  }
+};
+
+Hooks.DownloadFollowers = {
+  mounted() {
+    this.handleEvent("download_followers_json", ({ filename, content }) => {
+      const blob = new Blob([content], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  }
+};
+
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
-  params: {_csrf_token: csrfToken}
+  params: {_csrf_token: csrfToken},
+  hooks: Hooks
 })
 
 // Show progress bar on live navigation and form submits
@@ -41,4 +89,3 @@ liveSocket.connect()
 // >> liveSocket.enableLatencySim(1000)  // enabled for duration of browser session
 // >> liveSocket.disableLatencySim()
 window.liveSocket = liveSocket
-

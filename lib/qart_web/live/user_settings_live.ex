@@ -1,7 +1,9 @@
 defmodule QartWeb.UserSettingsLive do
   use QartWeb, :live_view
 
+  alias Qart.Repo
   alias Qart.Accounts
+  alias Qart.Accounts.{User}
 
   def render(assigns) do
     ~H"""
@@ -70,6 +72,36 @@ defmodule QartWeb.UserSettingsLive do
         </.simple_form>
       </div>
     </div>
+
+    <div class="flex mt-8 mb-8">
+      <div
+        phx-hook="DownloadFollowing"
+        id="download-follows">
+        <button
+          type="button"
+          phx-click="download_follows_json"
+          phx-ignore="true"
+          class={"inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset text-gray-900 bg-white hover:bg-gray-50 ring-gray-300"}
+        >
+          Export Follows
+        </button>
+      </div>
+
+      <div
+        class="ml-2"
+        phx-hook="DownloadFollowers"
+        id="download-follower">
+        <button
+          type="button"
+          phx-click="download_followers_json"
+          phx-ignore="true"
+          class={"inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset text-gray-900 bg-white hover:bg-gray-50 ring-gray-300"}
+        >
+          Export Followers
+        </button>
+      </div>
+    </div>
+    &nbsp;
     """
   end
 
@@ -163,5 +195,63 @@ defmodule QartWeb.UserSettingsLive do
       {:error, changeset} ->
         {:noreply, assign(socket, password_form: to_form(changeset))}
     end
+  end
+
+
+  def handle_event("download_follows_json", _params, socket) do
+
+    items = Accounts.list_users
+      |> Enum.sort_by(& &1.email)
+
+  # Convert items to JSON using Jason
+  #  json =
+  #   items
+  #   |> Enum.map(&Map.from_struct/1)  # Convert struct to map
+  #   |> Enum.map(&Map.drop(&1, [:__meta__]))  # Remove Ecto metadata
+  #   |> Jason.encode!()
+  #   |> Jason.Formatter.pretty_print
+
+  json =
+    items
+    |> Enum.map(fn user ->
+      %{
+        id: user.id,
+        display_name: user.display_name,
+        email: user.email,
+        handle: user.handle,
+      }
+    end)
+    # |> Enum.sort_by(& &1.email)
+    # |> Enum.sort_by(fn {key, _value} -> to_string(key) end)  # Sort keys
+    # |> Enum.into(%{})  # Convert back to a map
+    |> Jason.encode!()
+    |> Jason.Formatter.pretty_print
+
+    {:noreply,
+      push_event(socket, "download_following_json", %{filename: "follows.json", content: json})}
+
+  end
+
+  def handle_event("download_followers_json", _params, socket) do
+    user_id = socket.assigns.current_user.id
+    user = Repo.get(User, user_id)
+      |> Repo.preload(:followers)
+
+    json =
+      user.followers
+      |> Enum.map(fn user ->
+        %{
+          id: user.id,
+          display_name: user.display_name,
+          email: user.email,
+          handle: user.handle,
+        }
+      end)
+
+      |> Jason.encode!()
+      |> Jason.Formatter.pretty_print
+
+    {:noreply,
+      push_event(socket, "download_followers_json", %{filename: "followers.json", content: json})}
   end
 end

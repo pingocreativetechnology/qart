@@ -3,12 +3,11 @@ defmodule QartWeb.PageController do
   alias Qart.Accounts
 
   def home(conn, _params) do
-    # The home page is often custom made,
-    # so skip the default app layout.
     render(conn, :home,
       layout: false,
       page_title: "Home",
-      page_description: "Peer to peer commerce"
+      page_description: "Peer to peer commerce",
+      users: Qart.Accounts.list_users
     )
   end
 

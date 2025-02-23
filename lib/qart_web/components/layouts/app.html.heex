@@ -5,6 +5,7 @@
         <img src={~p"/images/logo.svg"} width="36" />
       </a>
     </div>
+    <%= if @current_user do %>
     <div class="flex items-center gap-4 font-semibold leading-6 text-zinc-900">
       <a
         href={~p"/items"}
@@ -13,6 +14,7 @@
         Manage items <span aria-hidden="true">&rarr;</span>
       </a>
     </div>
+    <% end %>
   </div>
 </header>
 <main>

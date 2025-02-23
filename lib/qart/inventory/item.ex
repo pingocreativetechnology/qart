@@ -10,6 +10,8 @@ defmodule Qart.Inventory.Item do
     field :tags, {:array, :string}, default: []
     field :images, {:array, :string}, default: []
 
+    has_many :favorites, Qart.Accounts.Favorite
+
     timestamps(type: :utc_datetime)
   end
 

@@ -29,6 +29,6 @@ defmodule QartWeb.HandleLive do
 
   @impl true
   def handle_event("validate", %{"handle" => handle}, socket) do
-      {:noreply, socket}
+    {:noreply, socket}
   end
 end
