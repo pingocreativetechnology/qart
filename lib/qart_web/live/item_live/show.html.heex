@@ -28,10 +28,10 @@
                 aria-controls="tabs-2-panel-1" role="tab" type="button">
                 <span class="sr-only">Angled view</span>
                 <span class="absolute inset-0 overflow-hidden rounded-md">
-                  <img
-                    src={~p"/images/image.png"}
-                    alt=""
-                    class="size-full object-cover">
+                <%= for image <- @item.images do %>
+                  <img src={image} alt="Angled front view with bag zipped and handles upright."
+                    class="aspect-square w-full object-cover sm:rounded-lg">
+                <% end %>
                 </span>
                 <!-- Selected: "ring-indigo-500", Not Selected: "ring-transparent" -->
                 <span class="pointer-events-none absolute inset-0 rounded-md ring-2 ring-transparent ring-offset-2"
@@ -45,7 +45,8 @@
           <div>
             <!-- Tab panel, show/hide based on tab state. -->
             <div id="tabs-2-panel-1" aria-labelledby="tabs-2-tab-1" role="tabpanel" tabindex="0">
-              <img src={~p"/images/image.png"}
+              <img
+                src={@item.images |> Enum.at(0)}
                 alt="Angled front view with bag zipped and handles upright."
                 class="aspect-square w-full object-cover sm:rounded-lg">
             </div>
@@ -63,9 +64,13 @@
 
           <div class="mt-3">
             <h2 class="sr-only">Product information</h2>
-            <p class="text-3xl tracking-tight text-gray-900">
+            <p class="text-3xl tracking-tight text-gray-900 mb-2">
               ${@item.price}
             </p>
+            <a
+              href={"/#{@item.user.try_handle}/shop"}>
+              <.user_avatar user={@item.user} />
+            </a>
           </div>
 
           <div class="mt-6">
@@ -94,11 +99,20 @@
             </div>
           </div>
 
-          <form class="mt-6">
-            <div class="mt-10 flex items-center">
-              <button type="submit"
-                class="flex max-w-xs flex-1 items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50 sm:w-full">
-                Add to cart
+          <form
+            class="mt-6">
+            <div
+              class="mt-8 flex items-center">
+              <button
+                type="button"
+                phx-click={if @item_in_cart, do: "remove_from_cart", else: "add_to_cart"}
+                phx-value-item_id={@item.id}
+                class={"flex max-w-xs flex-1 items-center justify-center rounded-md border border-transparent
+                px-8 py-3 text-base font-medium text-white focus:outline-none
+                focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50 sm:w-full " <>
+                if @item_in_cart, do: "bg-gray-400 hover:bg-gray-500 disabled", else: "bg-indigo-600 hover:bg-indigo-700"}
+              >
+                {if @item_in_cart, do: "Item in Cart", else: "Add to Cart"}
               </button>
 
             <%= if @current_user do %>
@@ -170,10 +184,19 @@
               <button phx-click="check_payment" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
                 I've Paid
               </button>
+
+              <button phx-click="handcash_payment_request" type="button" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+                Pay with Handcash
+              </button>
+
+              <%= if @payment_request_qr_code_url do %>
+              <a
+                href={@payment_request_qr_code_url}>{@payment_request_qr_code_url}</a>
+              <% end %>
             </div>
           </form>
 
-          <section aria-labelledby="details-heading" class="mt-12">
+          <section aria-labelledby="details-heading" class="mt-12 hidden">
             <h2 id="details-heading" class="sr-only">Additional details</h2>
 
             <div class="divide-y divide-gray-200 border-t">
@@ -199,7 +222,9 @@
                     </span>
                   </button>
                 </h3>
-                <div class="pb-6" id="disclosure-1">
+                <div
+                  class="pb-6"
+                  id="disclosure-1">
                   <ul role="list" class="list-disc space-y-1 pl-5 text-sm/6 text-gray-700 marker:text-gray-300">
                     <li class="pl-2">Multiple strap configurations</li>
                     <li class="pl-2">Spacious interior with top zip</li>

@@ -1,0 +1,17 @@
+<h2 class="text-xl font-bold">Upload Avatar</h2>
+
+<%= if @user && @user.avatar_url do %>
+  <img class="size-24 rounded-full ring-4 ring-white sm:size-32"
+    src={@user.avatar_url}
+    alt={@user.display_name <> " avatar"}>
+
+  <.user_avatar user={@user} />
+<% end %>
+
+<form
+  phx-submit="save"
+  phx-change="validate"
+  >
+  <.live_file_input upload={@uploads.avatar} class="border p-2" />
+  <button type="submit" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded">Upload</button>
+</form>

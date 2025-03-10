@@ -3,7 +3,6 @@ defmodule QartWeb.TipComponent do
 
   @impl true
   def update(assigns, socket) do
-    IO.puts("------TIP_OPEN-------------------->")
     {:ok, assign(socket, assigns)}
   end
 

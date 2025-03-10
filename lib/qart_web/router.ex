@@ -6,11 +6,13 @@ defmodule QartWeb.Router do
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
+    plug QartWeb.Plugs.CartSession # Ensure cart_id exists
     plug :fetch_live_flash
     plug :put_root_layout, html: {QartWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug :fetch_current_user
+    plug QartWeb.Plugs.AssignHandcashAuthUrl
   end
 
   pipeline :api do
@@ -21,6 +23,9 @@ defmodule QartWeb.Router do
     pipe_through :browser
 
     get "/start", PageController, :start
+    get "/catalog", PageController, :catalog
+    get "/map", PageController, :map
+    get "/handcash_auth", PageController, :handcash_auth
     # get "/:handle", PageController, :profile
     get "/", PageController, :home
   end
@@ -82,19 +87,31 @@ defmodule QartWeb.Router do
     live_session :current_user,
       on_mount: [{QartWeb.UserAuth, :mount_current_user}] do
 
+
+      live "/wallet", WalletLive.Show, :active
+      live "/wallets", WalletLive.Index, :list
+      live "/wallets/:id", WalletLive.Show, :show
+
+      live "/stream", StreamLive, :index
+      live "/cart", CartLive, :index
+
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
 
       live "/items", ItemLive.Index, :index
+      live "/items/list", ItemLive.Index, :list
       live "/items/new", ItemLive.Index, :new
       live "/items/:id/edit", ItemLive.Index, :edit
       live "/items/:id", ItemLive.Show, :show
       live "/items/:id/show/edit", ItemLive.Show, :edit
       live "/invite", HandleLive.Invite, :invite
 
+      # live "/posts", HandleLive.Show, :show
+      live "/:handle/posts/new", HandleLive.Show, :post
+      live "/:handle/shop", HandleLive.Shop, :shop
+      live "/:handle/avatar", AvatarUploadLive, :index
       # these routes go last, due to the wilcard for `handle`
       live "/:handle", HandleLive.Show, :show
-      live "/:handle/shop", HandleLive.Shop, :shop
     end
   end
 end

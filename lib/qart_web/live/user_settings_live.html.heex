@@ -1,0 +1,96 @@
+<div class="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
+  <.header class="text-center">
+    Account Settings
+    <:subtitle>Manage your account email address and password settings</:subtitle>
+  </.header>
+
+  <div class="space-y-12 divide-y">
+    <div>
+      <.simple_form
+        for={@email_form}
+        id="email_form"
+        phx-submit="update_email"
+        phx-change="validate_email"
+      >
+        <.input field={@email_form[:email]} type="email" label="Email" required />
+        <.input
+          field={@email_form[:current_password]}
+          name="current_password"
+          id="current_password_for_email"
+          type="password"
+          label="Current password"
+          value={@email_form_current_password}
+          required
+        />
+        <:actions>
+          <.button phx-disable-with="Changing...">Change Email</.button>
+        </:actions>
+      </.simple_form>
+    </div>
+    <div>
+      <.simple_form
+        for={@password_form}
+        id="password_form"
+        action={~p"/users/log_in?_action=password_updated"}
+        method="post"
+        phx-change="validate_password"
+        phx-submit="update_password"
+        phx-trigger-action={@trigger_submit}
+      >
+        <input
+          name={@password_form[:email].name}
+          type="hidden"
+          id="hidden_user_email"
+          value={@current_email}
+        />
+        <.input field={@password_form[:password]} type="password" label="New password" required />
+        <.input
+          field={@password_form[:password_confirmation]}
+          type="password"
+          label="Confirm new password"
+        />
+        <.input
+          field={@password_form[:current_password]}
+          name="current_password"
+          type="password"
+          label="Current password"
+          id="current_password_for_password"
+          value={@current_password}
+          required
+        />
+        <:actions>
+          <.button phx-disable-with="Changing...">Change Password</.button>
+        </:actions>
+      </.simple_form>
+    </div>
+  </div>
+
+  <div class="flex mt-8 mb-8">
+    <div
+      phx-hook="DownloadFollowing"
+      id="download-follows">
+      <button
+        type="button"
+        phx-click="download_follows_json"
+        phx-ignore="true"
+        class={"inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset text-gray-900 bg-white hover:bg-gray-50 ring-gray-300"}
+      >
+        Export Follows
+      </button>
+    </div>
+
+    <div
+      class="ml-2"
+      phx-hook="DownloadFollowers"
+      id="download-follower">
+      <button
+        type="button"
+        phx-click="download_followers_json"
+        phx-ignore="true"
+        class={"inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset text-gray-900 bg-white hover:bg-gray-50 ring-gray-300"}
+      >
+        Export Followers
+      </button>
+    </div>
+  </div>
+</div>

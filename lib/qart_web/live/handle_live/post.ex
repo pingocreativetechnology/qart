@@ -1,4 +1,4 @@
-defmodule QartWeb.HandleLive.Shop do
+defmodule QartWeb.HandleLive.Post do
   use QartWeb, :live_view
   alias Qart.Accounts
   alias Qart.Follows
@@ -7,10 +7,9 @@ defmodule QartWeb.HandleLive.Shop do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket,
-      items: [],
-      is_favorited: false,
-      tip_open: false)}
+    items = Qart.Inventory.list_items()
+
+    {:ok, assign(socket, items: items, is_favorited: false, tip_open: false)}
   end
 
   @impl true
@@ -23,14 +22,11 @@ defmodule QartWeb.HandleLive.Shop do
       profile_user ->
         user_id = socket.assigns.current_user && socket.assigns.current_user.id
         is_followed = if user_id, do: Follows.is_followed?(user_id, profile_user.id), else: false
-        items = Qart.Inventory.list_items()
 
         {:noreply, assign(socket,
           user: profile_user,
           page_title: "#{profile_user.display_name}'s Profile",
-          is_followed: is_followed,
-          items: Qart.Inventory.list_user_items(profile_user.id)
-          )
+          is_followed: is_followed)
         }
     end
   end
@@ -40,10 +36,10 @@ defmodule QartWeb.HandleLive.Shop do
     {:noreply, push_patch(socket, to: socket.assigns.live_action, status: 404)}
   end
 
+  @impl true
   def handle_event("submit_post", _params, socket) do
     IO.puts("Post submitted!")
     handle = socket.assigns.current_user.try_handle
     {:noreply, push_navigate(socket, to: ~p"/#{handle}/posts/new")}
-    # {:noreply, push_patch(socket, to: ~p"/#{handle}/posts/new")}
   end
 end

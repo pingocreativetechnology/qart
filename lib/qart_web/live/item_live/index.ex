@@ -6,14 +6,24 @@ defmodule QartWeb.ItemLive.Index do
 
   @impl true
   def mount(params, _session, socket) do
+
+    view_template =
+      case socket.assigns[:live_action] do
+        :grid -> "grid"
+        :table -> "table"
+        _ -> "grid"
+      end
+
+    # {:ok, assign(socket, items: items, view_mode: view_mode)}
+
     case params do
       %{"tag" => tag_name} ->
         items = Inventory.list_items_by_tag(tag_name)
-        {:ok, stream(socket, :items, items)}
+        {:ok, stream(socket, :items, items, view_template: view_template)}
 
       _ ->
         items = Inventory.list_items()
-        {:ok, stream(socket, :items, items)}
+        {:ok, stream(socket, :items, items, view_template: view_template)}
     end
   end
 
@@ -35,6 +45,12 @@ defmodule QartWeb.ItemLive.Index do
   end
 
   defp apply_action(socket, :index, _params) do
+    socket
+    |> assign(:page_title, "Listing Items")
+    |> assign(:item, nil)
+  end
+
+  defp apply_action(socket, :list, _params) do
     socket
     |> assign(:page_title, "Listing Items")
     |> assign(:item, nil)

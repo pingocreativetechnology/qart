@@ -9,7 +9,6 @@ defmodule QartWeb.TipButtonComponent do
     # user_id = assigns.current_user.id
     # profile_user_id = assigns[:profile_user_id]
     # is_following = user_id && Follows.is_followed?(user_id, profile_user_id)
-    IO.puts("------------->")
     {:ok, assign(socket, assigns)}
   end
 

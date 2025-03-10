@@ -9,6 +9,7 @@
     <.input field={@form[:description]} type="text" label="Description" />
     <.input field={@form[:price]} type="number" label="Price" step="any" />
     <.input field={@form[:status]} type="text" label="Status" />
+    <.input field={@form[:user_id]} type="text" label="User ID" />
 
     <.input field={@form[:tags]} type="text" label="Tags" value={Enum.join(@form.source.data.tags || [], ", " )} />
 
