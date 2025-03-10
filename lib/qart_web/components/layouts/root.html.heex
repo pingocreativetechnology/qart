@@ -50,6 +50,10 @@
             Log out
           </.link>
         </li>
+        <li>
+          <a href={@handcash_auth_url}
+            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700">Handcash Auth</a>
+        </li>
       <% else %>
         <li>
           <.link
@@ -69,6 +73,7 @@
         </li>
       <% end %>
     </ul>
+    <.flash_group flash={@flash} />
     <%= @inner_content %>
   </body>
 </html>

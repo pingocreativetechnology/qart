@@ -18,6 +18,13 @@ defmodule QartWeb.PageController do
     )
   end
 
+  def catalog(conn, _params) do
+    render(conn, :catalog,
+      items: Qart.Inventory.list_items(),
+      page_title: "Catalog"
+    )
+  end
+
   def profile(conn, %{"handle" => handle}) do
     case Accounts.get_user_by_handle(handle) do
       nil ->
@@ -34,5 +41,20 @@ defmodule QartWeb.PageController do
           page_title: "#{user.handle} on Qart"
         )
     end
+  end
+
+  def map(conn, _params) do
+    render(conn, :map)
+  end
+
+  def handcash_auth(conn, %{"authToken" => auth_token}) do
+    handcash_client = Handkit.create_connect_client(auth_token)
+    profile = Handkit.Profile.get_current_profile(handcash_client)
+
+    conn = conn
+      |> put_session(:handcash_oauth_token, auth_token)
+      |> configure_session(renew: true)
+      |> put_flash(:info, "Successfully authenticated via Handcash")
+      |> redirect(to: "/")
   end
 end

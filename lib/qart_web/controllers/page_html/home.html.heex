@@ -8,8 +8,11 @@
       peer to peer commerce
     </p>
     <div class="mt-10 flex items-center justify-center gap-x-6">
-      <a href="https://github.com/afomi/qart"
-        class="rounded-md bg-gray-400 px-2.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+      <a
+        href="https://github.com/afomi/qart"
+        class="rounded-md bg-gray-400 px-2.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        target="_blank"
+      >
         GitHub
       </a>
       <.link href={~p"/start"}
@@ -27,9 +30,7 @@
         <div class="px-4 sm:px-6 lg:px-8">
           <div class="mx-auto flex justify-between gap-x-6 w-96">
             <div class="flex min-w-0 gap-x-4">
-              <div class={"size-12 flex-none rounded-full bg-gradient-to-br #{user.gradient}
-                text-white font-bold text-lg"}>
-              </div>
+              <.user_avatar user={user} />
               <div class="min-w-0 flex-auto">
                 <p class="text-sm/6 font-semibold text-gray-900">
                   <.link patch={~p"/#{user.try_handle}"}>

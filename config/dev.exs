@@ -1,5 +1,16 @@
 import Config
 
+config :qart, Qart.EventStore,
+  serializer: Commanded.Serialization.JsonSerializer,
+  username: "postgres",
+  password: "postgres",
+  hostname: "localhost",
+  database: "qart_eventstore_dev",
+  stacktrace: true,
+  show_sensitive_data_on_connection_error: true,
+  pool_size: 10,
+  schema: "public"
+
 # Configure your database
 config :qart, Qart.Repo,
   username: "postgres",

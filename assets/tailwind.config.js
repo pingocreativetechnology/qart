@@ -15,7 +15,25 @@ module.exports = {
     extend: {
       colors: {
         brand: "#FD4F00",
-      }
+      },
+      animation: {
+        'pulse-custom': 'pulse-custom 3s infinite',
+        'shake': 'shake 0.3s ease-in-out 2', // 2 iterations
+        // 'shake': 'shake 0.3s ease-in-out',
+      },
+      keyframes: {
+        'pulse-custom': {
+          '0%, 100%': { transform: 'scale(1)', opacity: 1 },
+          '50%': { transform: 'scale(1.1)', opacity: 0.8 },
+        },
+        'shake': {
+          '0%': { transform: 'rotate(0deg)' },
+          '25%': { transform: 'rotate(-10deg)' },
+          '50%': { transform: 'rotate(10deg)' },
+          '75%': { transform: 'rotate(-5deg)' },
+          '100%': { transform: 'rotate(0deg)' },
+        },
+      },
     },
   },
   plugins: [

@@ -68,6 +68,39 @@ Hooks.DownloadFollowers = {
   }
 };
 
+Hooks.ShakeEm = {
+  mounted() {
+    function getRandomTime() {
+        return Math.floor(Math.random() * (1000 + 1)) + 1000; // Between 1-5 seconds
+    }
+
+    function shakeRandomImage() {
+      let images = document.querySelectorAll("#favorited-items img, #following img, #followers img");
+      if (images.length === 0) return;
+
+      let randomIndex = Math.floor(Math.random() * images.length);
+      let randomImage = images[randomIndex];
+
+      randomImage.classList.add("animate-shake");
+      // Remove the class after animation completes
+      setTimeout(() => {
+        randomImage.classList.remove("animate-shake");
+      }, 1000);
+
+      // Schedule the next shake randomly
+      setTimeout(shakeRandomImage, getRandomTime());
+    }
+
+    // Start the first shake
+    setTimeout(shakeRandomImage, getRandomTime());
+
+    this.handleEvent("shake_em", (e) => {
+      console.log('hiiiiii')
+    });
+  }
+
+}
+
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
