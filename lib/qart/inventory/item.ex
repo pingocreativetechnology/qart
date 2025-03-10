@@ -3,6 +3,7 @@ defmodule Qart.Inventory.Item do
   import Ecto.Changeset
 
   schema "items" do
+    belongs_to :user, Qart.Accounts.User
     field :name, :string
     field :status, :string
     field :description, :string
@@ -20,8 +21,20 @@ defmodule Qart.Inventory.Item do
     attrs = normalize_tags(attrs)
 
     item
-    |> cast(attrs, [:name, :description, :price, :tags, :status])
-    |> validate_required([:name, :description])
+    |> cast(attrs, [
+      :user_id,
+      :name,
+      :description,
+      :price,
+      :tags,
+      :status,
+      :images
+    ])
+    |> validate_required([
+      :user_id,
+      :name,
+      :description
+    ])
   end
 
   defp normalize_tags(%{"tags" => tags} = attrs) when is_binary(tags) do

@@ -18,7 +18,13 @@ defmodule Qart.Inventory do
 
   """
   def list_items do
-    Repo.all(Item)
+    Repo.all(Item) |> Repo.preload(:user)
+  end
+
+  def list_user_items(user_id) do
+    Item
+    |> where(user_id: ^user_id)
+    |> Repo.all()
   end
 
   def list_items_by_tag(tag_name) do
@@ -42,7 +48,16 @@ defmodule Qart.Inventory do
       ** (Ecto.NoResultsError)
 
   """
-  def get_item!(id), do: Repo.get!(Item, id)
+  def get_item!(id),
+    do: Repo.get!(Item, id)
+      |> Repo.preload(:user)
+      |> maybe_compute_user_virtuals()
+
+  defp maybe_compute_user_virtuals(%Item{user: user} = item) when not is_nil(user) do
+    %{item | user: Qart.Accounts.maybe_compute_display_name(user)}
+  end
+
+  defp maybe_compute_user_virtuals(item), do: item
 
   @doc """
   Creates a item.

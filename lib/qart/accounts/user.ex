@@ -15,6 +15,7 @@ defmodule Qart.Accounts.User do
     field :try_handle, :string, virtual: true
     field :gradient, :string, virtual: true
     field :role, :string, virtual: true
+    field :avatar_url, :string
 
     has_many :favorites, Qart.Accounts.Favorite
     has_many :favorited_items, through: [:favorites, :item]
@@ -63,6 +64,11 @@ defmodule Qart.Accounts.User do
       submitting the form), this option can be set to `false`.
       Defaults to `true`.
   """
+  def changeset(user, attrs, opts \\ []) do
+    user
+    |> cast(attrs, [:avatar_url])
+  end
+
   def registration_changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:email, :password])

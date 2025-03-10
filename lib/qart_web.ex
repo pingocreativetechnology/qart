@@ -89,6 +89,8 @@ defmodule QartWeb do
       import QartWeb.CoreComponents
       import QartWeb.Gettext
 
+      import QartWeb.UserAvatar
+
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
 
