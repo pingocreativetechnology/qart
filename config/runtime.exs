@@ -20,6 +20,19 @@ if System.get_env("PHX_SERVER") do
   config :qart, QartWeb.Endpoint, server: true
 end
 
+config :qart, Qart.Vault,
+  ciphers: [
+    default: {Cloak.Ciphers.AES.GCM,
+      tag: "AES256",
+      key: System.get_env("VAULT_KEY") |> Base.decode64!,
+      iv_length: 12
+    }
+  ]
+
+config :handkit,
+  api_key: System.get_env("HANDCASH_API_KEY"),
+  api_secret: System.get_env("HANDCASH_API_SECRET")
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||
@@ -28,13 +41,35 @@ if config_env() == :prod do
       For example: ecto://USER:PASS@HOST/DATABASE
       """
 
+  # event_store_database_url =
+  #   System.get_env("EVENT_STORE_DATABASE_URL") ||
+  #     raise """
+  #     environment variable EVENT_STORE_DATABASE_URL is missing.
+  #     For example: ecto://USER:PASS@HOST/DATABASE
+  #     """
+
   maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
+
+  # config :qart, Qart.EventStore,
+  #   serializer: Commanded.Serialization.JsonSerializer,
+  #   ssl: [cacerts: :public_key.cacerts_get()],
+  #   url: event_store_database_url,
+  #   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
+  #   socket_options: maybe_ipv6
 
   config :qart, Qart.Repo,
     # ssl: true,
+    # ssl_opts: [
+    #   verify: :verify_peer,
+    #   cacerts: :public_key.cacerts_get()
+    # ],
+    # ssl: [cacerts: :public_key.cacerts_get()],
+    # ssl: [cacertfile: "/etc/ssl/certs/ca-certificates.crt"],
     url: database_url,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
     socket_options: maybe_ipv6
+
+  # config :commanded, event_store_adapter: Commanded.EventStore.Adapters.EventStore
 
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you
