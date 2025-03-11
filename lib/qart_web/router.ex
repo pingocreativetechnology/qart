@@ -22,7 +22,6 @@ defmodule QartWeb.Router do
   scope "/", QartWeb do
     pipe_through :browser
 
-    get "/start", PageController, :start
     get "/catalog", PageController, :catalog
     get "/map", PageController, :map
     get "/handcash_auth", PageController, :handcash_auth
@@ -80,7 +79,7 @@ defmodule QartWeb.Router do
   end
 
   scope "/", QartWeb do
-    pipe_through [:browser]
+    pipe_through [:browser, :require_authenticated_user]
 
     delete "/users/log_out", UserSessionController, :delete
 
