@@ -9,6 +9,8 @@ defmodule Qart.Accounts do
   alias Qart.Accounts.{User, UserToken, UserNotifier}
   alias Qart.Accounts.{Favorite}
   alias Qart.Inventory.Item
+  alias Qart.Wallet.Wallet
+  alias Qart.Wallet.Address
 
   ## Database getters
 
@@ -26,17 +28,18 @@ defmodule Qart.Accounts do
   """
   def list_users do
     Repo.all(User)
-      |> Enum.map(&maybe_compute_display_name/1)
+    |> Enum.map(&maybe_compute_display_name/1)
   end
 
   def get_favorited_items(user_id) do
-    user = Repo.get(User, user_id) |> Repo.preload(:favorited_items)
-    user.favorited_items # Returns the list of items
+    user = Repo.get(User, user_id)
+    |> Repo.preload(:favorited_items)
+    user.favorited_items
   end
 
   def get_following(user_id) do
     user = Repo.get(User, user_id)
-      |> Repo.preload(:following)
+    |> Repo.preload(:following)
 
     following_users =
       Enum.map(user.following, fn follow ->
@@ -48,14 +51,12 @@ defmodule Qart.Accounts do
 
   def get_followers(user_id) do
     user = Repo.get(User, user_id)
-      |> Repo.preload(:followers)
+    |> Repo.preload(:followers)
 
     follower_users =
       Enum.map(user.followers, fn follower ->
         follower |> maybe_compute_display_name
       end)
-
-    Qart.debug(follower_users |> length)
 
     follower_users
   end
@@ -70,8 +71,8 @@ defmodule Qart.Accounts do
   end
 
 
-  defp maybe_compute_display_name(nil), do: nil
-  defp maybe_compute_display_name(user) do
+  def maybe_compute_display_name(nil), do: nil
+  def maybe_compute_display_name(user) do
     %{user |
       display_name: Qart.Accounts.User.display_name(user),
       try_handle: Qart.Accounts.User.try_handle(user),
@@ -293,6 +294,38 @@ defmodule Qart.Accounts do
     end
   end
 
+  def get_user_wallet(user_id, wallet_id) do
+    Repo.get_by(Wallet,
+      user_id: user_id,
+      id: wallet_id
+    )
+  end
+
+  def get_user_active_wallet(user_id) do
+    query =
+      from f in Wallet,
+        where: f.user_id == ^user_id,
+        order_by: [asc: f.id]
+
+    query |> first |> Repo.one
+  end
+
+  def get_user_wallets(user_id) do
+    Wallet
+    |> where(user_id: ^user_id)
+    |> order_by(asc: :id)
+    |> Repo.all()
+  end
+
+  def get_wallet_addresses(wallet_id) do
+    query =
+      from f in Address,
+        where: f.wallet_id == ^wallet_id,
+        order_by: [asc: f.derivation_path]
+
+    Repo.all(query)
+  end
+
   ## Session
 
   @doc """
@@ -353,7 +386,7 @@ defmodule Qart.Accounts do
   and the token is deleted.
   """
 
-  def confirm_user(user) do
+  def confirm_user(user) do # DEVMODE: only called if Mix.env == :dev
     Repo.update!(User.confirm_changeset(user))
   end
 
@@ -384,8 +417,11 @@ defmodule Qart.Accounts do
       {:ok, %{to: ..., body: ...}}
 
   """
-  def deliver_user_reset_password_instructions(_user, _url_fun) do
-    {:ok, :skipped_email}
+
+  if Mix.env == :dev do # DEVMODE: USED ONLY FOR TEST
+    def deliver_user_reset_password_instructions(_user, _url_fun) do
+      {:ok, :skipped_email}
+    end
   end
 
   def deliver_user_reset_password_instructions(%User{} = user, reset_password_url_fun)

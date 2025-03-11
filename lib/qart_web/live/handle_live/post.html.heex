@@ -1,0 +1,163 @@
+<div>
+  <div>
+    <img class="h-32 w-full object-cover lg:h-48"
+      src={~p"/images/profile-bg.jpg"}
+      alt="">
+  </div>
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+    <div class="-mt-12 sm:-mt-16 sm:flex sm:items-end sm:space-x-5">
+      <div class="flex">
+        <.link patch={~p"/#{@user.try_handle}"}
+          class="hover:border-red-200">
+          <img class="size-24 rounded-full ring-4 ring-white hover:ring-8 sm:size-32"
+            src={~p"/images/profile-avatar.png"}
+            alt="">
+        </.link>
+      </div>
+      <div class="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
+        <div class="mt-6 min-w-0 flex-1 sm:hidden md:block">
+          <h1 class="truncate text-2xl font-bold text-gray-900">{@user.display_name}'s Store</h1>
+        </div>
+        <div class="mt-6 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
+
+        <%= if @current_user do %>
+          <.live_component
+            module={QartWeb.FollowButtonComponent}
+            id="follow-user"
+            current_user={@current_user}
+            profile_user_id={@user.id} />
+
+          <.live_component
+            module={QartWeb.PostButtonComponent}
+            current_user={@current_user}
+            target_user={@user}
+            open={false}
+            id="post-button" />
+
+          <.live_component
+            module={QartWeb.AskButtonComponent}
+            current_user={@current_user}
+            open={true}
+            id="ask-the-market" />
+
+          <.live_component
+            module={QartWeb.TipButtonComponent}
+            current_user={@current_user}
+            target_user={@user}
+            open={false}
+            id="tip-user" />
+        <% end %>
+
+          <.link href={"/#{@user.try_handle}/shop"}
+            class="inline-flex justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+          >
+            <svg class="-ml-0.5 mr-1.5 size-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+            </svg>
+            Shop
+          </.link>
+        </div>
+      </div>
+    </div>
+    <div class="mt-6 hidden min-w-0 flex-1 sm:block md:hidden">
+      <h1 class="truncate text-2xl font-bold text-gray-900">{@user.display_name}</h1>
+    </div>
+  </div>
+
+  <.live_component
+    module={QartWeb.TipComponent}
+    open={false}
+    target_user={@user}
+    id="tip"
+  />
+
+  <div class="max-w-lg">
+    <.modal :if={@live_action in [:post]}
+      id="post-modal"
+      show
+      on_cancel={JS.patch(~p"/#{@current_user.try_handle}/shop")}>
+      <.new_post
+        current_user={@current_user} />
+    </.modal>
+  </div>
+
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+    <div class="">
+      <div class="mx-auto max-w-2xl px-4 py-16 sm:px-6 lg:max-w-7xl lg:px-8">
+        <div class="flex items-center justify-between space-x-4 hidden">
+          <h2 class="text-lg text-gray-900">
+            Customers also viewed
+          </h2>
+          <a href="#" class="whitespace-nowrap text-sm font-medium text-indigo-600 hover:text-indigo-500">
+            View all
+            <span aria-hidden="true"> &rarr;</span>
+          </a>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 gap-x-8 gap-y-8 sm:grid-cols-2 sm:gap-y-10 lg:grid-cols-4">
+          <%= for item <- @items do %>
+          <div class="group relative">
+            <div class="relative">
+              <img src="https://tailwindui.com/plus-assets/img/ecommerce-images/product-page-05-related-product-01.jpg"
+                alt="Payment application dashboard screenshot with transaction table, financial highlights, and main clients on colorful purple background."
+                class="aspect-[4/3] w-full rounded-lg bg-gray-100 object-cover">
+              <div class="absolute inset-0 flex items-end p-4 opacity-0 group-hover:opacity-100" aria-hidden="true">
+                <div
+                  class="w-full rounded-md bg-white/75 px-4 py-2 text-center text-sm font-medium text-gray-900 backdrop-blur backdrop-filter">
+                  View Product</div>
+              </div>
+            </div>
+            <div class="mt-4 flex items-center justify-between space-x-8 text-base font-medium text-gray-900">
+              <h3>
+                <a href={~p"/items/#{item}"}>
+                  <span aria-hidden="true" class="absolute inset-0"></span>
+                  {item.name}
+                </a>
+              </h3>
+              <p>${item.price}</p>
+            </div>
+            <p class="mt-1 text-sm text-gray-500">UI Kit</p>
+          </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="bg-white">
+      <div class="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
+        <h2 class="text-xl font-bold text-gray-900">Customers also bought</h2>
+
+        <div class="mt-8 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
+          <div>
+            <div class="relative">
+              <div class="relative h-72 w-full overflow-hidden rounded-lg">
+                <img src="https://tailwindui.com/plus-assets/img/ecommerce-images/product-page-03-related-product-01.jpg"
+                  alt="Front of zip tote bag with white canvas, black canvas straps and handle, and black zipper pulls."
+                  class="size-full object-cover">
+              </div>
+              <div class="relative mt-4">
+                <h3 class="text-sm font-medium text-gray-900">Zip Tote Basket</h3>
+                <p class="mt-1 text-sm text-gray-500">White and black</p>
+              </div>
+              <div class="absolute inset-x-0 top-0 flex h-72 items-end justify-end overflow-hidden rounded-lg p-4">
+                <div aria-hidden="true" class="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-black opacity-50">
+                </div>
+                <p class="relative text-lg font-semibold text-white">$140</p>
+              </div>
+            </div>
+            <div class="mt-6">
+              <a href="#"
+                class="relative flex items-center justify-center rounded-md border border-transparent bg-gray-100 px-8 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200">Add
+                to bag<span class="sr-only">, Zip Tote Basket</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -9,7 +9,8 @@ defmodule Qart.Application do
   def start(_type, _args) do
     children = [
       QartWeb.Telemetry,
-      Qart.Repo,
+      # Qart.EventStore, # Event Store Database (write)
+      Qart.Repo, # Original Database (read)
       {DNSCluster, query: Application.get_env(:qart, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Qart.PubSub},
       # Start the Finch HTTP client for sending emails
@@ -17,7 +18,9 @@ defmodule Qart.Application do
       # Start a worker by calling: Qart.Worker.start_link(arg)
       # {Qart.Worker, arg},
       # Start to serve requests, typically the last entry
-      QartWeb.Endpoint
+      QartWeb.Endpoint,
+      Qart.Wallet.WalletSession,
+      Qart.Vault,
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
