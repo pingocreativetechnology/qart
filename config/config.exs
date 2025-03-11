@@ -7,9 +7,34 @@
 # General application configuration
 import Config
 
+# config :qart, Qart.EventStore,
+#   serializer: Commanded.Serialization.JsonSerializer,
+#   username: "postgres",
+#   password: "postgres",
+#   hostname: "localhost",
+#   database: "qart_eventstore_dev",
+#   stacktrace: true,
+#   show_sensitive_data_on_connection_error: true,
+#   pool_size: 10,
+#   schema: "public"
+
 config :qart,
   ecto_repos: [Qart.Repo],
+  # event_stores: [Qart.EventStore],
   generators: [timestamp_type: :utc_datetime]
+
+config :qart, Qart.Vault,
+  ciphers: [
+    default: {Cloak.Ciphers.AES.GCM,
+      tag: "AES256",
+      key: Base.decode64!(System.get_env("VAULT_KEY")),
+      iv_length: 12
+    }
+  ]
+
+config :handkit,
+  api_key: System.get_env("HANDCASH_API_KEY"),
+  api_secret: System.get_env("HANDCASH_API_SECRET")
 
 # Configures the endpoint
 config :qart, QartWeb.Endpoint,
@@ -56,7 +81,8 @@ config :tailwind,
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
-  metadata: [:request_id]
+  metadata: [:request_id],
+  filter_parameters: ["mnemonic", "seed"]
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
