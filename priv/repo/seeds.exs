@@ -111,14 +111,6 @@ available_items = [
 Enum.each(users, fn user ->
   num_items = Enum.random(1..10)
 
-  # available_item = available_items |> Enum.random
-  # # Qart.debug(user)
-  # available_item = Map.put(available_item, :user_id, user.id)
-  # # Qart.debug(available_item)
-
-  # item_changeset = %Item{} |> Item.changeset(available_item)
-  # Qart.debug(item_changeset)
-
   1..num_items
   |> Enum.each(fn _ ->
     available_item = available_items |> Enum.random

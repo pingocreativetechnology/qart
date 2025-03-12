@@ -7,7 +7,7 @@ defmodule Qart.Accounts do
   alias Qart.Repo
 
   alias Qart.Accounts.{User, UserToken, UserNotifier}
-  alias Qart.Accounts.{Favorite}
+  alias Qart.Accounts.{Favorite, Follow}
   alias Qart.Inventory.Item
   alias Qart.Wallet.Wallet
   alias Qart.Wallet.Address
@@ -38,27 +38,41 @@ defmodule Qart.Accounts do
   end
 
   def get_following(user_id) do
-    user = Repo.get(User, user_id)
-    |> Repo.preload(:following)
-
-    following_users =
-      Enum.map(user.following, fn follow ->
-        follow |> maybe_compute_display_name
-      end)
-
-    following_users
+    from(u in User,
+      join: f in Follow, on: f.user_id == ^user_id and f.followed_user_id == u.id,
+      left_join: f2 in Follow, on: f2.user_id == u.id and f2.followed_user_id == ^user_id,
+      where: is_nil(f2.id),
+      select: u
+    )
+    |> Repo.all()
+    |> Enum.map(fn user ->
+      user |> maybe_compute_display_name
+    end)
   end
 
   def get_followers(user_id) do
-    user = Repo.get(User, user_id)
-    |> Repo.preload(:followers)
+    from(u in User,
+      join: f in Follow, on: f.followed_user_id == ^user_id and f.user_id == u.id,
+      left_join: f2 in Follow, on: f2.user_id == ^user_id and f2.followed_user_id == u.id,
+      where: is_nil(f2.id),
+      select: u
+    )
+    |> Repo.all()
+    |> Enum.map(fn user ->
+      user |> maybe_compute_display_name
+    end)
+  end
 
-    follower_users =
-      Enum.map(user.followers, fn follower ->
-        follower |> maybe_compute_display_name
-      end)
-
-    follower_users
+  def get_mutuals(user_id) do
+    from(u in User,
+      join: f1 in Follow, on: f1.user_id == ^user_id and f1.followed_user_id == u.id,
+      join: f2 in Follow, on: f2.followed_user_id == ^user_id and f2.user_id == u.id,
+      select: u
+    )
+    |> Repo.all()
+    |> Enum.map(fn user ->
+      user |> maybe_compute_display_name
+    end)
   end
 
   def get_joined_favorited_items(user_id) do
@@ -79,6 +93,43 @@ defmodule Qart.Accounts do
       gradient: Qart.Accounts.User.gradient(user),
       role: Qart.Accounts.User.role(user)
     }
+  end
+
+  def get_handcash_user_info(handcash_profile) do
+   %{"public_profile" => %{
+        "paymail" => email,
+        "display_name" => display_name,
+        "id" => provider_id,
+        "avatar_url" => avatar_url,
+      }
+    } = handcash_profile
+
+    {:ok, %{
+      email: email,
+      name: display_name,
+      provider_uid: provider_id,
+      provider: "handcash",
+      avatar_url: avatar_url
+      }
+    }
+  end
+
+  # used for Handcash
+  def find_or_create_user(%{email: email, name: name, provider: provider, provider_uid: uid}) do
+    case Repo.get_by(User, email: email) do
+      nil ->
+        %User{}
+        |> User.handcash_changeset(%{
+          email: email,
+          name: name,
+          provider: provider,
+          provider_uid: uid
+        })
+        |> Repo.insert()
+
+      user ->
+        {:ok, user}
+    end
   end
 
   def get_user_by_email(email) when is_binary(email) do

@@ -17,6 +17,9 @@ defmodule Qart.Accounts.User do
     field :role, :string, virtual: true
     field :avatar_url, :string
 
+    field :provider, :string  # :handcash
+    field :provider_uid, :string # handcash :id
+
     has_many :favorites, Qart.Accounts.Favorite
     has_many :favorited_items, through: [:favorites, :item]
 
@@ -67,6 +70,15 @@ defmodule Qart.Accounts.User do
   def changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:avatar_url])
+  end
+
+  def handcash_changeset(user, attrs, opts \\ []) do
+    throwaway_password = :crypto.strong_rand_bytes(32) |> Base.encode64()
+
+    user
+    |> cast(attrs, [:email, :password, :provider, :provider_uid])
+    |> validate_required([:email, :provider, :provider_uid])
+    |> put_change(:hashed_password, Bcrypt.hash_pwd_salt(throwaway_password))
   end
 
   def registration_changeset(user, attrs, opts \\ []) do

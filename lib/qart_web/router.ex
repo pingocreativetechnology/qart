@@ -72,7 +72,6 @@ defmodule QartWeb.Router do
 
     live_session :require_authenticated_user,
       on_mount: [{QartWeb.UserAuth, :ensure_authenticated}] do
-      live "/handle/set", HandleLive, :index
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
     end
@@ -85,7 +84,6 @@ defmodule QartWeb.Router do
 
     live_session :current_user,
       on_mount: [{QartWeb.UserAuth, :mount_current_user}] do
-
 
       live "/wallet", WalletLive.Show, :active
       live "/wallets", WalletLive.Index, :list
@@ -106,6 +104,7 @@ defmodule QartWeb.Router do
       live "/invite", HandleLive.Invite, :invite
 
       # live "/posts", HandleLive.Show, :show
+      live "/handle/set", HandleLive, :index
       live "/:handle/posts/new", HandleLive.Show, :post
       live "/:handle/shop", HandleLive.Shop, :shop
       live "/:handle/avatar", AvatarUploadLive, :index

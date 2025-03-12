@@ -42,12 +42,28 @@ defmodule QartWeb.PageController do
 
   def handcash_auth(conn, %{"authToken" => auth_token}) do
     handcash_client = Handkit.create_connect_client(auth_token)
-    profile = Handkit.Profile.get_current_profile(handcash_client)
+    {:ok, handcash_profile} = Handkit.Profile.get_current_profile(handcash_client)
 
-    conn = conn
-      |> put_session(:handcash_oauth_token, auth_token)
-      |> configure_session(renew: true)
-      |> put_flash(:info, "Successfully authenticated via Handcash")
-      |> redirect(to: "/")
+    case Qart.Accounts.get_handcash_user_info(handcash_profile) do
+      {:ok, user_info} ->
+        case Accounts.find_or_create_user(user_info) do
+          {:ok, user} ->
+            conn
+            |> QartWeb.UserAuth.log_in_user(user)
+            |> put_flash(:info, "Successfully authenticated via Handcash")
+            |> redirect(to: "/")
+
+          {:error, changeset} ->
+            conn
+            |> put_flash(:error, "Could not create user")
+            |> redirect(to: "/users/log_in")
+        end
+
+      {:error, reason} ->
+        conn
+        |> put_flash(:error, "OAuth failed: #{reason}")
+        |> redirect(to: "/users/log_in")
+    end
   end
+
 end
