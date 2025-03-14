@@ -11,6 +11,12 @@ defmodule QartWeb.PageController do
     )
   end
 
+  def about(conn, _params) do
+    render(conn, :about,
+      page_title: "About"
+    )
+  end
+
   def catalog(conn, _params) do
     render(conn, :catalog,
       items: Qart.Inventory.list_items(),

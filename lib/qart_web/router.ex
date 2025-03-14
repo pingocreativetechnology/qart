@@ -22,6 +22,7 @@ defmodule QartWeb.Router do
   scope "/", QartWeb do
     pipe_through :browser
 
+    get "/about", PageController, :about
     get "/catalog", PageController, :catalog
     get "/map", PageController, :map
     get "/handcash_auth", PageController, :handcash_auth
