@@ -32,13 +32,13 @@ defmodule Qart.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:bandit, "~> 1.6.7"},
+      {:bandit, "~> 1.6.8"},
       {:bcrypt_elixir, "~> 3.0"},
       {:bsv, "~> 2.1"},
       {:cloak_ecto, "~> 1.1"},
       {:commanded, "~> 1.4"},
       {:commanded_eventstore_adapter, "~> 1.4"},
-      {:eventstore, "~> 1.4"},
+      {:eventstore, "~> 1.4.8"},
 
       {:ecto_sql, "~> 3.10"},
       {:esbuild, "~> 0.9", runtime: Mix.env() == :dev},
@@ -50,10 +50,8 @@ defmodule Qart.MixProject do
       {:phoenix_live_view, "~> 1.0.5"},
       {:postgrex, ">= 0.20.0"},
       {:phoenix_live_dashboard, "~> 0.8.3"},
-
       {:phoenix_view, ">= 2.0.4"},
       {:phoenix_html_helpers, "~> 1.0"},
-
       {:tailwind, "~> 0.3.1", runtime: Mix.env() == :dev},
       {:heroicons,
         github: "tailwindlabs/heroicons",
@@ -63,17 +61,19 @@ defmodule Qart.MixProject do
         compile: false,
         depth: 1
       },
-      {:swoosh, "~> 1.17.10"},
+      {:mogrify, "~> 0.9.1"}, # to process images
+      {:swoosh, "~> 1.18.2"},
       {:finch, "~> 0.13"},
       {:telemetry_metrics, "~> 1.1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
-      {:dns_cluster, "~> 0.1.1"},
+      {:dns_cluster, "~> 0.2.0"},
       {:handkit, "~> 0.2", git: "https://github.com/afomi/handkit.git", branch: "wip"},
       {:uuid, "~> 1.1"},
       # For tests
       {:faker, "~> 0.17", only: :dev},
+      {:tesla, "~> 1.14.1"},
     ]
   end
 
