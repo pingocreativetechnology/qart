@@ -18,10 +18,15 @@ import Config
 #   pool_size: 10,
 #   schema: "public"
 
+config :bsv,
+  network: System.get_env("BSV_NETWORK", "test")
+
 config :qart,
   ecto_repos: [Qart.Repo],
   # event_stores: [Qart.EventStore],
   generators: [timestamp_type: :utc_datetime]
+
+config :tesla, adapter: Tesla.Adapter.Mint
 
 # Configures the endpoint
 config :qart, QartWeb.Endpoint,
