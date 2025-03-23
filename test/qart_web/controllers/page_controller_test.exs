@@ -3,7 +3,7 @@ defmodule QartWeb.PageControllerTest do
 
   test "GET /", %{conn: conn} do
     conn = get(conn, ~p"/")
-    assert html_response(conn, 200) =~ "open-source software"
+    assert html_response(conn, 200) =~ "open source software"
     assert html_response(conn, 200) =~ "qart.app"
     assert html_response(conn, 200) =~ "peer to peer commerce"
   end

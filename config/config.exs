@@ -19,7 +19,7 @@ import Config
 #   schema: "public"
 
 config :bsv,
-  network: System.get_env("BSV_NETWORK", "test")
+  network: System.get_env("BSV_NETWORK", "test") |> String.to_atom
 
 config :qart,
   ecto_repos: [Qart.Repo],

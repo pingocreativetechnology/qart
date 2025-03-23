@@ -1,25 +1,58 @@
+<div class="mt-4 text-right">
+  <a href={~p"/wallet/"}
+    class="my-2 rounded-md px-3 py-2 text-sm font-semibold text-slate-800">
+    <span>
+      Active Wallet
+      <span aria-hidden="true">&rarr;</span>
+    </span>
+  </a>
+</div>
+
 <div class="max-w-xl mx-auto">
 
   <div class="mt-4 flex justify-between items-center w-full mb-2 border-b">
+
     <div
-    class="text-2xl">
+      class="text-2xl">
       Wallets
     </div>
 
-    <button
-      type="button"
-      phx-click="generate_wallet"
-      class="my-2 inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold  shadow-sm ring-1 ring-inset text-gray-900 bg-white  hover:bg-gray-50 ring-gray-300">
-      <svg class="-ml-0.5 mr-1.5 size-5 text-white-400" xmlns="http://www.w3.org/2000/svg" fill="none"
-        viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round"
-          d="M15.042 21.672 13.684 16.6m0 0-2.51 2.225.569-9.47 5.227 7.917-3.286-.672ZM12 2.25V4.5m5.834.166-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243-1.59-1.59" />
-      </svg>
-      <span>Generate Wallet</span>
-    </button>
+    <div
+      class="flex space-x-2">
+      <button
+        type="button"
+        phx-click="generate_wallet"
+        class="my-2 inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold  shadow-sm ring-1 ring-inset text-gray-900 bg-white hover:bg-gray-50 ring-gray-300">
+        <svg class="-ml-0.5 mr-1.5 size-5 text-white-400" xmlns="http://www.w3.org/2000/svg" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M15.042 21.672 13.684 16.6m0 0-2.51 2.225.569-9.47 5.227 7.917-3.286-.672ZM12 2.25V4.5m5.834.166-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243-1.59-1.59" />
+        </svg>
+        <span>Generate Wallet</span>
+      </button>
+      <a href={~p"/transactions"}
+        class="my-2 inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold  shadow-sm ring-1 ring-inset text-gray-900 bg-white hover:bg-gray-50 ring-gray-300">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+          class="size-5 mr-1">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+        </svg>
+        Transactions
+      </a>
+      <a href={~p"/wallet/utils"}
+        class="my-2 inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold  shadow-sm ring-1 ring-inset text-slate-800 bg-orange-100  hover:bg-orange-200 ring-orange-200">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+          class="size-5 mr-1">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M21.75 6.75a4.5 4.5 0 0 1-4.884 4.484c-1.076-.091-2.264.071-2.95.904l-7.152 8.684a2.548 2.548 0 1 1-3.586-3.586l8.684-7.152c.833-.686.995-1.874.904-2.95a4.5 4.5 0 0 1 6.336-4.486l-3.276 3.276a3.004 3.004 0 0 0 2.25 2.25l3.276-3.276c.256.565.398 1.192.398 1.852Z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4.867 19.125h.008v.008h-.008v-.008Z" />
+        </svg>
+        Utilities
+      </a>
+    </div>
   </div>
 
-  <%= if @wallets do %>
+  <%= if @wallets |> length > 0 do %>
   <div>
   <%= for wallet <- @wallets do %>
     <a href={~p"/wallets/#{wallet.id}"}
@@ -31,11 +64,28 @@
         <path stroke-linecap="round" stroke-linejoin="round"
           d="M21 12a2.25 2.25 0 0 0-2.25-2.25H15a3 3 0 1 1-6 0H5.25A2.25 2.25 0 0 0 3 12m18 0v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 9m18 0V6a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 6v3" />
       </svg>
-      <span>Wallet <%= wallet.id %></span>
+      <span>Wallet {wallet.id} {wallet.network}- </span>
     </a>
     <br>
   <% end %>
   </div>
+<% else %>
+<div
+  class="text-center py-12">
+  <p class="mt-1 text-sm text-gray-500">Get started by creating a new Wallet.</p>
+  <div class="mt-6">
+    <button type="button" phx-click="generate_wallet"
+      class="my-2 inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold  shadow-sm ring-1 ring-inset text-gray-900 bg-white  hover:bg-gray-50 ring-gray-300">
+      <svg class="-ml-0.5 mr-1.5 size-5 text-white-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+        stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M15.042 21.672 13.684 16.6m0 0-2.51 2.225.569-9.47 5.227 7.917-3.286-.672ZM12 2.25V4.5m5.834.166-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243-1.59-1.59" />
+      </svg>
+      <span>Generate Wallet</span>
+    </button>
+  </div>
+</div>
+
 <% end %>
 
 <%= if @wallet do %>
@@ -47,27 +97,13 @@
       </li>
     <% end %>
   </ul>
+<% else %>
+none
 <% end %>
 
   <hr
     class="mt-24">
   <div>
-    <button type="button" phx-click="generate_mnemonic"
-      class={"my-2 inline-flex justify-center rounded-md px-3 py-2
-      text-sm font-semibold shadow-sm ring-1 ring-inset text-gray-900 " <>
-            " bg-orange-100 hover:bg-gray-50 ring-gray-300"}>
-      <svg class="-ml-0.5 mr-1.5 size-5 text-gray-800" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-        stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round"
-          d="M15.042 21.672 13.684 16.6m0 0-2.51 2.225.569-9.47 5.227 7.917-3.286-.672ZM12 2.25V4.5m5.834.166-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243-1.59-1.59" />
-      </svg>
-      <span>Generate Mnemonic</span>
-    </button>
-    <p class="text-xs mt-1 text-gray-600">
-      This is a one-off function.
-      The mnemonic is not saved: store the 12 words yourself if want to re-use it.
-    </p>
-
     <div
       class="text-xs mt-4">
       Mnemonic:

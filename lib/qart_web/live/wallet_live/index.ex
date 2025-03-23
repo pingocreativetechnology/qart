@@ -21,23 +21,6 @@ defmodule QartWeb.WalletLive.Index do
     {:ok, assign(socket, mnemonic_shown: false, user_id: user_id, addresses: [])}
   end
 
-
-  def handle_event("generate_mnemonic", _, socket) do
-    mnemonic = BSV.Mnemonic.new()
-    seed = BSV.Mnemonic.to_seed(mnemonic)
-    extkey = BSV.ExtKey.from_seed!(seed)
-    derivation_path = "m/44'/0'/0'/1"
-    child = BSV.ExtKey.derive(extkey, derivation_path)
-    address = BSV.Address.from_pubkey(child.pubkey)
-    address_string = BSV.Address.to_string(address)
-    socket =
-      socket
-      |> assign(mnemonic: mnemonic)
-      |> assign(derivation_path: derivation_path)
-      |> assign(address_string: address_string)
-    {:noreply, socket}
-  end
-
   ### NEW WALLET STUFF
   @impl true
   def handle_event("generate_wallet", _params, socket) do

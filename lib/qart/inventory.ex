@@ -32,6 +32,8 @@ defmodule Qart.Inventory do
       where: ^tag_name in i.tags
     )
     |> Repo.all()
+    |> Repo.preload(:user)
+    |> Enum.map(&maybe_compute_user_virtuals/1)
   end
 
   @doc """

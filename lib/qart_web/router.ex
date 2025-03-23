@@ -23,6 +23,7 @@ defmodule QartWeb.Router do
     pipe_through :browser
 
     get "/about", PageController, :about
+    get "/public", PageController, :public
     get "/catalog", PageController, :catalog
     get "/map", PageController, :map
     get "/handcash_auth", PageController, :handcash_auth
@@ -86,7 +87,10 @@ defmodule QartWeb.Router do
     live_session :current_user,
       on_mount: [{QartWeb.UserAuth, :mount_current_user}] do
 
+
       live "/wallet", WalletLive.Show, :active
+      live "/wallet/utils", UtilsLive, :index
+      live "/wallet/tx", WalletLive.Tx, :active
       live "/wallets", WalletLive.Index, :list
       live "/wallets/:id", WalletLive.Show, :show
 
@@ -103,6 +107,14 @@ defmodule QartWeb.Router do
       live "/items/:id", ItemLive.Show, :show
       live "/items/:id/show/edit", ItemLive.Show, :edit
       live "/invite", HandleLive.Invite, :invite
+
+
+      live "/transactions", TransactionLive.Index, :index
+      live "/transactions/new", TransactionLive.Index, :new
+      live "/transactions/:id/edit", TransactionLive.Index, :edit
+
+      live "/transactions/:id", TransactionLive.Show, :show
+      live "/transactions/:id/show/edit", TransactionLive.Show, :edit
 
       # live "/posts", HandleLive.Show, :show
       live "/handle/set", HandleLive, :index
