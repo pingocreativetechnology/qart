@@ -4,10 +4,8 @@ defmodule QartWeb.PageController do
 
   def home(conn, _params) do
     render(conn, :home,
-      layout: false,
       page_title: "Home",
-      page_description: "Peer to peer commerce",
-      users: Qart.Accounts.list_users
+      page_description: "Peer to peer commerce"
     )
   end
 
@@ -17,10 +15,17 @@ defmodule QartWeb.PageController do
     )
   end
 
+  def public(conn, _params) do
+    render(conn, :public,
+      page_title: "Public",
+      users: Qart.Accounts.list_users
+    )
+  end
+
   def catalog(conn, _params) do
     render(conn, :catalog,
-      items: Qart.Inventory.list_items(),
-      page_title: "Catalog"
+      page_title: "Catalog",
+      items: Qart.Inventory.list_items()
     )
   end
 

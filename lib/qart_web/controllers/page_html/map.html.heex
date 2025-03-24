@@ -1,0 +1,51 @@
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<style>
+  #map {
+    height: 100%;
+    width: 100%;
+  }
+</style>
+
+<div class="h-screen flex flex-col">
+  <div id="map" class="h-full w-full flex-grow relative">
+    <button
+      id="toggleBtn"
+      onclick="toggleNav()"
+      class="absolute top-4 right-4 bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded-lg"
+      style="z-index: 1000;">
+      Full screen
+    </button>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var map = L.map('map').setView([38.3566, -121.9877], 13); // Center on Vacaville, CA
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    L.marker([38.3566, -121.9877]).addTo(map)
+      .bindPopup("Vacaville, CA")
+      .openPopup();
+    });
+
+   function toggleNav() {
+      var navbar = document.querySelector("header");
+      var toggleBtn = document.getElementById("toggleBtn");
+
+      if (navbar.style.transform === "translateY(-100%)") {
+        navbar.style.transform = "translateY(0)";
+        navbar.classList.remove("hidden");
+        toggleBtn.textContent = "Full screen";
+
+      } else {
+        navbar.style.transform = "translateY(-100%)";
+        navbar.classList.add("hidden");
+        toggleBtn.textContent = "Show Nav";
+
+      }
+    }
+</script>
