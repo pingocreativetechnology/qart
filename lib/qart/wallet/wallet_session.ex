@@ -20,6 +20,10 @@ defmodule Qart.Wallet.WalletSession do
     GenServer.call(__MODULE__, {:derive_new_address, wallet_id})
   end
 
+  def derive_keypair(wallet_id, derivation_path) do
+    GenServer.call(__MODULE__, {:derive_keypair, wallet_id, derivation_path})
+  end
+
   def clear_wallet() do
     GenServer.cast(__MODULE__, :clear_wallet)
   end
@@ -45,7 +49,8 @@ defmodule Qart.Wallet.WalletSession do
         mnemonic = BSV.Mnemonic.new()
         seed = BSV.Mnemonic.to_seed(mnemonic)
         extkey = BSV.ExtKey.from_seed!(seed)
-        wallet = %Wallet{user_id: user_id, seed: seed, current_derivation: 0}
+        bsv_network = Application.get_env(:bsv, :network)
+        wallet = %Wallet{user_id: user_id, seed: seed, network: bsv_network, current_derivation: 0}
         {:ok, saved_wallet} = Repo.insert(wallet)
 
         {:reply, {:ok, saved_wallet, mnemonic}, saved_wallet}
@@ -56,7 +61,8 @@ defmodule Qart.Wallet.WalletSession do
       mnemonic = BSV.Mnemonic.new()
       seed = BSV.Mnemonic.to_seed(mnemonic)
       extkey = BSV.ExtKey.from_seed!(seed)
-      wallet = %Wallet{user_id: user_id, seed: seed, current_derivation: 0}
+      bsv_network = Application.get_env(:bsv, :network)
+      wallet = %Wallet{user_id: user_id, seed: seed, network: bsv_network, current_derivation: 0}
       {:ok, saved_wallet} = Repo.insert(wallet)
 
       {:reply, {:ok, saved_wallet, mnemonic}, saved_wallet}
@@ -71,7 +77,6 @@ defmodule Qart.Wallet.WalletSession do
 
       # Generate address from seed and derivation path
       {:ok, address_string} = generate_bitcoin_address(wallet.seed, derivation_path)
-
       new_address = %Address{
         wallet_id: wallet.id,
         address: address_string,
@@ -89,12 +94,30 @@ defmodule Qart.Wallet.WalletSession do
     end
   end
 
+  def handle_call({:derive_keypair, wallet_id, derivation_path}, _from, state) do
+    wallet = Repo.get_by(Wallet, id: wallet_id)
+
+    if wallet do
+      {:ok, keypair} = generate_bitcoin_keypair(wallet.seed, derivation_path)
+
+      {:reply, {:ok, keypair}, wallet}
+    else
+      {:reply, {:error, "Wallet not found 22"}, state}
+    end
+  end
+
   defp generate_bitcoin_address(seed, derivation_path) do
     extkey = BSV.ExtKey.from_seed!(seed)
     child = BSV.ExtKey.derive(extkey, derivation_path)
     address = BSV.Address.from_pubkey(child.pubkey)
     address_string = BSV.Address.to_string(address)
     {:ok, address_string}
+  end
+
+  defp generate_bitcoin_keypair(seed, derivation_path) do
+    extkey = BSV.ExtKey.from_seed!(seed)
+    keypair = BSV.ExtKey.derive(extkey, derivation_path)
+    {:ok, keypair}
   end
 
   # def handle_call(:get_wallet, _from, state) do

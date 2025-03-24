@@ -8,12 +8,11 @@ defmodule QartWeb.UserLoginLive do
     {:ok,
       assign(socket,
         form: form,
-        handcash_auth_url: handcash_auth_url),
+        handcash_auth_url: handcash_auth_url,
         temporary_assigns: [
-          form: form,
-          # html_class: "h-full bg-white",
-          # body_class: "h-full",
+          form: form
         ]
+      )
     }
   end
 end
