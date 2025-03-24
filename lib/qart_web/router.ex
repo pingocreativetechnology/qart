@@ -27,7 +27,6 @@ defmodule QartWeb.Router do
     get "/catalog", PageController, :catalog
     get "/map", PageController, :map
     get "/handcash_auth", PageController, :handcash_auth
-    # get "/:handle", PageController, :profile
     get "/", PageController, :home
   end
 

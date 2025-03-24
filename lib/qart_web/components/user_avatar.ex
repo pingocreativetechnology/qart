@@ -12,7 +12,7 @@ defmodule QartWeb.UserAvatar do
       <.user_avatar user={@user} class="w-12 h-12" />
   """
   attr :user, :map, required: true
-  attr :class, :string, default: "user-avatar size-14 flex-none rounded-full inline-block mr-2 mb-3 align-top"
+  attr :class, :string, default: "user-avatar size-8 md:size-14 flex-none rounded-full inline-block mr-1 md:mr-2 mb-3 align-top"
 
   def user_avatar(assigns) do
     ~H"""
