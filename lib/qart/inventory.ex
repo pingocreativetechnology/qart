@@ -55,11 +55,11 @@ defmodule Qart.Inventory do
       |> Repo.preload(:user)
       |> maybe_compute_user_virtuals()
 
-  defp maybe_compute_user_virtuals(%Item{user: user} = item) when not is_nil(user) do
+  def maybe_compute_user_virtuals(%Item{user: user} = item) when not is_nil(user) do
     %{item | user: Qart.Accounts.maybe_compute_display_name(user)}
   end
 
-  defp maybe_compute_user_virtuals(item), do: item
+  def maybe_compute_user_virtuals(item), do: item
 
   @doc """
   Creates a item.

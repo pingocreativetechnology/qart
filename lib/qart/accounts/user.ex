@@ -69,6 +69,12 @@ defmodule Qart.Accounts.User do
   """
   def changeset(user, attrs, opts \\ []) do
     user
+    |> cast(attrs, [:email, :avatar_url, :password])
+    |> maybe_hash_password(opts)
+  end
+
+  def avatar_changeset(user, attrs, opts \\ []) do
+    user
     |> cast(attrs, [:avatar_url])
   end
 

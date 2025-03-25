@@ -66,7 +66,17 @@
   </div>
 
   <div class="flex mt-8 mb-8">
+    <div>
+      <a
+        href={~p"/handle/set"}
+        class={"inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset text-gray-900 bg-white hover:bg-gray-50 ring-gray-300"}
+      >
+        Set a handle
+      </a>
+    </div>
+
     <div
+      class="ml-2"
       phx-hook="DownloadFollowing"
       id="download-follows">
       <button

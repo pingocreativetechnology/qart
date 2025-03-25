@@ -1,20 +1,49 @@
-<div class="flex items-center gap-x-6 bg-slate-800 px-6 py-2.5 sm:px-3.5 sm:before:flex-1">
+<%= if Mix.env == :dev do %>
+<div
+  name="development-banner"
+  class="flex items-center gap-x-6 bg-cyan-200 px-6 py-2.5 sm:px-3.5 sm:before:flex-1">
+  <p class="text-sm/6 text-slate-800">
+    <strong class="font-semibold">Development environment</strong>
+  </p>
+  <div class="flex flex-1 justify-end">
+    &nbsp;
+  </div>
+</div>
+<% end %>
+<%= if System.get_env("SHOW_STAGING_BANNER")=="true" do %>
+<div
+  name="staging-banner"
+  class="flex items-center gap-x-6 bg-yellow-200 px-6 py-2.5 sm:px-3.5 sm:before:flex-1">
+  <p class="text-sm/6 text-slate-800">
+    <strong class="font-semibold">Staging site</strong>
+    &middot;
+    <strong class="font-semibold">the database is reset regularly</strong>
+    &middot;
+    <span>NOT FOR PRODUCTION USE</span>
+  </p>
+  <div class="flex flex-1 justify-end">
+    &nbsp;
+  </div>
+</div>
+<% end %>
+
+<div
+  name="beta-banner"
+  class="flex items-center gap-x-6 bg-slate-800 px-6 py-2.5 sm:px-3.5 sm:before:flex-1">
   <p class="text-sm/6 text-gray-200">
-    <a href="#">
-      <strong class="font-semibold">Qart is being developed</strong>
-      &middot;
-      <span class="text-yellow-200">not yet production ready</span>
-      &middot;
-      last updated March 24, 2025&nbsp;
-      <span aria-hidden="true">&rarr;</span>
-      <a href="https://github.com/afomi/qart/issues/new"
-        class="text-blue-300"
-        target="_blank">Provide feedback</a>
-      &middot;
-      <a href="https://github.com/afomi/qart"
-        class="text-green-400"
-        target="_blank">Contribute</a>
-    </a>
+    <strong class="font-semibold">Qart is being developed</strong>
+    &middot;
+    <span class="text-yellow-200">not yet production ready</span>
+    &middot;
+    last updated March 24, 2025&nbsp;
+    <span aria-hidden="true">&rarr;</span>
+    <a href="https://github.com/afomi/qart/issues/new"
+      class="text-blue-300"
+      target="_blank">Provide feedback</a>
+    &middot;
+    <a href="https://github.com/afomi/qart"
+      class="text-green-400"
+      target="_blank">Contribute</a>
   </p>
   <div class="flex flex-1 justify-end">
     &nbsp;
@@ -92,6 +121,14 @@
         class="inline-flex justify-center rounded-md px-2 py-1 ring-1 text-xs
         ring-inset text-gray-900 bg-white hover:bg-gray-50 ring-gray-100">
         <span>Catalog</span>
+      </.link>
+    </li>
+    <li>
+      <.link
+        href={~p"/map"}
+        class="inline-flex justify-center rounded-md px-2 py-1 ring-1 text-xs
+        ring-inset text-gray-900 bg-white hover:bg-gray-50 ring-gray-100">
+        <span>Map</span>
       </.link>
     </li>
     <%= if @current_user do %>
