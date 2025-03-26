@@ -74,9 +74,15 @@ defmodule Qart.Inventory do
 
   """
   def create_item(attrs \\ %{}) do
-    %Item{}
+    {:ok, item} = %Item{}
     |> Item.changeset(attrs)
     |> Repo.insert()
+
+    item = item
+    |> Repo.preload(:user)
+    |> maybe_compute_user_virtuals()
+
+    {:ok, item}
   end
 
   @doc """
