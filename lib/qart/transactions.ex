@@ -207,19 +207,15 @@ defmodule Qart.Transactions do
       {:error, %Mint.TransportError{reason: :nxdomain}} ->
         {:error, nil}
 
-      response ->
-        Qart.debug(response.body)
-        # json = response.body |> Jason.decode!
+      # What's on Chain response
+      {:ok, response} ->
+        # Convert hex to base64
+        base64 = response.body |> hex_to_base64()
 
-        # Qart.debug(json)
-        z = response.body |> hex_to_base64()
-        Qart.debug z
-
-        # What's on Chain response
         new_tx = %{
           txid: txid,
           # raw: response.body,
-          raw: z,
+          raw: base64,
           # outputs: json["outputs"],
           # addresses: json["addresses"],
         }

@@ -18,7 +18,9 @@ defmodule Qart.Inventory do
 
   """
   def list_items do
-    Repo.all(Item) |> Repo.preload(:user)
+    Repo.all(Item)
+      |> Repo.preload(:user)
+      |> Enum.map(&maybe_compute_user_virtuals/1)
   end
 
   def list_user_items(user_id) do
@@ -74,15 +76,20 @@ defmodule Qart.Inventory do
 
   """
   def create_item(attrs \\ %{}) do
-    {:ok, item} = %Item{}
-    |> Item.changeset(attrs)
-    |> Repo.insert()
+    case %Item{}
+      |> Item.changeset(attrs)
+      |> Repo.insert() do
 
-    item = item
-    |> Repo.preload(:user)
-    |> maybe_compute_user_virtuals()
+      {:ok, item} ->
+        item = item
+        |> Repo.preload(:user)
+        |> maybe_compute_user_virtuals()
 
-    {:ok, item}
+        {:ok, item}
+
+      {:error, %Ecto.Changeset{}} ->
+        {:error, %Ecto.Changeset{}}
+    end
   end
 
   @doc """

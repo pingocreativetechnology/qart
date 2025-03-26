@@ -17,7 +17,7 @@ defmodule Qart.TransactionsFixtures do
         notes: "some notes",
         inputs: ["some inputs"],
         outputs: ["some outputs"],
-        raw: "some raw",
+        raw: "AQAAAAFYjpS29sCiqSWw2Acrf7a0qucKdIfwAklchldIAy19pUgAAABqRzBEAiBScc0e0aWrxEttmxF1swzCQMgU8u9k2QP09nPeS8hPLQIgBqEQR9gDPayOsz9EBy6XFK6T5dzPbg5Kfcy1o0PQ6/tBIQKSrNtXx4jB6Mg82wro8j4HkTm6e6G8z2ezFlPHrxLEtP////8BQIYBAAAAAAAZdqkUUoN1xA79dzu8IbgUZTa3PCKaCgaIrAAAAAA=",
         spent: true,
         txid: "some txid",
         version: "some version"

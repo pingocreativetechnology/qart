@@ -7,6 +7,7 @@ defmodule Qart.InventoryTest do
     alias Qart.Inventory.Item
 
     import Qart.InventoryFixtures
+    import Qart.UserFixtures
 
     @invalid_attrs %{name: nil, status: nil, description: nil, price: nil, tags: nil}
 
@@ -21,7 +22,8 @@ defmodule Qart.InventoryTest do
     end
 
     test "create_item/1 with valid data creates a item" do
-      valid_attrs = %{name: "some name", status: "some status", description: "some description", price: "120.5", tags: ["hello", "there"]}
+      user = user_fixture()
+      valid_attrs = %{user_id: user.id, name: "some name", status: "some status", description: "some description", price: "120.5", tags: ["hello", "there"]}
 
       assert {:ok, %Item{} = item} = Inventory.create_item(valid_attrs)
       assert item.name == "some name"

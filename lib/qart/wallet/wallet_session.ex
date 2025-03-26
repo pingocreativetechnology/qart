@@ -61,7 +61,7 @@ defmodule Qart.Wallet.WalletSession do
       mnemonic = BSV.Mnemonic.new()
       seed = BSV.Mnemonic.to_seed(mnemonic)
       extkey = BSV.ExtKey.from_seed!(seed)
-      bsv_network = Application.get_env(:bsv, :network)
+      bsv_network = Application.get_env(:bsv, :network) |> to_string()
       wallet = %Wallet{user_id: user_id, seed: seed, network: bsv_network, current_derivation: 0}
       {:ok, saved_wallet} = Repo.insert(wallet)
 
