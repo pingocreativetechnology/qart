@@ -81,8 +81,12 @@ defmodule QartWeb.Router do
   scope "/", QartWeb do
     pipe_through [:browser]
     delete "/users/log_out", UserSessionController, :delete
-    live "/users/confirm/:token", UserConfirmationLive, :edit
-    live "/users/confirm", UserConfirmationInstructionsLive, :new
+
+    live_session :confirm,
+      on_mount: [{QartWeb.UserAuth, :mount_current_user}] do
+      live "/users/confirm/:token", UserConfirmationLive, :edit
+      live "/users/confirm", UserConfirmationInstructionsLive, :new
+    end
   end
 
   scope "/", QartWeb do

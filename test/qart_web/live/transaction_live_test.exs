@@ -40,8 +40,8 @@ defmodule QartWeb.TransactionLiveTest do
     test "saves new transaction", %{conn: conn} do
       {:ok, index_live, _html} = live(conn, ~p"/transactions")
 
-      assert index_live |> element("a", "New Transaction") |> render_click() =~
-               "New Transaction"
+      assert index_live |> element("a", "New Transaction")
+        |> render_click() =~ "New Transaction"
 
       assert_patch(index_live, ~p"/transactions/new")
 
