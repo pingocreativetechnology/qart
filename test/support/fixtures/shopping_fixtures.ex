@@ -4,14 +4,19 @@ defmodule Qart.ShoppingFixtures do
   entities via the `Qart.Shopping` context.
   """
 
+  import Qart.UserFixtures
+  import Qart.InventoryFixtures
+
   @doc """
   Generate a cart.
   """
   def cart_fixture(attrs \\ %{}) do
+    user = user_fixture()
+
     {:ok, cart} =
       attrs
       |> Enum.into(%{
-
+        user_id: user.id
       })
       |> Qart.Shopping.create_cart()
 
@@ -22,9 +27,14 @@ defmodule Qart.ShoppingFixtures do
   Generate a cart_item.
   """
   def cart_item_fixture(attrs \\ %{}) do
+    cart = cart_fixture()
+    item = item_fixture()
+
     {:ok, cart_item} =
       attrs
       |> Enum.into(%{
+        cart_id: cart.id,
+        item_id: item.id,
         quantity: 42
       })
       |> Qart.Shopping.create_cart_item()

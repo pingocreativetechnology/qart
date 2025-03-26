@@ -7,8 +7,9 @@ defmodule Qart.ShoppingTest do
     alias Qart.Shopping.Cart
 
     import Qart.ShoppingFixtures
+    import Qart.UserFixtures
 
-    @invalid_attrs %{}
+    @invalid_attrs %{user_id: nil}
 
     test "list_carts/0 returns all carts" do
       cart = cart_fixture()
@@ -21,7 +22,8 @@ defmodule Qart.ShoppingTest do
     end
 
     test "create_cart/1 with valid data creates a cart" do
-      valid_attrs = %{}
+      user = user_fixture()
+      valid_attrs = %{user_id: user.id}
 
       assert {:ok, %Cart{} = cart} = Shopping.create_cart(valid_attrs)
     end
@@ -58,9 +60,11 @@ defmodule Qart.ShoppingTest do
   describe "cart_items" do
     alias Qart.Shopping.CartItem
 
+    import Qart.UserFixtures
     import Qart.ShoppingFixtures
+    import Qart.InventoryFixtures
 
-    @invalid_attrs %{quantity: nil}
+    @invalid_attrs %{item_id: nil, quantity: nil}
 
     test "list_cart_items/0 returns all cart_items" do
       cart_item = cart_item_fixture()
@@ -73,7 +77,10 @@ defmodule Qart.ShoppingTest do
     end
 
     test "create_cart_item/1 with valid data creates a cart_item" do
-      valid_attrs = %{quantity: 42}
+      user = user_fixture()
+      cart = cart_fixture()
+      item = item_fixture()
+      valid_attrs = %{user_id: user.id, cart_id: cart.id, item_id: item.id, quantity: 42}
 
       assert {:ok, %CartItem{} = cart_item} = Shopping.create_cart_item(valid_attrs)
       assert cart_item.quantity == 42

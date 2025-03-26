@@ -13,7 +13,7 @@ defmodule Qart.UserFixtures do
   def user_fixture(attrs \\ %{}) do
     {:ok, user} =
       Accounts.create_user(%{
-        email: "user@lvh.me",
+        email: "user#{System.unique_integer()}@lvh.me",
         password: "passwordpassword"
       })
 
