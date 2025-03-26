@@ -11,12 +11,12 @@ defmodule Qart.TransactionsFixtures do
     {:ok, transaction} =
       attrs
       |> Enum.into(%{
-        addresses: "some addresses",
+        addresses: ["some addresses"],
         block_hash: "some block_hash",
-        inputs: "some inputs",
-        merkle_proof: "some merkle_proof",
+        merkle_proof: ["some merkle_proof"],
         notes: "some notes",
-        outputs: "some outputs",
+        inputs: ["some inputs"],
+        outputs: ["some outputs"],
         raw: "some raw",
         spent: true,
         txid: "some txid",

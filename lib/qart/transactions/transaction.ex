@@ -5,11 +5,11 @@ defmodule Qart.Transactions.Transaction do
   schema "transactions" do
     field :raw, :string
     field :version, :string
-    field :inputs, :string
+    field :inputs, {:array, :string}
     field :txid, :string
     field :block_hash, :string
     field :outputs, {:array, :string}, default: []
-    field :merkle_proof, :string
+    field :merkle_proof, {:array, :string}
 
     field :spent, :boolean, default: false
     field :notes, :string
