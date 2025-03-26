@@ -22,7 +22,19 @@
       <div class="sm:w-1/2 flex flex-col justify-center items-center px-10">
         <div class="mx-auto w-full max-w-sm lg:w-96">
           <div>
-            <h2 class="mt-8 text-2xl/9 font-bold tracking-tight text-gray-900">Log in to account</h2>
+            <.header class="text-center mt-8">
+              <h2 class="text-2xl/9 font-bold tracking-tight text-slate-800">
+                Log in to account
+              </h2>
+              <:subtitle>
+                Don't have an account?
+                <.link navigate={~p"/users/register"}
+                  class="font-semibold text-brand hover:underline text-orange-500">
+                  Sign up
+                </.link>
+                for an account now.
+              </:subtitle>
+            </.header>
           </div>
 
           <div class="mt-10">

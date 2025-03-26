@@ -79,13 +79,17 @@ defmodule QartWeb.Router do
   end
 
   scope "/", QartWeb do
-    pipe_through [:browser, :require_authenticated_user]
-
+    pipe_through [:browser]
     delete "/users/log_out", UserSessionController, :delete
+    live "/users/confirm/:token", UserConfirmationLive, :edit
+    live "/users/confirm", UserConfirmationInstructionsLive, :new
+  end
+
+  scope "/", QartWeb do
+    pipe_through [:browser, :require_authenticated_user]
 
     live_session :current_user,
       on_mount: [{QartWeb.UserAuth, :mount_current_user}] do
-
 
       live "/wallet", WalletLive.Show, :active
       live "/wallet/utils", UtilsLive, :index
@@ -95,9 +99,6 @@ defmodule QartWeb.Router do
 
       live "/stream", StreamLive, :index
       live "/cart", CartLive, :index
-
-      live "/users/confirm/:token", UserConfirmationLive, :edit
-      live "/users/confirm", UserConfirmationInstructionsLive, :new
 
       live "/items", ItemLive.Index, :index
       live "/items/list", ItemLive.Index, :list
@@ -117,10 +118,11 @@ defmodule QartWeb.Router do
 
       # live "/posts", HandleLive.Show, :show
       live "/handle/set", HandleLive, :index
+
+      # these routes are last, due to the wilcard for `handle`
       live "/:handle/posts/new", HandleLive.Show, :post
       live "/:handle/shop", HandleLive.Shop, :shop
       live "/:handle/avatar", AvatarUploadLive, :index
-      # these routes go last, due to the wilcard for `handle`
       live "/:handle", HandleLive.Show, :show
     end
   end
