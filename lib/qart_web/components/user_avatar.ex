@@ -12,7 +12,7 @@ defmodule QartWeb.UserAvatar do
       <.user_avatar user={@user} class="w-12 h-12" />
   """
   attr :user, :map, required: true
-  attr :class, :string, default: "user-avatar size-8 md:size-14 flex-none rounded-full inline-block mr-1 md:mr-2 mb-3 align-top"
+  attr :class, :string, default: "user-avatar size-8 md:size-14 rounded-full inline-block mr-1 md:mr-1 mb-3 object-cover transition-transform duration-150 ease-in-out transform origin-center hover:scale-105"
 
   def user_avatar(assigns) do
     ~H"""
@@ -23,8 +23,7 @@ defmodule QartWeb.UserAvatar do
         class={@class} />
     <% else %>
       <div
-        class={"bg-gradient-to-br #{@user.gradient}
-        text-white font-bold text-lg " <> @class}>
+        class={"bg-gradient-to-br text-white font-bold text-lg #{@user.gradient} " <> @class}>
       </div>
     <% end %>
     """
@@ -43,14 +42,14 @@ defmodule QartWeb.UserAvatar do
     <% else %>
       <div
         class={"bg-gradient-to-br #{@user.gradient}
-        text-white font-bold text-lg " <> @class}>
+        text-white font-bold text-lg transition-transform duration-150 ease-in-out hover:scale-105" <> @class}>
       </div>
     <% end %>
     """
   end
 
   attr :user, :map, required: true
-  attr :class, :string, default: "user-avatar size-24 rounded-full ring-4 ring-white sm:size-32"
+  attr :class, :string, default: "user-avatar size-24 rounded-full ring-4 ring-white sm:size-32 object-cover transition-transform duration-150 ease-in-out transform origin-center hover:scale-105"
 
   def large_user_avatar(assigns) do
     ~H"""

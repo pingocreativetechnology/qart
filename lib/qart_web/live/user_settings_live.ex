@@ -22,6 +22,7 @@ defmodule QartWeb.UserSettingsLive do
     user = socket.assigns.current_user
     email_changeset = Accounts.change_user_email(user)
     password_changeset = Accounts.change_user_password(user)
+    settings_changeset = Accounts.change_user_settings(user)
 
     socket =
       socket
@@ -30,6 +31,7 @@ defmodule QartWeb.UserSettingsLive do
       |> assign(:current_email, user.email)
       |> assign(:email_form, to_form(email_changeset))
       |> assign(:password_form, to_form(password_changeset))
+      |> assign(:settings_form, to_form(settings_changeset))
       |> assign(:trigger_submit, false)
 
     {:ok, socket}
@@ -94,6 +96,26 @@ defmodule QartWeb.UserSettingsLive do
 
       {:error, changeset} ->
         {:noreply, assign(socket, password_form: to_form(changeset))}
+    end
+  end
+
+  def handle_event("update_settings", params, socket) do
+    %{"user" => user_params} = params
+    user = socket.assigns.current_user
+
+    Qart.debug Accounts.update_user_settings(user, user_params)
+    case Accounts.update_user_settings(user, user_params) do
+      {:ok, user} ->
+        settings_form =
+          user
+          |> Accounts.change_user_settings(user_params)
+          |> to_form()
+
+        socket = socket |> put_flash(:info, "Updated public profile settings")
+        {:noreply, assign(socket, settings_form: settings_form)}
+
+      {:error, changeset} ->
+        {:noreply, assign(socket, settings_form: to_form(changeset))}
     end
   end
 

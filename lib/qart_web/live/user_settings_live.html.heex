@@ -1,4 +1,4 @@
-<div class="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
+<div class="mx-auto max-w-2xl px-4 py-16 sm:px-6 lg:px-8">
   <.header class="text-center">
     Account Settings
     <:subtitle>Manage your account email address and password settings</:subtitle>
@@ -65,7 +65,40 @@
     </div>
   </div>
 
-  <div class="flex mt-8 mb-8">
+  <div
+    class="text-2xl mt-16 mb-8 border-b">
+    Public profile settings
+  </div>
+  <.simple_form
+    for={@settings_form}
+    id="settings_form"
+    action={~p"/users/log_in?_action=password_updated"}
+    method="post"
+    phx-submit="update_settings"
+    phx-trigger-action={@trigger_submit}
+  >
+    <.input
+      type="checkbox"
+      field={@settings_form[:publish_public_profile]}
+      label="Publish public profile?"
+    />
+    <.input
+      type="checkbox"
+      field={@settings_form[:publish_public_items]}
+      label="Publish public items?"
+    />
+    <.input
+      type="checkbox"
+      field={@settings_form[:publish_public_posts]}
+      label="Publish public posts?"
+    />
+
+    <:actions>
+      <.button phx-disable-with="Changing...">Change Settings</.button>
+    </:actions>
+  </.simple_form>
+
+  <div class="flex mt-8 mb-8 border-t pt-6">
     <div>
       <a
         href={~p"/handle/set"}

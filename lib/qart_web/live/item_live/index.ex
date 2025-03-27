@@ -14,8 +14,6 @@ defmodule QartWeb.ItemLive.Index do
         _ -> "grid"
       end
 
-    # {:ok, assign(socket, items: items, view_mode: view_mode)}
-
     case params do
       %{"tag" => tag_name} ->
         items = Inventory.list_items_by_tag(tag_name)

@@ -17,6 +17,10 @@ defmodule Qart.Accounts.User do
     field :role, :string, virtual: true
     field :avatar_url, :string
 
+    field :publish_public_profile, :boolean
+    field :publish_public_items, :boolean
+    field :publish_public_posts, :boolean
+
     field :provider, :string  # :handcash
     field :provider_uid, :string # handcash :id
 
@@ -172,6 +176,15 @@ defmodule Qart.Accounts.User do
     |> cast(attrs, [:password])
     |> validate_confirmation(:password, message: "does not match password")
     |> validate_password(opts)
+  end
+
+  def settings_changeset(user, attrs, opts \\ []) do
+    user
+    |> cast(attrs, [
+      :publish_public_profile,
+      :publish_public_items,
+      :publish_public_posts
+    ])
   end
 
   def handle_changeset(user, attrs) do
