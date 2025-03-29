@@ -14,11 +14,40 @@ defmodule QartWeb.WalletLive.Index do
       |> assign(derivation_path: nil)
       |> assign(address_string: nil)
       |> assign(wallet: wallet)
+      |> assign(words: nil)
       |> assign(wallets: wallets)
+      |> assign(show_restore_wallet_form: false)
       # |> assign(current_derivation: wallet.current_derivation)
       |> assign(current_derivation: nil)
 
     {:ok, assign(socket, mnemonic_shown: false, user_id: user_id, addresses: [])}
+  end
+
+  # RESTORE A WALLET
+  @impl true
+  def handle_event("show_restore_wallet_form", _, socket) do
+    {:noreply, assign(socket, show_restore_wallet_form: true)}
+  end
+
+  @impl true
+  def handle_event("restore_wallet", %{"words" => words_params}, socket) do
+    words = Map.values(words_params) |> Enum.map(&String.trim/1)
+    mnemonic = Enum.join(words, " ")
+
+    # Validate the mnemonic here, if needed
+    IO.inspect(mnemonic, label: "Submitted Mnemonic")
+
+    case WalletSession.restore_wallet(socket.assigns.user_id, mnemonic) do
+      {:ok, wallet, mnemonic} ->
+        socket = socket |> put_flash(:info, "Wallet restored successfully")
+        {:noreply, assign(socket, wallet: wallet, mnemonic: mnemonic)}
+
+      {:ok, wallet} ->
+        {:noreply, assign(socket, wallet: wallet)}
+
+      {:error, _reason} ->
+        {:noreply, put_flash(socket, :error, "Failed to generate wallet")}
+    end
   end
 
   ### NEW WALLET STUFF
@@ -27,6 +56,7 @@ defmodule QartWeb.WalletLive.Index do
 
     case WalletSession.generate_wallet(socket.assigns.user_id) do
       {:ok, wallet, mnemonic} ->
+        socket = socket |> put_flash(:info, "Wallet generated successfully")
         {:noreply, assign(socket, wallet: wallet, mnemonic: mnemonic)}
 
       {:ok, wallet} ->

@@ -8,6 +8,10 @@ defmodule Qart.Wallet.WalletSession do
     GenServer.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
+  def restore_wallet(user_id, mnemonic) do
+    GenServer.call(__MODULE__, {:restore_wallet, user_id, mnemonic})
+  end
+
   def generate_wallet(user_id) do
     GenServer.call(__MODULE__, {:generate_wallet, user_id})
   end
@@ -57,6 +61,16 @@ defmodule Qart.Wallet.WalletSession do
     end
   end
 
+  def handle_call({:restore_wallet, user_id, mnemonic}, _from, _state) do
+      seed = BSV.Mnemonic.to_seed(mnemonic)
+      extkey = BSV.ExtKey.from_seed!(seed)
+      bsv_network = Application.get_env(:bsv, :network) |> to_string()
+      wallet = %Wallet{user_id: user_id, seed: seed, network: bsv_network, current_derivation: 0}
+      {:ok, saved_wallet} = Repo.insert(wallet)
+
+      {:reply, {:ok, saved_wallet, mnemonic}, saved_wallet}
+  end
+
   def handle_call({:generate_wallet, user_id}, _from, _state) do
       mnemonic = BSV.Mnemonic.new()
       seed = BSV.Mnemonic.to_seed(mnemonic)
@@ -73,7 +87,8 @@ defmodule Qart.Wallet.WalletSession do
 
     if wallet do
       new_derivation = wallet.current_derivation + 1
-      derivation_path = "m/44'/0'/0'/0/#{new_derivation}"
+      # derivation_path = "m/44'/0'/0'/0/#{new_derivation}" # BTC derivation path
+      derivation_path = "m/44'/236'/0'/0/#{new_derivation}" # BSV derviation path
 
       # Generate address from seed and derivation path
       {:ok, address_string} = generate_bitcoin_address(wallet.seed, derivation_path)

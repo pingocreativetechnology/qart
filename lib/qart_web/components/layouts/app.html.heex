@@ -4,7 +4,15 @@
   name="development-banner"
   class="flex items-center gap-x-6 bg-cyan-200 px-6 py-2.5 sm:px-3.5 sm:before:flex-1">
   <p class="text-sm/6 text-slate-800">
-    <strong class="font-semibold">Development environment</strong>
+    <strong class="font-semibold">
+      Development environment
+    </strong>
+    &middot;
+    <span
+      class="font-semibold text-slate-500">
+      BSV network
+      <span class="font-normal">({Application.get_env(:bsv, :network)})</span>
+    </span>
   </p>
   <div class="flex flex-1 justify-end">
     &nbsp;
