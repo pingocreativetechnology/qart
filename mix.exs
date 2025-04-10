@@ -32,7 +32,7 @@ defmodule Qart.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:bandit, "~> 1.6.8"},
+      {:bandit, "~> 1.6.10"},
       {:bcrypt_elixir, "~> 3.0"},
       {:bsv, "~> 2.1"},
       {:cloak_ecto, "~> 1.1"},
@@ -42,12 +42,12 @@ defmodule Qart.MixProject do
 
       {:ecto_sql, "~> 3.10"},
       {:esbuild, "~> 0.9", runtime: Mix.env() == :dev},
-      {:floki, ">= 0.30.0", only: :test},
+      {:floki, ">= 0.37.1", only: :test},
       {:phoenix, "~> 1.7.20"},
       {:phoenix_ecto, "~> 4.4"},
       {:phoenix_html, "~> 4.2.1"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_view, "~> 1.0.5"},
+      {:phoenix_live_view, "~> 1.0.9"},
       {:postgrex, ">= 0.20.0"},
       {:phoenix_live_dashboard, "~> 0.8.3"},
       {:phoenix_view, ">= 2.0.4"},
@@ -62,7 +62,7 @@ defmodule Qart.MixProject do
         depth: 1
       },
       {:mogrify, "~> 0.9.1"}, # to process images
-      {:swoosh, "~> 1.18.2"},
+      {:swoosh, "~> 1.18.3"},
       {:finch, "~> 0.13"},
       {:telemetry_metrics, "~> 1.1.0"},
       {:telemetry_poller, "~> 1.0"},
@@ -72,7 +72,7 @@ defmodule Qart.MixProject do
       {:handkit, "~> 0.2", git: "https://github.com/afomi/handkit.git", branch: "wip"},
       {:uuid, "~> 1.1"},
       # For tests
-      {:faker, "~> 0.17", only: :dev},
+      {:faker, "~> 0.17"},
       {:tesla, "~> 1.14.1"},
     ]
   end
