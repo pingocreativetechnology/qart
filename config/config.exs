@@ -48,6 +48,8 @@ config :qart, QartWeb.Endpoint,
 # at the `config/runtime.exs`.
 config :qart, Qart.Mailer, adapter: Swoosh.Adapters.Local
 
+config :qart, :env, Mix.env()
+
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.17.11",

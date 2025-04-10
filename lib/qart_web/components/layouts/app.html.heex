@@ -1,5 +1,5 @@
 <.flash_group flash={@flash} />
-<%= if Mix.env == :dev do %>
+<%= if Application.get_env(:qart, :env) == :dev do %>
 <div
   name="development-banner"
   class="flex items-center gap-x-6 bg-cyan-200 px-6 py-2.5 sm:px-3.5 sm:before:flex-1">
