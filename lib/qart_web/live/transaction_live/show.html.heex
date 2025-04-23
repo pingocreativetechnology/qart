@@ -1,0 +1,64 @@
+<div
+  class="px-4">
+
+  <.header class="">
+    <.link
+      class="text-sm text-slate-400"
+      navigate={~p"/transactions"}>
+      &larr;
+      All transactions
+    </.link>
+    <:actions>
+      <.link patch={~p"/transactions/#{@transaction}/show/edit"} phx-click={JS.push_focus()}>
+        <.button>Edit transaction</.button>
+      </.link>
+    </:actions>
+  </.header>
+</div>
+
+<.modal :if={@live_action == :edit} id="transaction-modal" show on_cancel={JS.patch(~p"/transactions/#{@transaction}")}>
+  <.live_component
+    module={QartWeb.TransactionLive.FormComponent}
+    id={@transaction.id}
+    title={@page_title}
+    action={@live_action}
+    transaction={@transaction}
+    patch={~p"/transactions/#{@transaction}"}
+  />
+</.modal>
+
+<div
+  name="tx-viewer"
+  class="flex flex-col px-4">
+  <div
+    class="mx-auto w-full grow lg:flex xl:px-2">
+    <div
+      class="px-4 sm:px-6 lg:w-3/4 lg:pr-8 xl:pr-6 mb-12">
+      <%= if @tx do %>
+      <div
+        name="transaction"
+        title="Transaction"
+        class="border border-slate-200 p-2 rounded p-2 text-xs rounded"
+        style="word-break: break-all;">
+
+        <div
+          class="text-xs text-slate-400 mb-2">
+          Raw Transaction (Hex)
+          &middot;
+          {@transaction.raw |> String.length} bytes
+          &middot;
+          <a href={"https://test.whatsonchain.com/tx/#{@transaction.txid}"}>WhatsOnChain</a>
+        </div>
+
+        <div
+          class="text-xs font-mono"
+          style="word-break: break-all;">
+          {@transaction.raw}
+          <br>
+        </div>
+      </div>
+      <.transaction tx={@tx} transaction={@transaction} utxos={@utxos} />
+    <% end %>
+    </div>
+  </div>
+</div>
