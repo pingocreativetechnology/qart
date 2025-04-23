@@ -1,0 +1,13 @@
+<div
+  name="outpoint"
+  title="Outpoint. A reference to an unspent Output txid and vout."
+  class=""
+>
+  <div class="flex justify-left mt-2 mb-2">
+    <span>
+      &larr;
+      {@outpoint |> BSV.OutPoint.get_txid }_{@outpoint.vout }
+    </span>
+    <button type="button" class="hidden text-blue-700 ml-4" phx-click="get-txid">Get TXID</button>
+  </div>
+</div>

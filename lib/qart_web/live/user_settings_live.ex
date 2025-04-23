@@ -103,7 +103,6 @@ defmodule QartWeb.UserSettingsLive do
     %{"user" => user_params} = params
     user = socket.assigns.current_user
 
-    Qart.debug Accounts.update_user_settings(user, user_params)
     case Accounts.update_user_settings(user, user_params) do
       {:ok, user} ->
         settings_form =

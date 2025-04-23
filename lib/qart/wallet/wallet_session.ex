@@ -103,7 +103,8 @@ defmodule Qart.Wallet.WalletSession do
         Repo.update!(Ecto.Changeset.change(wallet, current_derivation: new_derivation))
       end)
 
-      {:reply, {:ok, new_address}, wallet}
+
+      {:reply, {:ok, new_address, wallet}, state }
     else
       {:reply, {:error, "Wallet not found"}, state}
     end

@@ -17,6 +17,8 @@ defmodule Qart.Accounts.User do
     field :role, :string, virtual: true
     field :avatar_url, :string
 
+    field :default_wallet_id, :string, virtual: true
+
     field :publish_public_profile, :boolean
     field :publish_public_items, :boolean
     field :publish_public_posts, :boolean
@@ -47,6 +49,8 @@ defmodule Qart.Accounts.User do
 
   def gradient(%__MODULE__{email: email}), do: get_gradient(email)
   def role(%__MODULE__{email: email}), do: "Role"
+
+  def default_wallet_id(%__MODULE__{}), do: 4
 
   @doc """
   A user changeset for registration.

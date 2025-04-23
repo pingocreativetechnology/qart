@@ -1,0 +1,1330 @@
+<%= if @live_action != :index do %>
+<div
+  name="top-navigation"
+  class="flex justify-between items-center">
+  <div>
+    <.link
+      class="my-2 inline-flex rounded-md px-3 py-2 text-sm font-semibold text-slate-800"
+      patch={~p"/wallets"}>
+      <span>
+        <span aria-hidden="true">&larr;</span>
+        All Wallets
+      </span>
+    </.link>
+    <.link
+      patch={~p"/wallet/tx"}
+      class="my-2 inline-flex rounded-md px-3 py-2 text-sm font-semibold text-slate-800"
+    >
+      <span>Craft a Tx</span>
+    </.link>
+  </div>
+
+  <div>
+    <button
+      type="button" phx-click="make_wallet_active"
+      class="text-xs text-slate-400 hover:text-slate-700">
+      <span>Set wallet as default</span>
+    </button>
+    <.link
+      patch={~p"/wallet/"}
+      class="my-2 rounded-md px-3 py-2 text-sm font-semibold text-slate-800">
+      <span>
+        Active Wallet
+        <%= if @default_wallet.name do %>
+        ({@default_wallet.name})
+        <% else %>
+        ({@default_wallet_id})
+        <% end %>
+        <span aria-hidden="true">&rarr;</span>
+      </span>
+    </.link>
+  </div>
+</div>
+<% end %>
+
+<%= if @live_action == :utils do %>
+<.live_component
+    module={QartWeb.WalletUtilsComponent}
+    json={@json}
+    mnemonic={@mnemonic}
+    id="wallet-utils" />
+<% end %>
+
+<%= if @live_action == :index do %>
+
+<div
+  name="wallets"
+  class="max-w-xl mx-auto">
+
+  <div class="mt-4 flex justify-between items-center w-full border-b">
+
+    <div
+      class="text-2xl">
+      Wallets
+    </div>
+
+    <div
+      class="flex space-x-2">
+      <button
+        type="button"
+        phx-click="generate_wallet"
+        class="my-2 inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold  shadow-sm ring-1 ring-inset text-slate-800 bg-white hover:bg-gray-50 ring-gray-300">
+        <svg class="-ml-0.5 mr-1.5 size-5 text-white-400" xmlns="http://www.w3.org/2000/svg" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M15.042 21.672 13.684 16.6m0 0-2.51 2.225.569-9.47 5.227 7.917-3.286-.672ZM12 2.25V4.5m5.834.166-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243-1.59-1.59" />
+        </svg>
+        <span>
+          Generate Wallet
+        </span>
+      </button>
+      <button
+        type="button"
+        phx-click="show_restore_wallet_form"
+        class="my-2 inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold  shadow-sm ring-1 ring-inset text-slate-800 bg-white hover:bg-gray-50 ring-gray-300">
+        <svg class="-ml-0.5 mr-1.5 size-5 text-white-400" xmlns="http://www.w3.org/2000/svg" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M15.042 21.672 13.684 16.6m0 0-2.51 2.225.569-9.47 5.227 7.917-3.286-.672ZM12 2.25V4.5m5.834.166-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243-1.59-1.59" />
+        </svg>
+        <span>
+          Restore Wallet
+        </span>
+      </button>
+    </div>
+  </div>
+  <div class="flex justify-end items-center w-full mb-2 border-b">
+
+    <div
+      class="flex space-x-2">
+      <a href={~p"/transactions"}
+        class="my-2 inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold  shadow-sm ring-1 ring-inset text-slate-800 bg-white hover:bg-gray-50 ring-gray-300">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+          class="size-5 mr-1">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+        </svg>
+        Transactions
+      </a>
+      <.link
+        patch={~p"/wallet/utils"}
+        class="my-2 inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold  shadow-sm ring-1 ring-inset text-slate-800 bg-orange-100  hover:bg-orange-200 ring-orange-200">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+          class="size-5 mr-1">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M21.75 6.75a4.5 4.5 0 0 1-4.884 4.484c-1.076-.091-2.264.071-2.95.904l-7.152 8.684a2.548 2.548 0 1 1-3.586-3.586l8.684-7.152c.833-.686.995-1.874.904-2.95a4.5 4.5 0 0 1 6.336-4.486l-3.276 3.276a3.004 3.004 0 0 0 2.25 2.25l3.276-3.276c.256.565.398 1.192.398 1.852Z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4.867 19.125h.008v.008h-.008v-.008Z" />
+        </svg>
+        Utilities
+      </.link>
+      <.link
+        patch={~p"/wallet/tx"}
+        class="my-2 inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold  shadow-sm ring-1 ring-inset text-slate-800 bg-white  hover:bg-gray-50 ring-gray-300">
+        <svg class="-ml-0.5 mr-1.5 size-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M15.042 21.672 13.684 16.6m0 0-2.51 2.225.569-9.47 5.227 7.917-3.286-.672ZM12 2.25V4.5m5.834.166-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243-1.59-1.59" />
+        </svg>
+        <span>Craft a Tx</span>
+      </.link>
+    </div>
+  </div>
+
+  <%= if @show_restore_wallet_form do %>
+    <button type="button" phx-click="fill_test_mnemonic"
+      class="my-2 inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold  shadow-sm ring-1 ring-inset text-white bg-red-600 hover:bg-red-400 ring-red-700 hover:ring-red-400">
+      <svg class="-ml-0.5 mr-1.5 size-5 text-white-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+        stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M15.042 21.672 13.684 16.6m0 0-2.51 2.225.569-9.47 5.227 7.917-3.286-.672ZM12 2.25V4.5m5.834.166-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243-1.59-1.59" />
+      </svg>
+      <span>
+        Load Test 12 words
+      </span>
+    </button>
+    <.form for={%{}}
+      as="words"
+      phx-submit="restore_wallet"
+      phx-change2="validate"
+      class="space-y-4 border border-slate-600 bg-white rounded p-2 mb-8">
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <%= for {word, i} <- Enum.with_index(@words) do %>
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">
+              Word {i + 1}
+            </label>
+            <input type="text" name={"words[#{word}]"} value={word} required autocomplete="off"
+              class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <% end %>
+      </div>
+
+      <div class="">
+        <button type="submit"
+          class="w-full inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold  shadow-sm ring-1 ring-inset text-white bg-blue-600 hover:bg-blue-400 ring-blue-700 hover:ring-blue-400">
+          Restore Wallet
+        </button>
+      </div>
+    </.form>
+  <% end %>
+  <%= if @wallets |> length > 0 do %>
+  <div>
+  <%= for {wallet, i} <- Enum.with_index(@wallets) do %>
+    <div
+      name="wallet"
+      title={"Wallet #{wallet.name }- #{wallet.network} network"}
+      class="flex items-center">
+      <.link
+        patch={~p"/wallets/#{wallet.id}"}
+        name="wallet"
+        class={"my-2 inline-flex justify-center rounded-md px-2 py-2 text-sm
+        font-semibold shadow-sm ring-1 ring-inset text-white "
+            <> if (wallet.network == "test"), do: "bg-amber-400 ring-amber-500 hover:bg-amber-500",
+            else: "bg-green-500 ring-green-600 hover:bg-green-600" }>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+          class="size-5 mr-1">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M21 12a2.25 2.25 0 0 0-2.25-2.25H15a3 3 0 1 1-6 0H5.25A2.25 2.25 0 0 0 3 12m18 0v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 9m18 0V6a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 6v3" />
+        </svg>
+        <span>
+          <%= if wallet.name && wallet.name != "" do %>
+          <span>
+            {wallet.name}
+          </span>
+          <% else %>
+            Wallet {wallet.id}
+          <% end %>
+        </span>
+      </.link>
+
+      <div
+      class="flex items-center text-slate-400 text-sm">
+        <div>
+          <%= if wallet.id == @default_wallet_id do %>
+            <div class="ml-2 flex-none rounded-full p-1 bg-green-400/10 text-green-400">
+              <div class="size-1.5 rounded-full bg-current"></div>
+            </div>
+          <% else %>
+          <% end %>
+        </div>
+
+        <div
+          class="ml-2">
+          <% addresses = Qart.Accounts.get_wallet_addresses(wallet.id) %>
+          <% z =  addresses |> Enum.at(0) %>
+
+          <%= addresses |> length %> addresses
+          &middot;
+          <%= if z && z.utxos do %>
+            <%= z.utxos |> Enum.map(fn u -> u.satoshis end) |> Enum.sum() %>
+          <% else %>
+            0
+          <% end %>
+          satoshis
+          &middot;
+          <%= if z do %>
+            <%= z.utxos |> length %>
+            UTXOs
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+  </div>
+<% else %>
+<div
+  class="text-center py-12">
+  <p class="mt-1 text-sm text-gray-500">Get started by creating a new Wallet.</p>
+  <div class="mt-6">
+    <button
+      type="button"
+      phx-click="generate_wallet"
+      class="my-2 inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold  shadow-sm ring-1 ring-inset text-slate-800 bg-white  hover:bg-gray-50 ring-gray-300">
+      <svg class="-ml-0.5 mr-1.5 size-5 text-white-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+        stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M15.042 21.672 13.684 16.6m0 0-2.51 2.225.569-9.47 5.227 7.917-3.286-.672ZM12 2.25V4.5m5.834.166-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243-1.59-1.59" />
+      </svg>
+      <span>Generate First Wallet</span>
+    </button>
+  </div>
+</div>
+
+<% end %>
+
+  <hr
+    class="mt-24">
+  <div>
+    <div
+      class="text-xs mt-4">
+      Mnemonic:
+      <br>
+      <div
+        name="mnemonic"
+        class="bg-gray-100 p-2"><%= @mnemonic %></div>
+      <hr>
+      <div
+        class="mt-2">
+        Derivation path:
+        <br>
+        <div class="bg-gray-100 p-2 font-mono"><%= @derivation_path %></div>
+      </div>
+      <hr>
+      <div class="mt-2">
+        Address string:
+        <br>
+        <div class="bg-gray-100 p-2"><%= @address_string %></div>
+      </div>
+    </div>
+  </div>
+</div>
+<% end %>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<%= if @live_action == :show do %>
+
+
+<div class="max-w-5xl mx-auto">
+
+  <div class="mt-4 w-full pb-1">
+    <div class="flex items-baseline justify-between">
+      <div class="flex items-center">
+        <svg
+          name="wallet-icon"
+          xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+          class="size-6 mr-2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M21 12a2.25 2.25 0 0 0-2.25-2.25H15a3 3 0 1 1-6 0H5.25A2.25 2.25 0 0 0 3 12m18 0v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 9m18 0V6a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 6v3" />
+        </svg>
+        <div
+          class="text-2xl">
+          Wallet
+          <%= if @show_wallet_name_editing do %>
+          <form
+            phx-submit="update-wallet-name"
+            phx-value-id={@wallet.id}
+            class="flex space-x-2">
+            <input
+              type="text"
+              name="name"
+              value={@wallet.name}
+              class="border p-1 rounded" />
+
+            <button
+              type="submit"
+              class="px-2 py-1 bg-blue-500 text-white rounded text-sm">
+              Save
+            </button>
+          </form>
+          <% else %>
+            <%= if @wallet.name do %>
+              <span class="text-sm text-slate-400" phx-click="showWalletNameEditing">
+                {@wallet.name}
+              </span>
+            <% else %>
+              <span
+                class="text-sm text-slate-400"
+                phx-click="showWalletNameEditing"
+              >
+                Name this wallet
+              </span>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="flex ml-8 align-center">
+        <div class="ml-4">
+          <span class="text-slate-400 text-sm">
+            ID
+          </span>
+          <span>
+            <%= @wallet.id %>
+          </span>
+        </div>
+        <div class="ml-4">
+          <span class="text-slate-400 text-sm">
+            Network
+          </span>
+          <span
+            class={"rounded-md px-1 py-1 text-sm font-semibold shadow-sm ring-1 ring-inset text-white "
+                              <> if (@wallet.network == " test"), do: "bg-amber-400 ring-amber-500" ,
+            else: "bg-green-500 ring-green-600" }>
+            <%= @wallet.network %>
+          </span>
+        </div>
+        <div class="ml-4">
+          <span class="text-slate-400 text-sm">
+            Current Derivation Index
+          </span>
+          <span>
+            <%= @wallet.current_derivation %>
+          </span>
+        </div>
+      </div>
+
+      <div class="flex">
+        <div
+          class="2flex ml-16 text-right items-center"
+        >
+          <span
+            class="text-xl font-mono mr-4">
+            <% total_satoshis = @addresses |> Enum.flat_map(& &1.utxos)
+              |> Enum.map(& &1.satoshis)
+              |> Enum.sum()
+              %>
+            {total_satoshis}
+          </span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+<%= @mnemonic %>
+<%= if @wallet do %>
+  <ul>
+  <%= for address <- @addresses do %>
+    <.address address={address} wallet={@wallet} utxos={@utxos2} />
+  <% end %>
+  </ul>
+
+  <div
+    class="text-center mb-8">
+    <button
+      type="button"
+      phx-click="derive_address"
+      class="mr-2 inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold  shadow-sm ring-1 ring-inset text-gray-900 bg-white  hover:bg-gray-50 ring-gray-300">
+      <svg class="-ml-0.5 mr-1.5 size-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+        stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M15.042 21.672 13.684 16.6m0 0-2.51 2.225.569-9.47 5.227 7.917-3.286-.672ZM12 2.25V4.5m5.834.166-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243-1.59-1.59" />
+      </svg>
+      <span>Generate New Address</span>
+    </button>
+  </div>
+  <div
+    class="text-right">
+    <button type="button" phx-click="delete_wallet" class={"my-2 inline-flex justify-center rounded-md px-3 py-2 text-sm
+      font-semibold shadow-sm ring-1 ring-inset text-white ml-3 mr-3" <>
+      " bg-red-600 hover:bg-red-500 ring-gray-300"}>
+      <svg class="-ml-0.5 mr-1.5 size-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+        stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M15.042 21.672 13.684 16.6m0 0-2.51 2.225.569-9.47 5.227 7.917-3.286-.672ZM12 2.25V4.5m5.834.166-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243-1.59-1.59" />
+      </svg>
+      <span>Delete Wallet</span>
+    </button>
+  </div>
+<% end %>
+
+</div>
+
+<% end %>
+
+<%= if @live_action == :tx do %>
+<div class="flex flex-col mx-4">
+  <div class="mx-auto w-full grow lg:flex border-b mb-2">
+    <div
+      class="flex mt-4 mb-4"
+      name="page-header"
+    >
+      <div
+        class="mr-8">
+        <span
+          class="text-slate-500">
+          Wallet ID
+        </span>
+        <a
+          href={"/wallets/#{@wallet_id}"}
+          class="text-blue-700">{@wallet.id}</a>
+          <span
+            class="text-slate-400">
+            {@wallet.name}
+          </span>
+
+      </div>
+      <div
+        class="mr-8">
+        <div>
+          <span
+            class="text-slate-500">
+            Derivation Path
+          </span>
+          <%= if @editing_derivation_path do %>
+            <form
+              phx-submit="save-derivation-path"
+              class="flex items-center space-x-1 text-sm">
+              <%
+                string = "m/44'/236'/0'/0/1"
+                derivation_elements = ["44'", "236'", "0'", "0", "1"]
+              %>
+
+              <%= for {seg, idx} <- Enum.with_index(derivation_elements) do %>
+                <input
+                  type="text"
+                  name={"segments[#{idx}]"}
+                  value={seg}
+                  class="w-12 p-1 text-center border rounded text-sm"/>
+                <input
+                  type="checkbox"
+                  name={"segments[#{idx}]"}
+                  value={seg}
+                  class="hidden p-1 text-center border rounded"/>
+              <% end %>
+
+              <button
+                type="submit"
+                class="px-2 py-1 bg-blue-500 text-white rounded text-xs">
+                OK
+              </button>
+            </form>
+          <% else %>
+            <span
+              phx-click="edit-derivation-path"
+              class="cursor-pointer text-blue-600 hover:underline text-sm">
+              {@derivation_path}
+            </span>
+          <% end %>
+
+
+          &nbsp;
+        </div>
+      </div>
+      <div
+        class="">
+        <div>
+          <span
+            class="text-slate-500">
+            Address
+          </span>
+
+          <span
+            class="font-mono">
+            {@address |> BSV.Address.to_string}
+          </span>
+          <% wallet_recently_synced = DateTime.diff(DateTime.utc_now(), @wallet_last_synced_at, :second) %>
+          <%= if wallet_recently_synced >= 0 && wallet_recently_synced <= 10 do %>
+          <button type="button"
+          phx-click="sync-address"
+          phx-value-address={@address |> BSV.Address.to_string}
+            class="text-xs bg-slate-300 hover:bg-slate-400 text-slate-600 px-3 py-1 rounded">
+            Updated {@wallet_last_synced_at |> inspect}
+          </button>
+          <% else %>
+          <button type="button"
+          phx-click="sync-address"
+          phx-value-address={@address |> BSV.Address.to_string}
+            class="text-xs bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">
+            Sync address
+          </button>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="mx-auto w-full border-b pt-1 pb-4 text-xl text-slate-300"
+    name="addresses"
+  >
+  <div
+    class="text-xs text-slate-300 uppercase mb-1">
+    Wallet addresses
+  </div>
+  <%= for address <- @addresses do %>
+    <%= if address.address === @address do %>
+      <span
+        class="font-mono mr-2 text-green-600">
+        <%= address.address %>
+      </span>
+    <% else %>
+      <span
+        class="font-mono mr-2">
+      <a href={~p"/wallets/#{address.wallet_id}/addresses/#{address.address}"}><%= address.address %></a>
+    </span>
+    <% end %>
+  <% end %>
+  </div>
+
+  <div
+    name="tx-viewer"
+    class="mx-auto w-full grow lg:flex gap-4">
+    <div
+      class="w-1/5">
+      <div
+        class="mt-2 mb-2">
+        <span
+          class="text-slate-400">
+          Locally-cached
+        </span>
+        <a href="/transactions"
+          class="text-blue-600"
+        >Transactions</a>
+      </div>
+      <%= for {tx, index} <- Enum.with_index(@transactions) do %>
+        <% tx_utxos = Enum.find(@utxos, fn txout ->
+          utxo_txid = txout.outpoint |> BSV.OutPoint.get_txid
+          utxo_txid == tx.txid end) %>
+        <% tx_has_utxos = Enum.any?(@utxos, fn txout ->
+          utxo_txid = txout.outpoint |> BSV.OutPoint.get_txid
+          utxo_txid == tx.txid end) %>
+
+        <a href={~p"/transactions/#{tx.txid}"} class="text-slate-600 text-sm">
+          <div
+            name="tx"
+            class="border p-2 bg-white rounded-md mb-1 hover:bg-gray-50"
+            phx-click="open_modal"
+            phx-value-content="This is the content of Element 1"
+            phx-value-id={tx.id}
+          >
+
+            <div
+              class="flex items-center">
+              <div
+              class={"font-mono text-lg mr-3 #{if tx_has_utxos, do: "text-green-600 font-semibold", else: "text-slate-300 "}"}
+              title={"#{if tx_has_utxos, do: "has UTXOs", else: ""}"}
+              >
+                <%= index %>
+              </div>
+
+              <div
+                class="text-xs font-mono"
+                style="word-break: break-all;">
+                <%= tx.txid %>
+              </div>
+            </div>
+
+            <%= if Enum.any?(@tx_builder.inputs, fn contract ->
+              contract_txid = contract.subject.outpoint |> BSV.OutPoint.get_txid
+              contract_txid == tx.txid
+
+              _ -> false end
+              )
+              do %>
+              <span class="">UTXO IN BUILDER</span>
+            <% end %>
+          </div>
+          </a>
+      <% end %>
+    </div>
+    <div
+      class="w-1/5">
+      <div
+        class="mt-2 mb-2">
+        Available UTXOs
+      </div>
+
+      <%# For each UTXO in Available UTXOs %>
+      <%= for utxo <- @utxos do %>
+      <% utxo_txid=utxo.outpoint |> BSV.OutPoint.get_txid %>
+      <% inputs_include_utxo = Enum.any?(@tx_builder.inputs, fn contract ->
+        contract_txid = contract.subject.outpoint |> BSV.OutPoint.get_txid
+        contract_txid == utxo_txid
+
+        _ -> false end)
+        %>
+
+      <div
+        class={"p-2 border border-slate-200 mb-1 #{if inputs_include_utxo, do: 'bg-slate-200'} "}>
+        <.tx_out txout={utxo.txout} utxo={utxo} />
+        <%# is this available UTXO included in the TxBuilder's Inputs? %>
+        <%= if inputs_include_utxo do %>
+        <button
+          type="button"
+          phx-click="delete-input"
+          phx-value-txid={utxo_txid}
+          phx-value-vout={"#{utxo.outpoint.vout}"}
+          class="bg-green-300 hover:bg-green-400 text-green-800 px-4 py-1 rounded w-full">
+          Selected
+        </button>
+        <% else %>
+        <button
+          type="button"
+          phx-click="select-utxo"
+          phx-value-txid={utxo.outpoint |> BSV.OutPoint.get_txid}
+          phx-value-vout={"#{utxo.outpoint.vout}"}
+          class="bg-slate-200 hover:bg-slate-300 text-slate-500 px-4 py-1 rounded rounded-t-none w-full">
+          Select
+        </button>
+        <% end %>
+      </div>
+      <% end %>
+    </div>
+
+    <div
+      class="w-2/5 flex gap-4 bg-slate-100 p-4 rounded"
+      name="two-center-columns ">
+      <div
+        name="tx-inputs"
+        class="w-1/2">
+        <div
+         class="flex justify-between text-2xl mb-2">
+          <div>
+            Inputs
+          </div>
+          <div
+            class="font-mono font-semibold text-green-600">
+            {@tx_builder |> BSV.TxBuilder.input_sum}
+          </div>
+        </div>
+
+        <.tx_builder tx_builder={@tx_builder} show_add_input={@show_add_input} />
+      </div>
+
+      <div class="w-1/2">
+          <div class="">
+            <div class="flex justify-between text-2xl mb-2">
+              <div>
+                Outputs
+              </div>
+              <div class="font-mono font-semibold text-red-600">
+                {@tx_builder |> BSV.TxBuilder.output_sum}
+              </div>
+            </div>
+
+            <form phx-submit="clickwrap">
+            <div>
+              <%= for {output, index} <- Enum.with_index(@tx_builder.outputs) do %>
+                <div
+                  name="output"
+                  class="bg-white border border-gray-300 rounded-lg w-full mb-2">
+                  <div class="flex items-center justify-between p-2 pb-1">
+                    <div class="text-sm font-semibold text-gray-800">
+                      <%= if index == 0 do %>
+                      To address
+                      <% end %>
+                      <%= if index == 1 do %>
+                      Change address
+                      <% end %>
+                      <%= if index > 1 do %>
+                      OP_RETURN Output
+                      <% end %>
+                    </div>
+                    <div class="flex items-center hidden">
+                      <label for="encrypted" class="mr-2 text-sm text-gray-600">Encrypt</label>
+                      <input type="checkbox" id="encrypted" name="encrypted"
+                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
+                    </div>
+                  </div>
+                  <div class="p-2">
+                    <%= if index == 0 do %>
+                      <% {BSV.Contract.P2PKH, :locking_script,[%{address: to_address}]} = output.mfa  %>
+                      <input
+                        id="content3"
+                        type="number"
+                        name="output-0-satoshis"
+                        placeholder="100"
+                        value={output.subject}
+                        phx-value-vout={index}
+                        phx-blur="update_satoshis"
+                        class="text-sm mt-1 block w-full border-gray-200 focus:ring-slate-500 focus:border-indigo-500 font-mono rounded-t-lg border-b-0" />
+                      <textarea
+                        id="content2"
+                        name="content-"
+                        rows="2"
+                        cols="50"
+                        placeholder="Enter text here..."
+                        class="text-sm block w-full border-gray-200 focus:ring-slate-500 focus:border-indigo-500 font-mono">{to_address |> BSV.Address.to_string}</textarea>
+                      <% end %>
+
+                      <%= if index == 1 do %>
+                      <% {BSV.Contract.P2PKH, :locking_script,[%{address: change_address}]} = output.mfa %>
+                      <input
+                          id="content3"
+                          type="number"
+                          name="output-0-satoshis"
+                          placeholder="100"
+                          value={output.subject}
+                          phx-blur="update_satoshis"
+                          phx-value-vout={index}
+                          class="text-sm mt-1 block w-full border-gray-200 focus:ring-slate-500 focus:border-indigo-500 font-mono rounded-t-lg border-b-0" />
+                      <textarea
+                        id="content3"
+                        name="content-3"
+                        rows="2"
+                        cols="50"
+                        placeholder="Enter text here..."
+                        class="text-sm block w-full border-gray-200 focus:ring-slate-500 focus:border-indigo-500 font-mono">{change_address |> BSV.Address.to_string }</textarea>
+                      <% end %>
+                      <%= if index > 1 do %>
+                      <% {BSV.Contract.OpReturn, :locking_script, [%{data: arr}]} = output.mfa %>
+                      <input
+                        id="content5"
+                        type="number"
+                        name={"output-#{index}-satoshis"}
+                        placeholder="100"
+                        value={output.subject}
+                        phx-blur="update_satoshis"
+                        phx-value-vout={index}
+                        class="text-sm mt-1 block w-full border-gray-200 focus:ring-slate-500 focus:border-indigo-500 font-mono rounded-t-lg border-b-0" />
+                      <textarea id={"content-#{index}"} name="content-3" rows="2" cols="50"
+                        placeholder="Enter text here..."
+                        phx-action="updateOpReturn"
+                        phx-blur="update-opreturn"
+                        phx-value-vout={index}
+                        class="text-sm block w-full  border-gray-200 focus:ring-slate-500 focus:border-indigo-500 font-mono">{arr |> Enum.join(" ")}</textarea>
+                        <div
+                          class="text-right">
+                          <button
+                            type="button"
+                            phx-click="delete-output"
+                            value={index}
+                            class="my-2 inline-flex justify-center rounded-md px-2 py-1
+                            font-semibold shadow-sm ring-1 ring-inset text-white bg-red-500 hover:bg-red-600 ring-red-500 text-xs items-center">
+                            <svg class="-ml-0.5 mr-1.5 size-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                              stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M15.042 21.672 13.684 16.6m0 0-2.51 2.225.569-9.47 5.227 7.917-3.286-.672ZM12 2.25V4.5m5.834.166-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243-1.59-1.59" />
+                            </svg>
+                            <span>Delete</span>
+                          </button>
+                        </div>
+                      <% end %>
+                  </div>
+                </div>
+                <% end %>
+
+                <div
+                  class="mt-6">
+                  <button
+                    type="button"
+                    phx-click="add_output"
+                    class="bg-slate-400 hover:bg-slate-500 text-white px-4 py-1 rounded w-full">
+                    Add Output
+                  </button>
+                </div>
+
+                <div class="text-slate-500 mb-3">
+                  <div>
+                    <span class="font-slate-600 text-xs">
+                      Standard Outputs
+                    </span>
+                  </div>
+                  <div>
+                    <div class="font-slate-600 text-xs">
+                      Additional Custom Outputs
+                    </div>
+                    <div class="font-slate-600 text-xs">
+                      OP_RETURN, 1satOrdinal, etc.
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  class="mt-2">
+                  <button
+                    class="inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset text-gray-900 bg-white  hover:bg-gray-50 ring-gray-300"
+                    type="submit">Update tx / Clickwrap</button>
+                </div>
+            </div>
+            </form>
+          </div>
+
+      </div>
+    </div>
+
+    <div
+      name="display-runtime-transaction-column"
+      class="w-1/5">
+      <div class="flex justify-between text-2xl items-center">
+        <div
+          class="text-sm">
+          Remaining
+          <span>
+            sats for Miners
+          </span>
+        </div>
+        <div class="font-mono font-semibold text-orange-600">
+          {(@tx_builder |> BSV.TxBuilder.input_sum) - (@tx_builder |> BSV.TxBuilder.output_sum)}
+        </div>
+      </div>
+      <%= if @tx_result && @tx_result_base64 do %>
+        <.transaction tx={@tx} utxos={@utxos} />
+      <% end %>
+
+        <%= if @tx_result && @tx_result_base64 do %>
+        <div
+          class="mt-6">
+          Raw transaction hex
+          <div class="text-xs font-mono" style="word-break: break-all;">
+            <%= @tx_result %>
+          </div>
+
+          <div class="hidden mt-4">
+            Validating tx logic.
+            Valid.
+            <div class="text-xs font-mono border  bg-green-200 text-green-900" style="word-break: break-all;">
+              <%= @tx_result %>
+            </div>
+          </div>
+
+
+          <!-- TODO: before broadcast, validate the transaction (with an animation) -->
+
+          <button type="button"
+            class="inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset text-slate-600 bg-white  hover:bg-gray-50 ring-gray-300 mt-2 items-center"
+            phx-click="broadcastTx">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+              class="size-4 mr-1">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" />
+            </svg>
+            Copy
+          </button>
+          <button type="button"
+            class="inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset text-white bg-orange-500  hover:bg-orange-6000 ring-orange-600 mt-2 hover:bg-gradient-to-t from-orange-600 items-center"
+            phx-click="broadcastTx">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+              class="size-4 mr-1">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25" />
+            </svg>
+
+            Broadcast this transaction
+          </button>
+
+          <div class="hidden bg-yellow-50 p-2 py-6 mt-3">
+            Raw transaction base64
+            <div class="text-xs font-mono" style="word-break: break-all;">
+              <%= @tx_result_base64 %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+  </div>
+
+
+  <hr
+    class="my-12">
+
+  <div
+    name="contract-validation">
+    NEW Valid contract?
+
+    <button
+      class="inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset text-gray-900 bg-white  hover:bg-gray-50 ring-gray-300"
+      type="submit"
+      phx-click="validate2"
+      >Validate
+    </button>
+
+    <%= @valid_contract2 %>
+    <%= @contract_validation_error %>
+  </div>
+
+  <div
+  name="contract-validation">
+  Valid contract?
+
+  <button
+    class="inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset text-gray-900 bg-white  hover:bg-gray-50 ring-gray-300"
+    type="submit"
+    phx-click="validate"
+    >Validate
+  </button>
+
+    <%= @valid_contract %>
+  </div>
+
+</div>
+<% end %>
+
+<%= if @live_action== :easy do %>
+<div class="flex flex-col mx-4">
+  <div class="mx-auto w-full grow lg:flex border-b mb-2">
+    <div class="flex mt-4 mb-4" name="page-header">
+      <div class="mr-8">
+        <.link patch={~p"/wallets/"} class="">
+          <span>
+            <span aria-hidden="true">&larr;</span>
+            All Wallets
+          </span>
+        </.link>
+      </div>
+      <div class="mr-8">
+        <span class="text-slate-500">
+          Wallet ID
+        </span>
+        <a href={"/wallets/#{@wallet_id}"} class="text-blue-700">{@wallet_id}</a>
+      </div>
+      <div class="">
+        <div>
+          <span class="text-slate-500">
+            Address
+          </span>
+
+          <span class="font-mono">
+            {@address}
+          </span>
+          <% wallet_recently_synced=DateTime.diff(DateTime.utc_now(), @wallet_last_synced_at, :second) %>
+          <%= if wallet_recently_synced>= 0 && wallet_recently_synced <= 10 do %>
+            <button type="button" phx-click="sync-address" phx-value-address={@address}
+              class="text-xs bg-slate-300 hover:bg-slate-400 text-slate-600 px-3 py-1 rounded">
+              Updated {@wallet_last_synced_at |> inspect}
+            </button>
+          <% else %>
+            <button type="button" phx-click="sync-address" phx-value-address={@address}
+              class="text-xs bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">
+              Sync address
+            </button>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div
+    name="tx-viewer"
+    class="mx-auto w-full grow lg:flex gap-4">
+    <div class="w-1/5">
+      <div class="mt-2 mb-2">
+        Available UTXOs
+      </div>
+
+      <%# For each UTXO in Available UTXOs %>
+        <%= for utxo <- @utxos2 do %>
+          <% utxo_txid=utxo.outpoint |> BSV.OutPoint.get_txid %>
+            <% inputs_include_utxo=Enum.any?(@tx_builder.inputs, fn contract ->
+              contract_txid = contract.subject.outpoint |> BSV.OutPoint.get_txid
+              contract_txid == utxo_txid
+
+              _ -> false end)
+            %>
+
+            <div class={"p-2 border border-slate-200 mb-1 #{if inputs_include_utxo, do: 'bg-slate-200' } "}>
+          <.tx_out txout={utxo.txout} utxo={utxo} />
+          <%# is this available UTXO included in the TxBuilder's Inputs? %>
+          <%= if inputs_include_utxo do %>
+            <button
+              type=" button"
+              phx-click="delete-input"
+                phx-value-txid={utxo_txid}
+                phx-value-vout={"#{utxo.outpoint.vout}"}
+                class="bg-green-300 hover:bg-green-400 text-green-800 px-4 py-1 rounded w-full">
+                  Selected
+            </button>
+          <% else %>
+            <button type="button" phx-click="select-utxo" phx-value-txid={utxo.outpoint |> BSV.OutPoint.get_txid}
+              phx-value-vout={"#{utxo.outpoint.vout}"}
+              class="bg-slate-200 hover:bg-slate-300 text-slate-500 px-4 py-1 rounded rounded-t-none w-full">
+              Select
+            </button>
+          <% end %>
+        </div>
+        <% end %>
+    </div>
+
+    <div class="w-2/5 flex gap-4 bg-slate-100 p-4 rounded" name="two-center-columns ">
+      <div name="tx-inputs" class="w-1/2">
+        <div class="flex justify-between text-2xl mb-2">
+          <div>
+            Inputs
+          </div>
+          <div class="font-mono font-semibold text-green-600">
+            {@tx_builder |> BSV.TxBuilder.input_sum}
+          </div>
+        </div>
+
+        <.tx_builder tx_builder={@tx_builder} show_add_input={@show_add_input} />
+      </div>
+
+      <div class="w-1/2">
+        <div class="">
+          <div class="flex justify-between text-2xl mb-2">
+            <div>
+              Outputs
+            </div>
+            <div class="font-mono font-semibold text-red-600">
+              {@tx_builder |> BSV.TxBuilder.output_sum}
+            </div>
+          </div>
+
+          <form phx-submit="clickwrap">
+            <div>
+              <%= for {output, index} <- Enum.with_index(@tx_builder.outputs) do %>
+                <div name="output" class="bg-white border border-gray-300 rounded-lg w-full mb-2">
+                  <div class="flex items-center justify-between p-2 pb-1">
+                    <div class="text-sm font-semibold text-gray-800">
+                      <%= if index==0 do %>
+                        To address
+                        <% end %>
+                          <%= if index==1 do %>
+                            Change address
+                            <% end %>
+                              <%= if index> 1 do %>
+                                OP_RETURN Output
+                                <% end %>
+                    </div>
+                    <div class="flex items-center hidden">
+                      <label for="encrypted" class="mr-2 text-sm text-gray-600">Encrypt</label>
+                      <input type="checkbox" id="encrypted" name="encrypted"
+                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
+                    </div>
+                  </div>
+                  <div class="p-2">
+                    <%= if index==0 do %>
+                      <% {BSV.Contract.P2PKH, :locking_script,[%{address: to_address}]}=output.mfa %>
+                        <input id="content3" type="number" name="output-0-satoshis" placeholder="100"
+                          value={output.subject} phx-value-vout={index} phx-blur="update_satoshis"
+                          class="text-sm mt-1 block w-full border-gray-200 focus:ring-slate-500 focus:border-indigo-500 font-mono rounded-t-lg border-b-0" />
+                        <textarea id="content2" name="content-" rows="2" cols="50" placeholder="Enter text here..."
+                          class="text-sm block w-full border-gray-200 focus:ring-slate-500 focus:border-indigo-500 font-mono">{to_address |> BSV.Address.to_string}</textarea>
+                        <% end %>
+
+                          <%= if index==1 do %>
+                            <% {BSV.Contract.P2PKH, :locking_script,[%{address: change_address}]}=output.mfa %>
+                              <input id="content3" type="number" name="output-0-satoshis" placeholder="100"
+                                value={output.subject} phx-blur="update_satoshis" phx-value-vout={index}
+                                class="text-sm mt-1 block w-full border-gray-200 focus:ring-slate-500 focus:border-indigo-500 font-mono rounded-t-lg border-b-0" />
+                              <textarea id="content3" name="content-3" rows="2" cols="50"
+                                placeholder="Enter text here..."
+                                class="text-sm block w-full border-gray-200 focus:ring-slate-500 focus:border-indigo-500 font-mono">{change_address |> BSV.Address.to_string }</textarea>
+                              <% end %>
+                                <%= if index> 1 do %>
+                                  <% {BSV.Contract.OpReturn, :locking_script, [%{data: arr}]}=output.mfa %>
+                                    <input id="content5" type="number" name={"output-#{index}-satoshis"}
+                                      placeholder="100" value={output.subject} phx-blur="update_satoshis"
+                                      phx-value-vout={index}
+                                      class="text-sm mt-1 block w-full border-gray-200 focus:ring-slate-500 focus:border-indigo-500 font-mono rounded-t-lg border-b-0" />
+                                    <textarea id={"content-#{index}"} name="content-3" rows="2" cols="50"
+                                      placeholder="Enter text here..." phx-action="updateOpReturn"
+                                      phx-blur="update-opreturn" phx-value-vout={index}
+                                      class="text-sm block w-full  border-gray-200 focus:ring-slate-500 focus:border-indigo-500 font-mono">{arr |> Enum.join(" ")}</textarea>
+                                    <div class="text-right">
+                                      <button type="button" phx-click="delete-output" value={index}
+                                        class="my-2 inline-flex justify-center rounded-md px-2 py-1
+                            font-semibold shadow-sm ring-1 ring-inset text-white bg-red-500 hover:bg-red-600 ring-red-500 text-xs items-center">
+                                        <svg class="-ml-0.5 mr-1.5 size-4 text-white" xmlns="http://www.w3.org/2000/svg"
+                                          fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                          <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M15.042 21.672 13.684 16.6m0 0-2.51 2.225.569-9.47 5.227 7.917-3.286-.672ZM12 2.25V4.5m5.834.166-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243-1.59-1.59" />
+                                        </svg>
+                                        <span>Delete</span>
+                                      </button>
+                                    </div>
+                                    <% end %>
+                  </div>
+                </div>
+                <% end %>
+
+                  <div class="mt-6">
+                    <button type="button" phx-click="add_output"
+                      class="bg-slate-400 hover:bg-slate-500 text-white px-4 py-1 rounded w-full">
+                      Add Output
+                    </button>
+                  </div>
+
+                  <div class="text-slate-500 mb-3">
+                    <div>
+                      <span class="font-slate-600 text-xs">
+                        Standard Outputs
+                      </span>
+                    </div>
+                    <div>
+                      <div class="font-slate-600 text-xs">
+                        Additional Custom Outputs
+                      </div>
+                      <div class="font-slate-600 text-xs">
+                        OP_RETURN, 1satOrdinal, etc.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mt-2">
+                    <button
+                      class="inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset text-gray-900 bg-white  hover:bg-gray-50 ring-gray-300"
+                      type="submit">Update tx / Clickwrap</button>
+                  </div>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+
+    <div name="display-runtime-transaction-column" class="w-1/5">
+      <div class="flex justify-between text-2xl items-center">
+        <div class="text-sm">
+          Remaining
+          <span>
+            sats for Miners
+          </span>
+        </div>
+        <div class="font-mono font-semibold text-orange-600">
+          {(@tx_builder |> BSV.TxBuilder.input_sum) - (@tx_builder |> BSV.TxBuilder.output_sum)}
+        </div>
+      </div>
+      <%= if @tx_result && @tx_result_base64 do %>
+        <.transaction tx={@tx} utxos={@utxos} />
+        <% end %>
+
+          <%= if @tx_result && @tx_result_base64 do %>
+            <div class="mt-6">
+              Raw transaction hex
+              <div class="text-xs font-mono" style="word-break: break-all;">
+                <%= @tx_result %>
+              </div>
+
+              <div class="hidden mt-4">
+                Validating tx logic.
+                Valid.
+                <div class="text-xs font-mono border  bg-green-200 text-green-900" style="word-break: break-all;">
+                  <%= @tx_result %>
+                </div>
+              </div>
+
+
+              <!-- TODO: before broadcast, validate the transaction (with an animation) -->
+
+              <button type="button"
+                class="inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset text-slate-600 bg-white  hover:bg-gray-50 ring-gray-300 mt-2 items-center"
+                phx-click="broadcastTx">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                  stroke="currentColor" class="size-4 mr-1">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" />
+                </svg>
+                Copy
+              </button>
+              <button type="button"
+                class="inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset text-white bg-orange-500  hover:bg-orange-6000 ring-orange-600 mt-2 hover:bg-gradient-to-t from-orange-600 items-center"
+                phx-click="broadcastTx">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                  stroke="currentColor" class="size-4 mr-1">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25" />
+                </svg>
+
+                Broadcast this transaction
+              </button>
+
+              <div class="hidden bg-yellow-50 p-2 py-6 mt-3">
+                Raw transaction base64
+                <div class="text-xs font-mono" style="word-break: break-all;">
+                  <%= @tx_result_base64 %>
+                </div>
+              </div>
+            </div>
+            <% end %>
+    </div>
+
+  </div>
+
+
+  <hr class="my-12">
+
+  <div name="contract-validation">
+    NEW Valid contract?
+
+    <button
+      class="inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset text-gray-900 bg-white  hover:bg-gray-50 ring-gray-300"
+      type="submit" phx-click="validate2">Validate
+    </button>
+
+    <%= @valid_contract2 %>
+      <%= @contract_validation_error %>
+  </div>
+
+  <div name="contract-validation">
+    Valid contract?
+
+    <button
+      class="inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset text-gray-900 bg-white  hover:bg-gray-50 ring-gray-300"
+      type="submit" phx-click="validate">Validate
+    </button>
+
+    <%= @valid_contract %>
+  </div>
+
+</div>
+<% end %>
+
+
+
+
+
+
+
+<div class="min-h-screen bg-gray-100 p-8 hidden">
+  <div class="max-w-6xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+    <div class="flex">
+      <!-- Inputs Column -->
+      <div class="w-1/2 p-4 border-r border-gray-200">
+        <h2 class="text-2xl font-bold mb-6">Inputs</h2>
+        <div class="space-y-4">
+          <div class="p-4 bg-gray-50 rounded shadow">
+            <p class="font-semibold">Input #1</p>
+            <p class="text-sm text-gray-600">Address: 1A2B3C...XYZ</p>
+            <p class="text-sm text-gray-600">Amount: 0.5 BTC</p>
+          </div>
+          <div class="p-4 bg-gray-50 rounded shadow">
+            <p class="font-semibold">Input #2</p>
+            <p class="text-sm text-gray-600">Address: 1D4E5F...UVW</p>
+            <p class="text-sm text-gray-600">Amount: 0.3 BTC</p>
+          </div>
+          <!-- Additional inputs can be added here -->
+        </div>
+      </div>
+      <!-- Outputs Column -->
+      <div class="w-1/2 p-4">
+        <h2 class="text-2xl font-bold mb-6">Outputs</h2>
+        <div class="space-y-4">
+          <div class="p-4 bg-gray-50 rounded shadow">
+            <p class="font-semibold">Output #1</p>
+            <p class="text-sm text-gray-600">Address: 3G7H8J...KLM</p>
+            <p class="text-sm text-gray-600">Amount: 0.4 BTC</p>
+          </div>
+          <div class="p-4 bg-gray-50 rounded shadow">
+            <p class="font-semibold">Output #2</p>
+            <p class="text-sm text-gray-600">Address: 3N9O0P...QRS</p>
+            <p class="text-sm text-gray-600">Amount: 0.3 BTC</p>
+          </div>
+          <!-- Additional outputs can be added here -->
+        </div>
+      </div>
+    </div>
+    <!-- Transaction Metadata Footer -->
+    <div class="p-4 border-t border-gray-200">
+      <p class="text-sm text-gray-500">Transaction ID: abcdef1234567890</p>
+    </div>
+  </div>
+</div>
+
+<%= if @show_modal do %>
+<div
+  id="modal-overlay"
+  class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+  <div
+    class="bg-white rounded-lg shadow-xl p-6 w-1/2">
+    <h2 class="text-xl font-semibold mb-4">Modal Content</h2>
+    <div class="text-xs font-mono" style="word-break: break-all;">
+      <%= @selected_tx |> inspect %>
+    </div>
+    <div class="text-right">
+      <button phx-click="close_modal" class="px-4 py-2 bg-blue-500 text-white rounded">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+<% end %>

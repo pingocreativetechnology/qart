@@ -53,12 +53,13 @@ defmodule QartWeb.Router do
   end
 
   ## Authentication routes
-
   scope "/", QartWeb do
     pipe_through [:browser, :redirect_if_user_is_authenticated]
 
     live_session :redirect_if_user_is_authenticated,
-      on_mount: [{QartWeb.UserAuth, :redirect_if_user_is_authenticated}] do
+      on_mount: [
+        {QartWeb.UserAuth, :redirect_if_user_is_authenticated}
+      ] do
       live "/users/register", UserRegistrationLive, :new
       live "/users/log_in", UserLoginLive, :new
       live "/users/reset_password", UserForgotPasswordLive, :new
@@ -72,7 +73,9 @@ defmodule QartWeb.Router do
     pipe_through [:browser, :require_authenticated_user]
 
     live_session :require_authenticated_user,
-      on_mount: [{QartWeb.UserAuth, :ensure_authenticated}] do
+      on_mount: [
+        {QartWeb.UserAuth, :ensure_authenticated}
+      ] do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
     end
@@ -93,13 +96,25 @@ defmodule QartWeb.Router do
     pipe_through [:browser, :require_authenticated_user]
 
     live_session :current_user,
-      on_mount: [{QartWeb.UserAuth, :mount_current_user}] do
+      on_mount: [
+        {QartWeb.UserAuth, :mount_current_user}
+      ] do
 
-      live "/wallet", WalletLive.Show, :active
-      live "/wallet/utils", UtilsLive, :index
-      live "/wallet/tx", WalletLive.Tx, :active
-      live "/wallets", WalletLive.Index, :list
-      live "/wallets/:id", WalletLive.Show, :show
+      live "/wallet", WalletLive, :show
+      live "/wallet/utils", WalletLive, :utils
+      live "/wallet/tx", WalletLive, :tx
+      live "/wallet/eztx", WalletLive, :easy
+      live "/wallets", WalletLive, :index
+      live "/wallets/:id", WalletLive, :show
+      live "/wallets/:id/addresses/:address", WalletLive, :show
+
+      live "/utxos", UtxoLive.Index, :index
+      live "/utxos/new", UtxoLive.Index, :new
+      live "/utxos/:id/edit", UtxoLive.Index, :edit
+
+      live "/utxos/:id", UtxoLive.Show, :show
+      live "/utxos/:id/show/edit", UtxoLive.Show, :edit
+
 
       live "/stream", StreamLive, :index
       live "/cart", CartLive, :index

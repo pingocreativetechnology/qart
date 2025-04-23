@@ -1,0 +1,41 @@
+<div
+  name="tx-output"
+  class="mb-1 bg-white rounded"
+>
+  <div
+    class="sm-flex justify-between items-center">
+    <div
+      class="flex justify-left items-center text-xs gap-2">
+      <.coinbase_tag coinbase={@txout.script.coinbase} />
+      <span name="script-type"
+        class="inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs ring-1 ring-blue-600/20 ring-inset text-blue-500 text-sans">
+        <%= Qart.BSV.ScriptPatterns.identify(@txout.script) %>
+      </span>
+    <%= if false do %>
+      <span
+        class="inline-flex items-center rounded-full bg-red-50 px-2 py-1 text-xs ring-1 ring-red-600/20 ring-inset text-red-500 text-sans">
+        spent
+      </span>
+    <% else %>
+      <%= if @utxo do %>
+      <button
+        class="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs ring-1 ring-green-600/20 ring-inset text-green-500 text-sans hover:bg-green-100"
+        phx-click="spend-utxo"
+        phx-value-id={@utxo.outpoint |> BSV.OutPoint.get_txid}
+        >
+        unspent
+      </button>
+      <% end %>
+    <% end %>
+    </div>
+    <div class="text-lg text-right">
+      {@txout.satoshis}
+    </div>
+  </div>
+  <div
+    class="text-xs font-mono mt-2 text-slate-600"
+    title="script"
+    style="word-break: break-all;">
+    {@txout.script |> BSV.Script.to_asm}
+  </div>
+</div>

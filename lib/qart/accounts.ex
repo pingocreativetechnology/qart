@@ -91,7 +91,8 @@ defmodule Qart.Accounts do
       display_name: Qart.Accounts.User.display_name(user),
       try_handle: Qart.Accounts.User.try_handle(user),
       gradient: Qart.Accounts.User.gradient(user),
-      role: Qart.Accounts.User.role(user)
+      role: Qart.Accounts.User.role(user),
+      default_wallet_id: Qart.Accounts.User.default_wallet_id(user),
     }
   end
 
@@ -130,6 +131,12 @@ defmodule Qart.Accounts do
       user ->
         {:ok, user}
     end
+  end
+
+  def create_user(attrs) do
+    %User{}
+    |> User.changeset(attrs)
+    |> Repo.insert()
   end
 
   def get_user_by_email(email) when is_binary(email) do
@@ -238,6 +245,12 @@ defmodule Qart.Accounts do
     |> Repo.update()
   end
 
+  def update_user_settings(user, attrs) do
+    user
+    |> User.settings_changeset(attrs)
+    |> Repo.update()
+  end
+
   @doc """
   Emulates that the email will change without actually changing
   it in the database.
@@ -317,6 +330,14 @@ defmodule Qart.Accounts do
     User.password_changeset(user, attrs, hash_password: false)
   end
 
+  def change_user_settings(user, attrs \\ %{}) do
+    User.settings_changeset(user, attrs,
+      publish_public_profile: false,
+      publish_public_items: false,
+      publish_public_posts: false
+    )
+  end
+
   @doc """
   Updates the user password.
 
@@ -352,6 +373,12 @@ defmodule Qart.Accounts do
     )
   end
 
+  def update_wallet_name(%Wallet{} = wallet, %{name: name} = attrs) do
+    wallet
+    |> Wallet.name_changeset(%{name: name})
+    |> Repo.update()
+  end
+
   def get_user_active_wallet(user_id) do
     query =
       from f in Wallet,
@@ -368,13 +395,40 @@ defmodule Qart.Accounts do
     |> Repo.all()
   end
 
+  def preload_utxos(address) do
+    utxos = Qart.Transactions.list_utxos_by_address(address.address)
+    %{address |
+      utxos: utxos
+    }
+  end
+
   def get_wallet_addresses(wallet_id) do
     query =
       from f in Address,
         where: f.wallet_id == ^wallet_id,
-        order_by: [asc: f.derivation_path]
+        order_by: [asc: f.id]
 
-    Repo.all(query)
+    addresses = Repo.all(query)
+      |> Enum.map(&preload_utxos/1)
+
+    addresses
+  end
+
+  def delete_wallet(%Wallet{} = wallet) do
+    Repo.delete(wallet)
+  end
+
+
+  def get_address_keypair(wallet_id, address) do
+    query =
+      from f in Address,
+        where: f.wallet_id == ^wallet_id,
+        where: f.address == ^address
+
+    address = Repo.one(query)
+
+    # take the wallet and address's derivation path to regenerate the keypair
+    address
   end
 
   ## Session
@@ -437,17 +491,19 @@ defmodule Qart.Accounts do
   and the token is deleted.
   """
 
-  def confirm_user(user) do # DEVMODE: only called if Mix.env == :dev
-    Repo.update!(User.confirm_changeset(user))
-  end
-
   def confirm_user(token) do
-    with {:ok, query} <- UserToken.verify_email_token_query(token, "confirm"),
-         %User{} = user <- Repo.one(query),
-         {:ok, %{user: user}} <- Repo.transaction(confirm_user_multi(user)) do
-      {:ok, user}
-    else
-      _ -> :error
+    case Mix.env() do
+      :dev ->
+        Repo.update!(User.confirm_changeset(token))
+
+      _ ->
+        with {:ok, query} <- UserToken.verify_email_token_query(token, "confirm"),
+            %User{} = user <- Repo.one(query),
+            {:ok, %{user: user}} <- Repo.transaction(confirm_user_multi(user)) do
+          {:ok, user}
+        else
+          _ -> :error
+        end
     end
   end
 
@@ -469,18 +525,25 @@ defmodule Qart.Accounts do
 
   """
 
-  if Mix.env == :dev do # DEVMODE: USED ONLY FOR TEST
-    def deliver_user_reset_password_instructions(_user, _url_fun) do
-      {:ok, :skipped_email}
-    end
-  end
-
   def deliver_user_reset_password_instructions(%User{} = user, reset_password_url_fun)
       when is_function(reset_password_url_fun, 1) do
     {encoded_token, user_token} = UserToken.build_email_token(user, "reset_password")
     Repo.insert!(user_token)
     UserNotifier.deliver_reset_password_instructions(user, reset_password_url_fun.(encoded_token))
   end
+
+  def deliver_user_reset_password_instructions(%User{} = user, reset_password_url_fun)  when is_function(reset_password_url_fun, 1) do
+    case Mix.env do
+      :dev ->
+        {:ok, :skipped_email} # TODO: Temporary, until email is fixed
+
+      _ ->
+        {encoded_token, user_token} = UserToken.build_email_token(user, "reset_password")
+        Repo.insert!(user_token)
+        UserNotifier.deliver_reset_password_instructions(user, reset_password_url_fun.(encoded_token))
+    end
+  end
+
 
   @doc """
   Gets the user by reset password token.

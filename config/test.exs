@@ -19,9 +19,12 @@ config :qart, Qart.Repo,
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
 config :qart, QartWeb.Endpoint,
-  http: [ip: {127, 0, 0, 1}, port: 4002],
+  http: [
+    ip: {127, 0, 0, 1},
+    port: 4002
+  ],
   secret_key_base: "sfSCTl4KRPUn1Yx6NiZA+x3Vo44OAdHrPhMHDREmyxntAmxtATWEOo39Hjr9zb8I",
-  server: false
+  server: true # true | false
 
 # In test we don't send emails.
 config :qart, Qart.Mailer, adapter: Swoosh.Adapters.Test
@@ -34,3 +37,14 @@ config :logger, level: :warning
 
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
+
+config :wallaby,
+  driver: Wallaby.Chrome,
+  chromedriver: [headless: false]
+
+config :wallaby, otp_app: :qart
+
+config :qart, :sandbox, Qart.Sandbox
+
+config :bsv,
+  network: :test

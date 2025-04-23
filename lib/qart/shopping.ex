@@ -236,7 +236,11 @@ defmodule Qart.Shopping do
   def get_cart_items(user_id) do
     cart = get_or_create_cart(user_id)
 
-    Repo.all(from ci in CartItem, where: ci.cart_id == ^cart.id, preload: [:item])
+    Repo.all(
+      from ci in CartItem,
+      where: ci.cart_id == ^cart.id,
+      preload: [item: :user]
+    )
   end
 
   def get_cart_items(cart_id) do
@@ -268,6 +272,11 @@ defmodule Qart.Shopping do
   end
 
   def get_cart_total(cart_id, tax_rate \\ 0.075) do
+    excise_tax_rate = 0.15
+    shipping_cost = 5
+
+    payees = []
+
     cart_items =
       Repo.all(
         from ci in CartItem,
@@ -276,18 +285,39 @@ defmodule Qart.Shopping do
         select: {i.price, ci.quantity}
       )
 
+    line_items =
+      Repo.all(
+        from ci in CartItem,
+        where: ci.cart_id == ^cart_id,
+        preload: [item: :user]
+      )
+
+    payees = line_items
+      |> Enum.map(fn cart_item -> %{user_email: cart_item.item.user.email} end)
+
+    payees = line_items
+      |> Enum.map(fn cart_item -> %{user_email: cart_item.item.user.email} end)
+
     subtotal =
       Enum.reduce(cart_items, Decimal.new("0.00"), fn {price, quantity}, acc ->
         acc
         |> Decimal.add(Decimal.mult(price, Decimal.new(quantity)))
       end)
 
-    tax = Decimal.new Decimal.mult(subtotal, Decimal.from_float(tax_rate)) |> Decimal.round(2)
-    total = Decimal.add(subtotal, tax) |> Decimal.round(2)
+    sales_tax = Decimal.new Decimal.mult(subtotal, Decimal.from_float(tax_rate)) |> Decimal.round(2)
+
+    excise_tax = Decimal.new Decimal.mult(subtotal, Decimal.from_float(excise_tax_rate)) |> Decimal.round(2)
+
+    total = Decimal.add(subtotal, sales_tax)
+      |> Decimal.add(excise_tax)
+      |> Decimal.add(shipping_cost)
+      |> Decimal.round(2)
 
     %{
+      payees: payees,
       subtotal: subtotal,
-      tax: tax,
+      sales_tax: sales_tax,
+      excise_tax: excise_tax,
       total: total
     }
   end

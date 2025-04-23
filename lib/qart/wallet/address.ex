@@ -6,6 +6,9 @@ defmodule Qart.Wallet.Address do
     field :wallet_id, :integer
     field :address, :string  # Public Bitcoin address
     field :derivation_path, :string  # Track the derivation path used
+    field :pubkey_hash, :string
+
+    field :utxos, {:array, :string}, virtual: true
 
     timestamps()
   end

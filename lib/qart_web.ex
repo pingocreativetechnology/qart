@@ -90,6 +90,7 @@ defmodule QartWeb do
       import QartWeb.Gettext
 
       import QartWeb.UserAvatar
+      import QartWeb.SharedHTML
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
@@ -105,6 +106,20 @@ defmodule QartWeb do
         endpoint: QartWeb.Endpoint,
         router: QartWeb.Router,
         statics: QartWeb.static_paths()
+    end
+  end
+
+  def view do
+    quote do
+      use Phoenix.View,
+        root: "lib/qart_web/templates",
+        namespace: QartWeb
+
+      # Import convenience functions from controllers
+      import Phoenix.Controller,
+        only: [get_flash: 1, get_flash: 2, view_module: 1]
+
+      unquote(html_helpers())
     end
   end
 

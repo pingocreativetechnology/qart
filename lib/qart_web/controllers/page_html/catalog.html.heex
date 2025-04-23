@@ -15,7 +15,10 @@
 
         <div class="grid grid-cols-1 gap-x-8 gap-y-8 sm:grid-cols-2 sm:gap-y-10 lg:grid-cols-4">
         <%= for item <- @items do %>
-          <div class="group relative">
+          <div
+            name="item"
+            id={"item-#{item.id}"}
+            class="group relative">
             <div class="relative">
               <img src={item.images |> Enum.at(0)}
               alt={item.description}

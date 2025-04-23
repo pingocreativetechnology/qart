@@ -1,6 +1,11 @@
 defmodule QartWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :qart
 
+  # For Wallaby
+  if sandbox = Application.compile_env(:qart, :sandbox, false) do
+    plug Phoenix.Ecto.SQL.Sandbox, sandbox: sandbox
+  end
+
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.

@@ -10,9 +10,7 @@ defmodule QartWeb.TipComponent do
   def handle_event("follow", %{"value" => followed_user_id}, socket) do
 
     if socket.assigns.is_following do
-      # {:noreply, assign(socket, is_following: false)}
-      assign(socket, is_following: false)
-      {:noreply, socket}
+      {:noreply, assign(socket, is_following: false, followed_user_id: followed_user_id)}
     else
       {:noreply, assign(socket, is_following: true)}
     end

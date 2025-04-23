@@ -1,0 +1,53 @@
+<div
+  name="tx_builder"
+  class="border border-slate-200 p-2 rounded"
+>
+  <div
+    class="">
+  <%= if Enum.any?(@tx_builder.inputs) do %>
+    <%= for contract <- @tx_builder.inputs do %>
+      <% tx_input=contract |> BSV.Contract.to_txin %>
+      <.tx_input tx_input={tx_input} show_remove_button={true} />
+    <% end %>
+
+  <% else %>
+  <div
+    class="text-slate-400">
+    No inputs yet
+  </div>
+  <% end %>
+  </div>
+</div>
+
+<div
+  class="hidden">
+  <%= if @show_add_input  do %>
+  <div
+    class="bg-white border border-slate-300 mt-2 p-2">
+    <div
+      class="">
+      <div class="mt-2">
+        Add a custom input
+        <textarea
+          class="w-full"
+          value="">paste a tx here</textarea>
+      </div>
+      <button type="button" phx-click="show-add-input"
+        class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-1 rounded w-full mt-1">
+        Add Input
+      </button>
+      <button type="button" phx-click="hide-add-input"
+        class="bg-slate-300 hover:bg-slate-400 text-white px-4 py-1 rounded w-full mt-1">
+        Cancel
+      </button>
+    </div>
+  </div>
+  <% else %>
+  <button
+    type="button"
+    phx-click="show-add-input"
+    class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-1 rounded w-full mt-2">
+    Add Input
+  </button>
+  <% end %>
+</div>

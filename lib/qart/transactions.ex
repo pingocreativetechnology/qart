@@ -38,6 +38,9 @@ defmodule Qart.Transactions do
   """
   def get_transaction!(id), do: Repo.get!(Transaction, id)
 
+
+  def get_transaction_by_txid!(txid), do: Repo.get_by(Transaction, txid: txid)
+
   @doc """
   Creates a transaction.
 
@@ -112,130 +115,104 @@ defmodule Qart.Transactions do
     z
   end
 
-  def call_junglebus(txid) do
-    url = "https://junglebus.gorillapool.io/v1/transaction/get/#{txid}"
 
-    response = Tesla.get!(url)
-    json = response.body |> Jason.decode!
+  alias Qart.Transactions.Utxo
 
-    Qart.debug(json)
+  @doc """
+  Returns the list of utxos.
 
-    # Write the JungleBus response to the Transactions table
-    new_tx = %{
-      txid: json["id"],
-      raw: json["transaction"],
-      # outputs: json["outputs"],
-      addresses: json["addresses"],
-    }
+  ## Examples
 
-    {:ok, tx} = Qart.Transactions.create_transaction(new_tx)
-    # {:ok, nil}
+      iex> list_utxos()
+      [%Utxo{}, ...]
+
+  """
+  def list_utxos do
+    Repo.all(Utxo)
   end
 
-  def get_address(address) do
-    bsv_network = Application.get_env(:bsv, :network)
-    # url = "https://api.whatsonchain.com/v1/bsv/#{bsv_network}/address/#{address}/info"
-    url = "https://api.whatsonchain.com/v1/bsv/#{bsv_network}/address/#{address}/unspent/all"
-
-    # response =
-
-    # Qart.debug response
-
-    case Tesla.get(url) do
-      {:error, %Mint.TransportError{reason: :nxdomain}} ->
-        Qart.debug("111")
-        Qart.debug(url)
-        IO.puts "ya"
-        {:error, nil}
-
-      response ->
-        json = response.body |> Jason.decode!
-        Qart.debug(json)
-        {:ok, nil}
-
-      _ ->
-        Qart.debug("333")
-        IO.puts "else"
-        {:ok, nil}
-    end
-
-
-    # %{
-    #   "address" => "mo3FBnaVPmaUvBPDqLEqE2P9JyiXi56sST",
-    #   "error" => "",
-    #   "result" => [
-    #     %{
-    #       "hex" => "76a914528375c40efd773bbc21b8146536b73c229a0a0688ac",
-    #       "isSpentInMempoolTx" => false,
-    #       "status" => "unconfirmed",
-    #       "tx_hash" => "3a34b6c5e49cfa9841631cf6aa7120d044c0916f1a7f2d1bb0d95841df54b700",
-    #       "tx_pos" => 0,
-    #       "value" => 99904
-    #     },
-    #     %{
-    #       "height" => 1666107,
-    #       "isSpentInMempoolTx" => false,
-    #       "status" => "confirmed",
-    #       "tx_hash" => "3a34b6c5e49cfa9841631cf6aa7120d044c0916f1a7f2d1bb0d95841df54b700",
-    #       "tx_pos" => 0,
-    #       "value" => 99904
-    #     }
-    #   ],
-    #   "script" => "8b447290eea5989eaaeb98dedfc8ee95f3600a122f98f07ffe856b214ab68aac"
-    # }
-
-    # # Write the JungleBus response to the Transactions table
-    # new_tx = %{
-    #   txid: json["id"],
-    #   raw: json["transaction"],
-    #   # outputs: json["outputs"],
-    #   addresses: json["addresses"],
-    # }
-
-    # {:ok, tx} = Qart.Transactions.create_transaction(new_tx)
-
+  def list_utxos_by_address(address) do
+    Repo.all(from i in Utxo, where: i.address == ^address)
   end
 
-  def get_tx(txid) do
-    bsv_network = Application.get_env(:bsv, :network)
-    # url = "https://api.whatsonchain.com/v1/bsv/#{bsv_network}/tx/hash/#{txid}"
-    # url = "https://api.whatsonchain.com/v1/bsv/main/tx/hash/6e93e17cf98c1af0f851454e984942d72704412369e8b85ca74262285857b2d4"
-    url = "https://api.whatsonchain.com/v1/bsv/#{bsv_network}/tx/#{txid}/hex"
+  @doc """
+  Gets a single utxo.
 
-    case Tesla.get(url) do
-      {:error, %Mint.TransportError{reason: :nxdomain}} ->
-        {:error, nil}
+  Raises `Ecto.NoResultsError` if the Utxo does not exist.
 
-      # What's on Chain response
-      {:ok, response} ->
-        # Convert hex to base64
-        base64 = response.body |> hex_to_base64()
+  ## Examples
 
-        new_tx = %{
-          txid: txid,
-          # raw: response.body,
-          raw: base64,
-          # outputs: json["outputs"],
-          # addresses: json["addresses"],
-        }
+      iex> get_utxo!(123)
+      %Utxo{}
 
-        {:ok, tx} = Qart.Transactions.create_transaction(new_tx)
-    end
+      iex> get_utxo!(456)
+      ** (Ecto.NoResultsError)
 
-    # # Write the JungleBus response to the Transactions table
-    # new_tx = %{
-    #   txid: json["id"],
-    #   raw: json["transaction"],
-    #   # outputs: json["outputs"],
-    #   addresses: json["addresses"],
-    # }
+  """
+  def get_utxo!(id), do: Repo.get!(Utxo, id)
+
+  @doc """
+  Creates a utxo.
+
+  ## Examples
+
+      iex> create_utxo(%{field: value})
+      {:ok, %Utxo{}}
+
+      iex> create_utxo(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_utxo(attrs \\ %{}) do
+    %Utxo{}
+    |> Utxo.changeset(attrs)
+    |> Repo.insert()
   end
 
-  def hex_to_base64(hex) do
-    with {:ok, binary} <- Base.decode16(hex, case: :mixed) do
-      Base.encode64(binary)
-    else
-      _ -> {:error, "Invalid hex string"}
-    end
+  @doc """
+  Updates a utxo.
+
+  ## Examples
+
+      iex> update_utxo(utxo, %{field: new_value})
+      {:ok, %Utxo{}}
+
+      iex> update_utxo(utxo, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_utxo(%Utxo{} = utxo, attrs) do
+    utxo
+    |> Utxo.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a utxo.
+
+  ## Examples
+
+      iex> delete_utxo(utxo)
+      {:ok, %Utxo{}}
+
+      iex> delete_utxo(utxo)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_utxo(%Utxo{} = utxo) do
+    Repo.delete(utxo)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking utxo changes.
+
+  ## Examples
+
+      iex> change_utxo(utxo)
+      %Ecto.Changeset{data: %Utxo{}}
+
+  """
+  def change_utxo(%Utxo{} = utxo, attrs \\ %{}) do
+    Utxo.changeset(utxo, attrs)
   end
 end

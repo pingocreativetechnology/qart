@@ -9,7 +9,14 @@ defmodule Qart.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+
+      # Added for Wallaby
+      test_coverage: [tool: ExCoveralls],
+      # preferred_cli_env: [
+      #   :test,
+      #   "test.watch": :test
+      # ],
     ]
   end
 
@@ -46,7 +53,7 @@ defmodule Qart.MixProject do
       {:phoenix, "~> 1.7.20"},
       {:phoenix_ecto, "~> 4.4"},
       {:phoenix_html, "~> 4.2.1"},
-      {:phoenix_live_reload, "~> 1.2", only: :dev},
+      {:phoenix_live_reload, "~> 1.6.0", only: :dev},
       {:phoenix_live_view, "~> 1.0.9"},
       {:postgrex, ">= 0.20.0"},
       {:phoenix_live_dashboard, "~> 0.8.3"},
@@ -65,7 +72,7 @@ defmodule Qart.MixProject do
       {:swoosh, "~> 1.18.3"},
       {:finch, "~> 0.13"},
       {:telemetry_metrics, "~> 1.1.0"},
-      {:telemetry_poller, "~> 1.0"},
+      {:telemetry_poller, "~> 1.2.0"},
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
@@ -74,6 +81,10 @@ defmodule Qart.MixProject do
       # For tests
       {:faker, "~> 0.17"},
       {:tesla, "~> 1.14.1"},
+
+      {:dotenv, "~> 3.0.0"},
+      {:ex_machina, "~> 2.8.0", only: :test},
+      {:wallaby, "~> 0.30.0", only: :test},
     ]
   end
 

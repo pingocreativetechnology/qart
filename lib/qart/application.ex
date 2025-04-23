@@ -7,6 +7,11 @@ defmodule Qart.Application do
 
   @impl true
   def start(_type, _args) do
+    # For Dotenv
+    unless Mix.env == :prod do
+      Dotenv.load
+    end
+
     children = [
       QartWeb.Telemetry,
       # Qart.EventStore, # Event Store Database (write)

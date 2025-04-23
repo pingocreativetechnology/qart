@@ -16,7 +16,9 @@ defmodule QartWeb.CartLive do
       cart: cart,
       cart_items: cart_items,
       cart_total: cart_total,
-      user_id: user_id
+      invoice_line_items: [],
+      user_id: user_id,
+      checkout: false
     )}
   end
 
@@ -24,6 +26,18 @@ defmodule QartWeb.CartLive do
   def handle_event("add_item", %{"item_id" => item_id}, socket) do
     Shopping.add_to_cart(socket.assigns.user_id, item_id)
     {:noreply, assign(socket, cart_items: Shopping.get_cart_items(socket.assigns.user_id))}
+  end
+
+  @impl true
+  def handle_event("checkout", _, socket) do
+    %{payees: payees} = Shopping.get_cart_total(socket.assigns.cart.id)
+
+    {:noreply, assign(socket,
+      cart_items: Shopping.get_cart_items(socket.assigns.user_id),
+      checkout: true,
+      payees: payees,
+      transaction_id: 123243443
+    )}
   end
 
   def handle_event("remove_from_cart", %{"item_id" => item_id}, socket) do
