@@ -72,6 +72,7 @@ defmodule QartWeb.HandleLive.Show do
     {:noreply, push_patch(socket, to: socket.assigns.live_action, status: 404)}
   end
 
+  @impl true
   def handle_event("submit_post", _params, socket) do
     IO.puts("Post submitted!")
     handle = socket.assigns.current_user.try_handle

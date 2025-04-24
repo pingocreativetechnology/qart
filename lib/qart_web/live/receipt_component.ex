@@ -26,6 +26,7 @@ defmodule QartWeb.ReceiptComponent do
 
   end
 
+  @impl true
   def render(assigns) do
     ~H"""
     <div class="lg:col-start-3 lg:row-end-1">
