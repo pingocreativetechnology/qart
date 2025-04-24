@@ -144,7 +144,7 @@ defmodule QartWeb.WalletLive do
       _ ->
         socket = socket
         |> put_flash(:error, "Wallet #{wallet_id} not found")
-        |> push_redirect(to: ~p"/wallets" )
+        |> push_navigate(to: ~p"/wallets" )
 
         {:noreply, assign(socket, wallet: nil)}
     end
@@ -313,25 +313,6 @@ defmodule QartWeb.WalletLive do
     {:noreply, assign(socket, utxos: utxo_with_selections)}
   end
 
-
-
-
-  ### NEW WALLET STUFF
-  @impl true
-  def handle_event("generate_wallet", _params, socket) do
-
-    case WalletSession.generate_wallet(socket.assigns.user_id) do
-      {:ok, wallet, mnemonic} ->
-        {:noreply, assign(socket, wallet: wallet, mnemonic: mnemonic)}
-
-      {:ok, wallet} ->
-        {:noreply, assign(socket, wallet: wallet)}
-
-      {:error, _reason} ->
-        {:noreply, put_flash(socket, :error, "Failed to generate wallet")}
-    end
-  end
-
   def handle_event("derive_address", _params, socket) do
     case WalletSession.derive_new_address(socket.assigns.wallet.id) do
       {:ok, new_address, wallet} ->
@@ -350,17 +331,12 @@ defmodule QartWeb.WalletLive do
     end
   end
 
-  def handle_event("clear_wallet", _params, socket) do
-    WalletSession.clear_wallet()
-    {:noreply, assign(socket, wallet: nil)}
-  end
-
   def handle_event("delete_wallet", _params, socket) do
     wallet = socket.assigns.wallet
     Qart.Accounts.delete_wallet(wallet)
 
     socket = put_flash(socket, :info, "Wallet deleted")
-      |> push_redirect(to: ~p"/wallets" )
+      |> push_navigate(to: ~p"/wallets" )
     {:noreply, assign(socket, wallet: nil)}
   end
 
