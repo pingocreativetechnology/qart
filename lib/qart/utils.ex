@@ -7,10 +7,10 @@ defmodule Qart.Utils do
   Removes the first element from a list. Returns an empty list if given an empty list.
   ## Examples
 
-      iex> MyApp.Utils.drop_first([1, 2, 3])
+      iex> Qart.Utils.drop_first([1, 2, 3])
       [2, 3]
 
-      iex> MyApp.Utils.drop_first([])
+      iex> Qart.Utils.drop_first([])
       []
   """
   def drop_first([]), do: []

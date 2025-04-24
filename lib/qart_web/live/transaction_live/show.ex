@@ -60,11 +60,11 @@ defmodule QartWeb.TransactionLive.Show do
           payload_base64: payload_base64
         }
       } ->
-        Qart.debug('going well here')
+        Qart.debug("going well here")
         false
 
       false ->
-        Qart.debug('also going well here')
+        Qart.debug("also going well here")
         false
     end
 
@@ -106,10 +106,10 @@ defmodule QartWeb.TransactionLive.Show do
           payload_base64: payload_base64
         }
       } ->
-        Qart.debug('going well here')
+        Qart.debug("going well here")
 
        false ->
-        Qart.debug('also going well here')
+        Qart.debug("also going well here")
         false
     end
 
