@@ -3,6 +3,7 @@ defmodule QartWeb.CartLive do
 
   alias Qart.Shopping
 
+  @impl true
   def mount(_params, session, socket) do
     user_id = if socket.assigns.current_user,
       do: socket.assigns.current_user.id,
