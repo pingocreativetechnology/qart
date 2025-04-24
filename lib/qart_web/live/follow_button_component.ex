@@ -27,6 +27,7 @@ defmodule QartWeb.FollowButtonComponent do
 
   end
 
+  @impl true
   def render(assigns) do
     ~H"""
       <button type="button"

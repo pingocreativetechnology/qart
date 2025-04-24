@@ -9,6 +9,7 @@ defmodule QartWeb.WalletUtilsComponent do
     )}
   end
 
+  @impl true
   def render(assigns) do
     ~H"""
     <div

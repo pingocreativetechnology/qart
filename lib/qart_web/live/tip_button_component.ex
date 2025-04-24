@@ -27,6 +27,7 @@ defmodule QartWeb.TipButtonComponent do
     end
   end
 
+  @impl true
   def render(assigns) do
     ~H"""
     <button
