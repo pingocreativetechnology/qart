@@ -55,27 +55,27 @@ defmodule QartWeb.UserRegistrationLive do
 
   def handle_event("save", %{"user" => user_params}, socket) do
     case Accounts.register_user(user_params) do
-      # temporary
       {:ok, user} ->
-        # Auto-confirm the user by skipping email verification
-        user = Accounts.confirm_user(user)
-        {:noreply, socket |> assign(user: user)}
+        case Mix.env do
+          # :dev ->
+          #   user = Accounts.confirm_user(user)
 
-        {:noreply,
-          socket
-          |> put_flash(:info, "Account created successfully.")
-          |> redirect(to: "/")}
+          #   {:noreply,
+          #     socket
+          #     |> assign(user: user)
+          #     |> put_flash(:info, "Account created successfully.")
+          #     |> redirect(to: "/")}
 
-      # original
-      {:ok, user} ->
-        {:ok, _} =
-          Accounts.deliver_user_confirmation_instructions(
-            user,
-            &url(~p"/users/confirm/#{&1}")
-          )
+          _ -> # NON-DEV ENVS
+            {:ok, _} =
+              Accounts.deliver_user_confirmation_instructions(
+                user,
+                &url(~p"/users/confirm/#{&1}")
+              )
 
-        changeset = Accounts.change_user_registration(user)
-        {:noreply, socket |> assign(trigger_submit: true) |> assign_form(changeset)}
+            changeset = Accounts.change_user_registration(user)
+            {:noreply, socket |> assign(trigger_submit: true) |> assign_form(changeset)}
+        end
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, socket |> assign(check_errors: true) |> assign_form(changeset)}

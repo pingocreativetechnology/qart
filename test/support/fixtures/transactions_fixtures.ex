@@ -26,4 +26,23 @@ defmodule Qart.TransactionsFixtures do
 
     transaction
   end
+
+  @doc """
+  Generate a utxo.
+  """
+  def utxo_fixture(attrs \\ %{}) do
+    {:ok, utxo} =
+      attrs
+      |> Enum.into(%{
+        satoshis: 42,
+        script: "some script",
+        spent: true,
+        spent_at: ~U[2025-04-18 21:13:00Z],
+        txid: "some txid",
+        vout: 42
+      })
+      |> Qart.Transactions.create_utxo()
+
+    utxo
+  end
 end
