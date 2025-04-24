@@ -54,7 +54,7 @@ defmodule Qart.MixProject do
       {:phoenix_ecto, "~> 4.4"},
       {:phoenix_html, "~> 4.2.1"},
       {:phoenix_live_reload, "~> 1.6.0", only: :dev},
-      {:phoenix_live_view, "~> 1.0.9"},
+      {:phoenix_live_view, "~> 1.0.10"},
       {:postgrex, ">= 0.20.0"},
       {:phoenix_live_dashboard, "~> 0.8.3"},
       {:phoenix_view, ">= 2.0.4"},
@@ -82,7 +82,7 @@ defmodule Qart.MixProject do
       {:faker, "~> 0.17"},
       {:tesla, "~> 1.14.1"},
 
-      {:dotenv, "~> 3.0.0"},
+      {:dotenv, "~> 3.1.0"},
       {:ex_machina, "~> 2.8.0", only: :test},
       {:wallaby, "~> 0.30.0", only: :test},
     ]
