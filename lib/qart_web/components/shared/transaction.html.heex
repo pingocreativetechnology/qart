@@ -49,7 +49,7 @@
     </span>
   </div>
 
-<%= for {tx_input, index} <- @tx.inputs |> Enum.with_index do %>
+<%= for tx_input <- @tx.inputs do %>
   <.tx_input tx_input={tx_input} show_remove_button={false} />
 <% end %>
 

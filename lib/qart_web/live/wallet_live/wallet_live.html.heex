@@ -641,7 +641,6 @@
       <div
         class={"p-2 border border-slate-200 mb-1 #{if inputs_include_utxo, do: 'bg-slate-200'} "}>
         <.tx_out txout={utxo.txout} utxo={utxo} />
-        <%# is this available UTXO included in the TxBuilder's Inputs? %>
         <%= if inputs_include_utxo do %>
         <button
           type="button"
@@ -1014,7 +1013,6 @@
 
             <div class={"p-2 border border-slate-200 mb-1 #{if inputs_include_utxo, do: 'bg-slate-200' } "}>
           <.tx_out txout={utxo.txout} utxo={utxo} />
-          <%# is this available UTXO included in the TxBuilder's Inputs? %>
           <%= if inputs_include_utxo do %>
             <button
               type=" button"
