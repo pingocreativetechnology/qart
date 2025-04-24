@@ -169,7 +169,7 @@
   <% end %>
   <%= if @wallets |> length > 0 do %>
   <div>
-  <%= for {wallet, i} <- Enum.with_index(@wallets) do %>
+  <%= for wallet <- @wallets do %>
     <div
       name="wallet"
       title={"Wallet #{wallet.name }- #{wallet.network} network"}
@@ -468,7 +468,6 @@
               phx-submit="save-derivation-path"
               class="flex items-center space-x-1 text-sm">
               <%
-                string = "m/44'/236'/0'/0/1"
                 derivation_elements = ["44'", "236'", "0'", "0", "1"]
               %>
 
@@ -627,7 +626,6 @@
         Available UTXOs
       </div>
 
-      <%# For each UTXO in Available UTXOs %>
       <%= for utxo <- @utxos do %>
       <% utxo_txid=utxo.outpoint |> BSV.OutPoint.get_txid %>
       <% inputs_include_utxo = Enum.any?(@tx_builder.inputs, fn contract ->
@@ -999,8 +997,6 @@
       <div class="mt-2 mb-2">
         Available UTXOs
       </div>
-
-      <%# For each UTXO in Available UTXOs %>
         <%= for utxo <- @utxos2 do %>
           <% utxo_txid=utxo.outpoint |> BSV.OutPoint.get_txid %>
             <% inputs_include_utxo = Enum.any?(@tx_builder.inputs, fn contract ->

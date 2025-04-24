@@ -4,6 +4,7 @@ defmodule QartWeb.WalletLive do
   alias Qart.Accounts
   alias BSV.Contract.{P2PKH, OpReturn}
 
+  @impl true
   def mount(_params, session, socket) do
     user = socket.assigns.current_user |> Accounts.maybe_compute_display_name
     user_id = socket.assigns.current_user.id
@@ -56,8 +57,6 @@ defmodule QartWeb.WalletLive do
         utxos2 = Qart.Transactions.list_utxos
 
         # given a UTXO (txid, vout), get the corresponding Transaction(txid) Output[vout]
-
-        utxo = utxos |> Enum.at(0)
 
         tx_builder = %BSV.TxBuilder{
           inputs: inputs,
@@ -136,8 +135,7 @@ defmodule QartWeb.WalletLive do
         {:noreply, assign(socket,
           wallet: wallet,
           addresses: addresses,
-          address: address,
-          # default_wallet: wallet
+          address: address
         )
         }
 
@@ -415,13 +413,9 @@ defmodule QartWeb.WalletLive do
           Qart.Transactions.create_utxo(q)
         end
 
-
         # Write these results to the UTXOs table
-
         satoshis = Enum.reduce(results, 0, fn result, acc -> acc + result["value"] end)
 
-        # x = script_string |> BSV.Script.from_binary(encoding: :base64)
-        {:ok, y} = script_string |> BSV.Script.from_binary(encoding: :hex)
         {:noreply, assign(socket, response: response, satoshis: satoshis)}
 
        _ ->
@@ -434,20 +428,7 @@ defmodule QartWeb.WalletLive do
   # TODO: Associate the UTXO to a valid KeyPair / Derivation path
 
   def handle_params(params = %{"outpoint" => outpoint, "txid" => txid, "vout" => vout, "script" => script, "satoshis" => satoshis}, _uri, socket) do
-    # vout = 1 #Integer.parse(vout)
-    Qart.debug(params)
-    # updated_params = params
-    # updated_params = assign(updated_params, vout: 2)
-
-    # %{
-    #   "outpoint" => "40860100000000001976a914b3182303bb218b771cc7cbf84d9ddacfbd6180b088ac",
-    #   "satoshis" => "99904",
-    #   "script" => "76a914b3182303bb218b771cc7cbf84d9ddacfbd6180b088ac",
-    #   "txid" => "10",
-    #   "vout" => "0"
-    # } = params
-
-    vout_as_int = Integer.parse("3")
+    # vout_as_int = Integer.parse("3")
 
     params2 = %{
       "outpoint" => outpoint,
@@ -583,10 +564,10 @@ defmodule QartWeb.WalletLive do
 
   # Remove a UTXO from inputs
   def handle_event("unselect-utxo", %{"txid" => search_txid, "vout" => vout}, socket) do
-    selected_utxo = Enum.find(socket.assigns.tx_builder.inputs, fn contract ->
-      txid = contract.subject.outpoint |> BSV.OutPoint.get_txid
-      txid == search_txid
-    end)
+    # selected_utxo = Enum.find(socket.assigns.tx_builder.inputs, fn contract ->
+    #   txid = contract.subject.outpoint |> BSV.OutPoint.get_txid
+    #   txid == search_txid
+    # end)
 
     # The Proper thing to do here is:
     # Update socket UTXOs
@@ -744,9 +725,11 @@ defmodule QartWeb.WalletLive do
     [address | _] = addresses
 
     encrypted = socket.assigns.encrypted
+    Qart.debug(encrypted) # box
 
     case WalletSession.derive_keypair(wallet.id, address.derivation_path) do
       {:ok, keypair} ->
+        Qart.debug(keypair)
 
         # final_content =
         #   if encrypted do
@@ -794,10 +777,10 @@ defmodule QartWeb.WalletLive do
 
   def handle_event("validate", _, socket) do
     keypair = BSV.KeyPair.new()
-    keypair2 = BSV.KeyPair.new()
     lock_params = %{address: BSV.Address.from_pubkey(keypair.pubkey)}
-    # unlock_params = %{keypair: keypair2}
-    unlock_params = %{keypair: keypair}
+
+    keypair2 = BSV.KeyPair.new()
+    unlock_params = %{keypair: keypair2}
 
     case BSV.Contract.simulate(P2PKH, lock_params, unlock_params) do
       {:ok, vm} ->
@@ -892,9 +875,9 @@ defmodule QartWeb.WalletLive do
     # Translate to BSV.UTXO params
     utxos = Enum.map(woc_utxos, fn utxo ->
       %{
-        "height" => height,
-        "isSpentInMempoolTx" => isSpentInMempoolTx,
-        "status" => status,
+        "height" => _,
+        "isSpentInMempoolTx" => _,
+        "status" => _,
         "tx_hash" => txid,
         "tx_pos" => vout,
         "value" => satoshis,
