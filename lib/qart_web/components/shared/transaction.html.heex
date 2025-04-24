@@ -67,7 +67,7 @@
       (<%= @tx.outputs |> length %>)
     </span>
   </div>
-  <%= for {output, index} <- Enum.with_index(@tx.outputs) do %>
+  <%= for output <- @tx.outputs do %>
     <.tx_out txout={output} utxos={@utxos} utxo={nil} />
   <% end %>
 

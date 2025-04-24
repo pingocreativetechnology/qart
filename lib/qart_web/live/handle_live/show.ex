@@ -45,8 +45,8 @@ defmodule QartWeb.HandleLive.Show do
         {:noreply, socket}
 
       profile_user ->
-        user_id = if @current_user, do: socket.assigns.current_user.id, else: nil
-        is_followed = if @current_user, do: Follows.is_followed?(user_id, profile_user.id), else: false
+        user_id = if socket.assigns.current_user, do: socket.assigns.current_user.id, else: nil
+        is_followed = if socket.assigns.current_user, do: Follows.is_followed?(user_id, profile_user.id), else: false
         following = Accounts.get_following(profile_user.id)
         followers = Accounts.get_followers(profile_user.id)
         mutuals = Accounts.get_mutuals(profile_user.id)

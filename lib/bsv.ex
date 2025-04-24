@@ -37,14 +37,10 @@ defmodule Qart.BSV do
 
 
   def build_inputs_tx(outputs, keypair) do
-    i = outputs |> Enum.at(0)
-
     built_outputs = outputs |> Enum.map(fn input -> OpReturn.lock(0, %{data: input.content}) end)
 
     # Create a new transaction and add an output with the OP_RETURN script.
     # Here, the output value is set to 0 since OP_RETURN outputs don't carry spendable bitcoin.
-    address = BSV.Address.from_pubkey(keypair.pubkey)
-
     utxo_1 = BSV.UTXO.from_params!(%{
       "txid" => "5e3014372338f079f005eedc85359e4d96b8440e7dbeb8c35c4182e0c19a1a12",
       "vout" => 0,
@@ -67,7 +63,7 @@ defmodule Qart.BSV do
       outputs: built_outputs
     }
 
-    tx = BSV.TxBuilder.to_tx(builder)
+    BSV.TxBuilder.to_tx(builder)
   end
 
   defmodule ScriptPatterns do

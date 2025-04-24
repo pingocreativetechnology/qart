@@ -2,7 +2,6 @@ defmodule QartWeb.HandleLive.Invite do
   use QartWeb, :live_view
   alias Qart.Mailer
   alias Qart.Forms.ContactForm
-  import Phoenix.LiveView.Helpers
 
   # for email stuff
   import Swoosh.Email

@@ -43,7 +43,7 @@ defmodule QartWeb do
         layouts: [html: QartWeb.Layouts]
 
       import Plug.Conn
-      import QartWeb.Gettext
+      use Gettext, backend: QartWeb.Gettext
 
       unquote(verified_routes())
     end
