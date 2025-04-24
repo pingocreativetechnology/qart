@@ -109,10 +109,8 @@ defmodule Qart.Transactions do
 
   # JungleBus functions ########################################################
   def parse_transaction do
-    txid = "6e93e17cf98c1af0f851454e984942d72704412369e8b85ca74262285857b2d4"
     transaction = "AQAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////8XA52NDS9DVVZWRS9LyH9b7vhTJywAAAD/////Ac5toBIAAAAAGXapFNZIaGz2A8EYUPOWAONzEnOKzMqPiKwAAAAA"
-    z = BSV.Tx.from_binary(transaction, encoding: :base64)
-    z
+    BSV.Tx.from_binary(transaction, encoding: :base64)
   end
 
 

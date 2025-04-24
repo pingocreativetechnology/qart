@@ -379,7 +379,7 @@ defmodule QartWeb.WalletLive do
   end
 
   def handle_event("sync-tx", %{"address" => address}, socket) do
-    case Qart.Transactions.get_address(address) do
+    case Qart.WhatsOnChain.get_address(address) do
       {:error, nil} ->
         {:noreply, put_flash(socket, :error, "Cannot sync address when offline")}
 

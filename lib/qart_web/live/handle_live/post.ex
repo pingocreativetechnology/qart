@@ -2,7 +2,6 @@ defmodule QartWeb.HandleLive.Post do
   use QartWeb, :live_view
   alias Qart.Accounts
   alias Qart.Follows
-  import Phoenix.LiveView.Helpers
   import QartWeb.Post
 
   @impl true
