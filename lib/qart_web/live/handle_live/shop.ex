@@ -26,6 +26,7 @@ defmodule QartWeb.HandleLive.Shop do
         items = Qart.Inventory.list_items()
 
         {:noreply, assign(socket,
+          items: items,
           user: profile_user,
           page_title: "#{profile_user.display_name}'s Profile",
           is_followed: is_followed,
