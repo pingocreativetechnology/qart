@@ -1,4 +1,3 @@
-require IEx
 defmodule QartWeb.HandleLive do
   use QartWeb, :live_view
   alias Qart.Accounts

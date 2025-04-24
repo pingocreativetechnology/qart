@@ -2,7 +2,6 @@ defmodule Qart.Transactions do
   @moduledoc """
   The Transactions context.
   """
-  require IEx
 
   import Ecto.Query, warn: false
   alias Qart.Repo

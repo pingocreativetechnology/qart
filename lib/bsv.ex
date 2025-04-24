@@ -1,5 +1,4 @@
 defmodule Qart.BSV do
-  require IEx
   @moduledoc """
   Module to create a dummy unsigned BSV transaction embedding content.
   """
