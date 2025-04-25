@@ -54,7 +54,7 @@ defmodule QartWeb.TransactionLive.Show do
     payload_base64 = nil
 
     case output.script.chunks |> Qart.BSV.ScriptPatterns.is_2sat_ordinal? do
-      {:ok, %{
+      {:ok, :one_sat, %{
           json: json,
           payload: payload,
           payload_base64: payload_base64

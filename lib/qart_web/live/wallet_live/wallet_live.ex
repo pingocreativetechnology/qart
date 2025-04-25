@@ -38,7 +38,7 @@ defmodule QartWeb.WalletLive do
     case WalletSession.derive_keypair(wallet.id, derivation_path) do
       {:ok, keypair} ->
         inputs = [
-          # P2PKH.unlock(, %{keypair: keypair})
+          # P2PKH.unlock(utxo, %{keypair: keypair})
         ]
 
         # All sorts of different data patterns can go here
@@ -83,8 +83,6 @@ defmodule QartWeb.WalletLive do
           default_wallet_id: default_wallet_id,
           derivation_path: derivation_path,
           editing_derivation_path: false,
-          inputs: inputs,
-
           json: nil,
           mnemonic: nil,
           mnemonic_shown: false,
@@ -99,7 +97,6 @@ defmodule QartWeb.WalletLive do
           tx: nil,
           tx_builder: tx_builder,
           tx_result: nil,
-          tx_result_base64: nil,
           user: user,
           user_id: user_id,
           utxos: utxos,
@@ -459,7 +456,7 @@ defmodule QartWeb.WalletLive do
     {:noreply, assign(socket,
       tx_builder: tx_builder,
       tx: "nil",
-    show_add_input: false)
+      show_add_input: false)
     } end
 
   def handle_params(%{}, _uri, socket) do
@@ -534,7 +531,10 @@ defmodule QartWeb.WalletLive do
       outputs: updated_outputs
     }
 
+    tx = BSV.TxBuilder.to_tx(tx_builder)
+
     {:noreply, assign(socket,
+      tx: tx,
       tx_builder: tx_builder,
       next_id: socket.assigns.next_id + 1
       )
@@ -551,7 +551,7 @@ defmodule QartWeb.WalletLive do
 
     new_input = P2PKH.unlock(selected_utxo, %{keypair: keypair})
 
-    updated_inputs = socket.assigns.inputs ++ [new_input]
+    updated_inputs = socket.assigns.tx_builder.inputs ++ [new_input]
 
     tx_builder = %BSV.TxBuilder{
       inputs: updated_inputs,
@@ -559,7 +559,6 @@ defmodule QartWeb.WalletLive do
     }
 
     {:noreply, assign(socket,
-      inputs: updated_inputs,
       tx_builder: tx_builder,
       next_id: socket.assigns.next_id + 1
       )
@@ -576,8 +575,8 @@ defmodule QartWeb.WalletLive do
     # The Proper thing to do here is:
     # Update socket UTXOs
     # Then populate the objects from them in a standard-ish way
-    updated_inputs = Enum.reject(socket.assigns.inputs, fn contract ->
-      Enum.any?(socket.assigns.inputs, fn
+    updated_inputs = Enum.reject(socket.assigns.tx_builder.inputs, fn contract ->
+      Enum.any?(socket.assigns.tx_builder.inputs, fn
         contract ->
           contract_txid = contract.subject.outpoint |> BSV.OutPoint.get_txid
           contract_txid == search_txid
@@ -592,7 +591,6 @@ defmodule QartWeb.WalletLive do
     }
 
     {:noreply, assign(socket,
-      inputs: updated_inputs,
       tx_builder: tx_builder,
       next_id: socket.assigns.next_id - 1
       )
@@ -613,15 +611,19 @@ defmodule QartWeb.WalletLive do
 
     new_input = P2PKH.unlock(utxo, %{keypair: keypair})
 
-    updated_inputs = socket.assigns.inputs ++ [new_input]
+    updated_inputs = socket.assigns.tx_builder.inputs ++ [new_input]
 
     tx_builder = %BSV.TxBuilder{
       inputs: updated_inputs,
       outputs: socket.assigns.tx_builder.outputs
     }
 
+    tx = BSV.TxBuilder.to_tx(tx_builder)
+    tx_string = BSV.Tx.to_binary(tx, encoding: :hex)
+
     {:noreply, assign(socket,
-      inputs: updated_inputs,
+      tx_result: tx_string,
+      tx: tx,
       tx_builder: tx_builder,
       next_id: socket.assigns.next_id + 1
       )
@@ -632,8 +634,7 @@ defmodule QartWeb.WalletLive do
     keypair = BSV.KeyPair.new
 
     idx = String.to_integer(vout)
-    # updated_inputs = socket.assigns.inputs
-    updated_inputs = List.delete_at(socket.assigns.inputs, idx)
+    updated_inputs = List.delete_at(socket.assigns.tx_builder.inputs, idx)
 
     tx_builder = %BSV.TxBuilder{
       inputs: updated_inputs,
@@ -641,7 +642,6 @@ defmodule QartWeb.WalletLive do
     }
 
     {:noreply, assign(socket,
-      inputs: updated_inputs,
       tx_builder: tx_builder,
       next_id: socket.assigns.next_id - 1
       )
@@ -718,32 +718,19 @@ defmodule QartWeb.WalletLive do
 
 
   # Handle the "clickwrap" event: encrypt if needed and generate an unsigned BSV transaction.
-  # def handle_event("clickwrap", %{"content" => content}, socket) do
   def handle_event("clickwrap", params, socket) do
-    user = socket.assigns.current_user
-    user_id = socket.assigns.current_user.id
-    default_wallet_id = socket.assigns.default_wallet_id
 
-    # wallet = Qart.Accounts.get_user_active_wallet(user_id)
-    # wallet = Qart.Accounts.get_user_wallet(user_id, default_wallet_id)
-    wallet = socket.assigns.wallet
-    addresses = socket.assigns.addresses
-    address = socket.assigns.address
-
-    # Get the Keypair from the Wallet for a Derivation path,
-    # then sign the transaction
-    case WalletSession.derive_keypair(wallet.id, address.derivation_path) do
+    # Get the Keypair from the Wallet for a Derivation path, then sign the transaction
+    case WalletSession.derive_keypair(socket.assigns.wallet.id, socket.assigns.address.derivation_path) do
       {:ok, keypair} ->
         # Create an unsigned BSV transaction
         tx_builder = socket.assigns.tx_builder
 
         tx = BSV.TxBuilder.to_tx(tx_builder)
         tx_string = BSV.Tx.to_binary(tx, encoding: :hex)
-        tx_string_base64 = BSV.Tx.to_binary(tx, encoding: :base64)
 
         {:noreply, assign(socket,
           tx_result: tx_string,
-          tx_result_base64: tx_string_base64,
           tx_builder: tx_builder,
           tx: tx
         )}
