@@ -1,5 +1,6 @@
 <%
 utxo_for_address = []
+{:ok, bsv_address} = BSV.Address.from_string(@address.address)
 
 utxo2_for_address = @utxos |> Enum.filter(fn utxo ->
   utxo.address == @address.address
@@ -26,8 +27,12 @@ utxo2_for_address = @utxos |> Enum.filter(fn utxo ->
             <%= @address.derivation_path %>
           </a></span>
         <br>
-        <span name="address-pubkey-hash" title="Address PubKey hash" class="hidden text-slate-400">
-          <%= @address.pubkey_hash %>
+        <span
+          name="address-pubkey-hash"
+          title="Address PubKey hash"
+          class="text-slate-400"
+          comment="this is referenceed in a UTXO's P2PKH script">
+          <%= bsv_address.pubkey_hash |> Base.encode16(case: :lower) %>
         </span>
       </div>
     </div>

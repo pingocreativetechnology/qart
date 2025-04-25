@@ -114,19 +114,41 @@ defmodule Qart.BSV do
       end
     end
 
-    def identify(script = %BSV.Script{}) do
+    def identify(script = %BSV.Script{}) when is_list(script.chunks) do
       cond do
         is_p2pkh?(script.chunks) -> :p2pkh
         is_2sat_ordinal?(script.chunks) -> :one_sat_ordinal
+        is_op_return?(script.chunks) -> :op_return
         # match_p2wpkh?(script.chunks) -> :p2wpkh
         # match_p2wsh?(script.chunks) -> :p2wsh
         # match_op_return?(script.chunks) -> :op_return
-        true -> :unknown_script_type
+
+        true -> :unknown # :unknown_script_type
+      end
+    end
+
+    def identify!(chunks) do
+      Qart.debug(chunks)
+    end
+
+    def is_op_return?(chunks) do
+      case chunks do
+        [
+          :OP_FALSE,
+          :OP_RETURN
+          |
+          payload
+        ] ->
+          {:ok, :op_return, %{
+            payload: payload
+          }}
+
+        _ ->
+          false
       end
     end
 
     def is_2sat_ordinal?(chunks) do
-      # Qart.debug(chunks)
       case chunks do
         [
           :OP_DUP,
@@ -170,5 +192,14 @@ defmodule Qart.BSV do
       end
     end
   end
+
+  def standard_transaction_with_change_outputs(to_address, change_address, opreturn_array) do
+    [
+      P2PKH.lock(10000, %{address: to_address}),
+      P2PKH.lock(10000, %{address: change_address}),
+      OpReturn.lock(0, %{data: opreturn_array})
+    ]
+  end
+
 
 end

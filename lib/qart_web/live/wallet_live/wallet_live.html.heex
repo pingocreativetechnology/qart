@@ -431,7 +431,6 @@
 <% end %>
 
 </div>
-
 <% end %>
 
 <%= if @live_action == :tx do %>
@@ -443,17 +442,41 @@
     >
       <div
         class="mr-8">
-        <span
-          class="text-slate-500">
-          Wallet ID
-        </span>
-        <a
-          href={"/wallets/#{@wallet_id}"}
-          class="text-blue-700">{@wallet.id}</a>
-          <span
-            class="text-slate-400">
-            {@wallet.name}
-          </span>
+        <div
+          class="text-2xl"
+          title={"Wallet #{@wallet.id} #{@wallet.name}"}>
+          Wallet
+          <%= if @show_wallet_name_editing do %>
+          <form
+            phx-submit="update-wallet-name"
+            phx-value-id={@wallet.id}
+            class="flex space-x-2">
+            <input
+              type="text"
+              name="name"
+              value={@wallet.name}
+              class="border p-1 rounded" />
+            <button
+              type="submit"
+              class="px-2 py-1 bg-blue-500 text-white rounded text-sm">
+              Save
+            </button>
+          </form>
+          <% else %>
+            <%= if @wallet.name do %>
+              <span class="text-sm text-slate-400" phx-click="showWalletNameEditing">
+                {@wallet.name}
+              </span>
+            <% else %>
+              <span
+                class="text-sm text-slate-400"
+                phx-click="showWalletNameEditing"
+              >
+                Name this wallet
+              </span>
+            <% end %>
+          <% end %>
+        </div>
 
       </div>
       <div
@@ -512,20 +535,20 @@
 
           <span
             class="font-mono">
-            {@address |> BSV.Address.to_string}
+            {@bsv_address |> BSV.Address.to_string}
           </span>
           <% wallet_recently_synced = DateTime.diff(DateTime.utc_now(), @wallet_last_synced_at, :second) %>
           <%= if wallet_recently_synced >= 0 && wallet_recently_synced <= 10 do %>
           <button type="button"
           phx-click="sync-address"
-          phx-value-address={@address |> BSV.Address.to_string}
+          phx-value-address={@bsv_address |> BSV.Address.to_string}
             class="text-xs bg-slate-300 hover:bg-slate-400 text-slate-600 px-3 py-1 rounded">
             Updated {@wallet_last_synced_at |> inspect}
           </button>
           <% else %>
           <button type="button"
           phx-click="sync-address"
-          phx-value-address={@address |> BSV.Address.to_string}
+          phx-value-address={@bsv_address |> BSV.Address.to_string}
             class="text-xs bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">
             Sync address
           </button>
@@ -536,7 +559,7 @@
   </div>
 
   <div
-    class="mx-auto w-full border-b pt-1 pb-4 text-xl text-slate-300"
+    class="mx-auto w-full border-b pt-1 pb-4 text-md text-slate-300"
     name="addresses"
   >
   <div
@@ -562,7 +585,7 @@
     name="tx-viewer"
     class="mx-auto w-full grow lg:flex gap-4">
     <div
-      class="w-1/5">
+      class="w-1/5 hidden">
       <div
         class="mt-2 mb-2">
         <span
@@ -613,14 +636,14 @@
               _ -> false end
               )
               do %>
-              <span class="">UTXO IN BUILDER</span>
+              <span class="hidden">UTXO IN BUILDER</span>
             <% end %>
           </div>
           </a>
       <% end %>
     </div>
     <div
-      class="w-1/5">
+      class="w-1/4">
       <div
         class="mt-2 mb-2">
         Available UTXOs
@@ -636,8 +659,9 @@
         %>
 
       <div
-        class={"p-2 border border-slate-200 mb-1 #{if inputs_include_utxo, do: 'bg-slate-200'} "}>
+        class={"border border-slate-200 rounded mb-2 #{if inputs_include_utxo, do: ' border-green-500'} "}>
         <.tx_out txout={utxo.txout} utxo={utxo} />
+        <.link href=""} >Link</.link>
         <%= if inputs_include_utxo do %>
         <button
           type="button"
@@ -662,7 +686,7 @@
     </div>
 
     <div
-      class="w-2/5 flex gap-4 bg-slate-100 p-4 rounded"
+      class="w-1/2 flex gap-4 bg-slate-100 p-4 rounded"
       name="two-center-columns ">
       <div
         name="tx-inputs"
@@ -682,6 +706,7 @@
       </div>
 
       <div class="w-1/2">
+        <form phx-submit="clickwrap">
           <div class="">
             <div class="flex justify-between text-2xl mb-2">
               <div>
@@ -692,7 +717,7 @@
               </div>
             </div>
 
-            <form phx-submit="clickwrap">
+
             <div>
               <%= for {output, index} <- Enum.with_index(@tx_builder.outputs) do %>
                 <div
@@ -795,47 +820,87 @@
                 <% end %>
 
                 <div
-                  class="mt-6">
+                  class="mt-2">
                   <button
                     type="button"
                     phx-click="add_output"
-                    class="bg-slate-400 hover:bg-slate-500 text-white px-4 py-1 rounded w-full">
+                    class="bg-white hover:text-slate-600 hover:bg-slate-200 text-slate-900 px-4 py-1 min-h-36 rounded w-full border hover:border">
                     Add Output
                   </button>
                 </div>
 
-                <div class="text-slate-500 mb-3">
-                  <div>
-                    <span class="font-slate-600 text-xs">
-                      Standard Outputs
-                    </span>
+                <div
+                  class="hidden">
+                  <div
+                    class="mt-8">
+                    <button
+                      type="button"
+                      phx-click="add_output"
+                      phx-value-output-type="1sat"
+                      class="bg-yellow-400 hover:bg-orange-200 text-white px-4 py-1 rounded w-full">
+                      Add 1Sat Output
+                    </button>
                   </div>
-                  <div>
-                    <div class="font-slate-600 text-xs">
-                      Additional Custom Outputs
-                    </div>
-                    <div class="font-slate-600 text-xs">
-                      OP_RETURN, 1satOrdinal, etc.
-                    </div>
+
+                  <div
+                    class="mt-1">
+                    <button
+                      type="button"
+                      phx-click="add_output"
+                      phx-value-output-type="op_return"
+                      class="bg-slate-400 hover:bg-slate-500 text-white px-4 py-1 rounded w-full">
+                      Add Bitcoin Schema object
+                    </button>
+                  </div>
+                  <div
+                    class="mt-1">
+                    <button
+                      type="button"
+                      phx-click="add_output"
+                      phx-value-output-type="op_return"
+                      class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-1 rounded w-full">
+                      Add Twetch Post
+                    </button>
+                  </div>
+
+                  <div
+                    class="mt-1">
+                    <button
+                      type="button"
+                      phx-click="add_output"
+                      phx-value-output-type="op_return"
+                      class="bg-orange-400 hover:bg-orange-500 text-white px-4 py-1 rounded w-full">
+                      Add BRC-20 Output
+                    </button>
+                  </div>
+
+                  <div class="mt-1">
+                    <button type="button" phx-click="add_output" phx-value-output-type="op_return"
+                      class="bg-slate-300 hover:bg-slate-500 text-slate-900 px-4 py-1 rounded w-full">
+                      Add Custom Output
+                    </button>
                   </div>
                 </div>
 
                 <div
-                  class="mt-2">
+                  class="mt-2 text-right">
                   <button
                     class="inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset text-gray-900 bg-white  hover:bg-gray-50 ring-gray-300"
-                    type="submit">Update tx / Clickwrap</button>
+                    type="submit">
+                    Update Transaction
+                    &rarr;
+                  </button>
                 </div>
             </div>
-            </form>
           </div>
+        </form>
 
       </div>
     </div>
 
     <div
       name="display-runtime-transaction-column"
-      class="w-1/5">
+      class="w-1/4">
       <div class="flex justify-between text-2xl items-center">
         <div
           class="text-sm">
@@ -1028,7 +1093,9 @@
         <% end %>
     </div>
 
-    <div class="w-2/5 flex gap-4 bg-slate-100 p-4 rounded" name="two-center-columns ">
+    <div
+      class="w-2/5 flex gap-4 bg-slate-100 p-4 rounded"
+      name="two-center-columns ">
       <div name="tx-inputs" class="w-1/2">
         <div class="flex justify-between text-2xl mb-2">
           <div>
@@ -1076,7 +1143,7 @@
                     </div>
                   </div>
                   <div class="p-2">
-                    <%= if index==0 do %>
+                    <%= if index == 0 do %>
                       <% {BSV.Contract.P2PKH, :locking_script,[%{address: to_address}]}=output.mfa %>
                         <input id="content3" type="number" name="output-0-satoshis" placeholder="100"
                           value={output.subject} phx-value-vout={index} phx-blur="update_satoshis"

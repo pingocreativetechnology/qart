@@ -43,3 +43,12 @@ erl_crash.dump
 /assets/node_modules/
 /priv/static/assets/
 /priv/static/cache_manifest.json
+
+# Additional excluded files
+.env
+.env.sample
+.env.development
+.env.test
+Dockerfile
+fly.toml
+fly.staging.toml

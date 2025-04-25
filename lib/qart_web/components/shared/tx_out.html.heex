@@ -1,11 +1,11 @@
 <div
   name="tx-output"
-  class="mb-1 bg-white rounded"
+  class="mb-1 bg-white rounded p-2"
 >
   <div
-    class="sm-flex justify-between items-center">
+    class="flex justify-between items-center">
     <div
-      class="flex justify-left items-center text-xs gap-2">
+      class="justify-left items-center text-xs gap-1">
       <.coinbase_tag coinbase={@txout.script.coinbase} />
       <span name="script-type"
         class="inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs ring-1 ring-blue-600/20 ring-inset text-blue-500 text-sans">
@@ -28,7 +28,7 @@
       <% end %>
     <% end %>
     </div>
-    <div class="text-lg text-right">
+    <div class="justify-right text-lg text-right">
       {@txout.satoshis}
     </div>
   </div>

@@ -492,7 +492,7 @@ defmodule Qart.Accounts do
   """
 
   def confirm_user(token) do
-    case Mix.env() do
+    case Application.get_env(:qart, :env) do
       :dev ->
         Repo.update!(User.confirm_changeset(token))
 

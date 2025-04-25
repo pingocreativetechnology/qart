@@ -8,7 +8,7 @@ defmodule Qart.Application do
   @impl true
   def start(_type, _args) do
     # For Dotenv
-    unless Mix.env == :prod do
+    unless Application.get_env(:qart, :env) == :prod do
       Dotenv.load
     end
 
@@ -22,10 +22,10 @@ defmodule Qart.Application do
       {Finch, name: Qart.Finch},
       # Start a worker by calling: Qart.Worker.start_link(arg)
       # {Qart.Worker, arg},
-      # Start to serve requests, typically the last entry
-      QartWeb.Endpoint,
       Qart.Wallet.WalletSession,
       Qart.Vault,
+      # Start to serve requests, typically the last entry
+      QartWeb.Endpoint,
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

@@ -14,10 +14,10 @@
       <.outpoint outpoint={@tx_input.outpoint} /></a>
   </div>
 </div>
-  <div class="flex justify-between border-b pb-1">
-    <div class="flex items-center p-1">
+  <div class="justify-between border-b pb-1">
+    <div class="items-center p-1">
       <span
-        class="text-slate-400 mr-1">
+        class="text-slate-400 mr-1 min-w-8">
         vout
       </span>
       <span
@@ -25,23 +25,21 @@
         {@tx_input.outpoint.vout}
       </span>
       &middot;
-      <span name="description" class="ml-4 mr-4">
+      <span name="description"
+        class="ml-2 mr-2 min-w-20">
         <span name="type" title="Type"
           class="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs ring-1 ring-blue-600/20 ring-inset text-blue-600 mr-2">
           <%= Qart.BSV.ScriptPatterns.identify(@tx_input.script) %>
         </span>
-        <span class="text-xs italic text-slate-400">
-          with
-        </span>
-        Unlocking Script
       </span>
-      &middot;
-      <span name="sequence" class="text-slate-400 ml-4 mr-1">
+      <span
+        name="sequence"
+        class="text-slate-400 ml-2 min-w-36">
         Sequence
+        {@tx_input.sequence}
       </span>
-      {@tx_input.sequence}
     </div>
-    <div class="flex justify-end items-center">
+    <div class="justify-end items-center min-w-36">
       <.coinbase_tag coinbase={@tx_input.script.coinbase} />
     </div>
   </div>
