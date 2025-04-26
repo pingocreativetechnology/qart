@@ -28,37 +28,25 @@ defmodule Qart.WhatsOnChain do
     new_tx = %{
       txid: json["id"],
       raw: json["transaction"],
-      # outputs: json["outputs"],
       addresses: json["addresses"],
     }
 
     {:ok, tx} = Qart.Transactions.create_transaction(new_tx)
-    # {:ok, nil}
   end
 
   def get_address(address) do
     bsv_network = Application.get_env(:bsv, :network)
     url = "https://api.whatsonchain.com/v1/bsv/#{bsv_network}/address/#{address}/info"
 
-    # response =
-
-    # Qart.debug response
-
     case Tesla.get(url) do
       {:error, %Mint.TransportError{reason: :nxdomain}} ->
-        Qart.debug("111")
-        Qart.debug(url)
-        IO.puts "ya"
         {:error, nil}
 
       response ->
         json = response.body |> Jason.decode!
-        Qart.debug(json)
         {:ok, nil}
 
       _ ->
-        Qart.debug("333")
-        IO.puts "else"
         {:ok, nil}
     end
   end
@@ -76,8 +64,6 @@ defmodule Qart.WhatsOnChain do
         {:ok, response_body}
 
       _ ->
-        Qart.debug("333")
-        IO.puts "else"
         {:ok, nil}
     end
 
@@ -136,7 +122,5 @@ defmodule Qart.WhatsOnChain do
 
   defp fetch_and_insert(txid) do
     {:ok, tx} = get_tx(txid)
-    Qart.debug(tx)
-    {:ok, tx}
   end
 end

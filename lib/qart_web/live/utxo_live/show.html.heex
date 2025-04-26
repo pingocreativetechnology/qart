@@ -1,9 +1,12 @@
+<% bsv_utxo = @utxo |> Qart.Transactions.Utxo.to_bsv_utxo
+%>
+
+<.back navigate={~p"/utxos"}>Back to utxos</.back>
 <div
   class="max-w-4xl mx-auto">
 
   <.header>
     Utxo {@utxo.id}
-    <:subtitle>This is a utxo record from your database.</:subtitle>
     <:actions>
       <.link patch={~p"/utxos/#{@utxo}/show/edit"} phx-click={JS.push_focus()}>
         <.button>Edit utxo</.button>
@@ -17,11 +20,10 @@
     <:item title="Satoshis">{@utxo.satoshis}</:item>
     <:item title="Address">{@utxo.address}</:item>
     <:item title="Script"><div class="font-mono" style="word-break: break-all;">{@utxo.script}</div></:item>
+    <:item title="Script .to_asm"><div class="font-mono" style="word-break: break-all;">{bsv_utxo.txout.script |> BSV.Script.to_asm |> inspect}</div></:item>
     <:item title="Spent">{@utxo.spent}</:item>
     <:item title="Spent at">{@utxo.spent_at}</:item>
   </.list>
-
-  <.back navigate={~p"/utxos"}>Back to utxos</.back>
 
   <.modal :if={@live_action == :edit} id="utxo-modal" show on_cancel={JS.patch(~p"/utxos/#{@utxo}")}>
     <.live_component
@@ -33,4 +35,11 @@
       patch={~p"/utxos/#{@utxo}"}
     />
   </.modal>
+
+
+  <br>
+  <br>
+  <br>
+  <br>
+  <.utxo utxo={bsv_utxo} />
 </div>

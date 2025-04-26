@@ -1,15 +1,12 @@
 <%
-utxo_for_address = []
-{:ok, bsv_address} = BSV.Address.from_string(@address.address)
-
+# TODO: improve this very clunky joining of an Address and its UTXOs
 utxo2_for_address = @utxos |> Enum.filter(fn utxo ->
   utxo.address == @address.address
   end )
 
-  total_utxo_satoshis = Enum.reduce(utxo2_for_address, 0, fn %Qart.Transactions.Utxo{satoshis: satoshis}, acc ->
-    acc + satoshis end)
+total_utxo_satoshis = Enum.reduce(utxo2_for_address, 0, fn %Qart.Transactions.Utxo{satoshis: satoshis}, acc ->
+  acc + satoshis end)
 %>
-
 <li
   class="px-2 border rounded border-slate-400 my-2 bg-slate-100"
   name="address">
@@ -32,7 +29,7 @@ utxo2_for_address = @utxos |> Enum.filter(fn utxo ->
           title="Address PubKey hash"
           class="text-slate-400"
           comment="this is referenceed in a UTXO's P2PKH script">
-          <%= bsv_address.pubkey_hash |> Base.encode16(case: :lower) %>
+          <%= @bsv_address.pubkey_hash |> Base.encode16(case: :lower) %>
         </span>
       </div>
     </div>
@@ -45,7 +42,7 @@ utxo2_for_address = @utxos |> Enum.filter(fn utxo ->
   <div name="utxos" class="">
     <%= for utxo <- utxo2_for_address |> Enum.map(fn txo -> Qart.Transactions.Utxo.to_bsv_utxo(txo) end) do %>
       <.utxo utxo={utxo} />
-      <% end %>
+    <% end %>
   </div>
   <% else %>
   <% end %>

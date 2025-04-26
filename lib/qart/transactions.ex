@@ -5,8 +5,8 @@ defmodule Qart.Transactions do
 
   import Ecto.Query, warn: false
   alias Qart.Repo
-
   alias Qart.Transactions.Transaction
+  alias Qart.Transactions.Utxo
 
   @doc """
   Returns the list of transactions.
@@ -104,16 +104,6 @@ defmodule Qart.Transactions do
   def change_transaction(%Transaction{} = transaction, attrs \\ %{}) do
     Transaction.changeset(transaction, attrs)
   end
-
-
-  # JungleBus functions ########################################################
-  def parse_transaction do
-    transaction = "AQAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////8XA52NDS9DVVZWRS9LyH9b7vhTJywAAAD/////Ac5toBIAAAAAGXapFNZIaGz2A8EYUPOWAONzEnOKzMqPiKwAAAAA"
-    BSV.Tx.from_binary(transaction, encoding: :base64)
-  end
-
-
-  alias Qart.Transactions.Utxo
 
   @doc """
   Returns the list of utxos.

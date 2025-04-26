@@ -60,11 +60,9 @@ defmodule QartWeb.TransactionLive.Show do
           payload_base64: payload_base64
         }
       } ->
-        Qart.debug("going well here")
         false
 
       false ->
-        Qart.debug("also going well here")
         false
     end
 
@@ -93,24 +91,21 @@ defmodule QartWeb.TransactionLive.Show do
 
     output = tx.outputs |> Enum.at(0)
     chunks = test = output.script.chunks
-    # test = chunks |> Enum.at(0)
-    test = chunks |> Qart.BSV.ScriptPatterns.is_2sat_ordinal?
 
     payload = nil
     payload_base64 = nil
 
     case output.script.chunks |> Qart.BSV.ScriptPatterns.is_2sat_ordinal? do
-      {:ok, %{
+      {:ok, :one_sat, %{
           json: json,
           payload: payload,
           payload_base64: payload_base64
         }
       } ->
-        Qart.debug("going well here")
+        Qart.debug("this is a 1sat ordinal")
 
-       false ->
-        Qart.debug("also going well here")
-        false
+      false ->
+        Qart.debug("this is not a 1sat ordinal")
     end
 
      {:noreply,
@@ -119,7 +114,6 @@ defmodule QartWeb.TransactionLive.Show do
          |> assign(:transaction, transaction)
          |> assign(:tx, tx)
          |> assign(:hex, hex)
-         |> assign(:test, test)
          |> assign(:payload, payload)
          |> assign(:payload_base64, payload_base64)
         }

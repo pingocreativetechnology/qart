@@ -6,8 +6,10 @@
     name="tx_builder-inputs">
   <%= if Enum.any?(@tx_builder.inputs) do %>
     <%= for contract <- @tx_builder.inputs do %>
-      <% tx_input=contract |> BSV.Contract.to_txin %>
-      <.tx_input tx_input={tx_input} show_remove_button={true} />
+      <% tx_input = contract |> BSV.Contract.to_txin %>
+      <.tx_input
+        tx_input={tx_input}
+        show_remove_button={true} />
     <% end %>
   <% else %>
   <div

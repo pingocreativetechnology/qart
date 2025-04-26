@@ -117,7 +117,7 @@ defmodule QartWeb.WalletLive do
         )}
 
       _ ->
-          Qart.debug("whoooooooooa")
+        Qart.debug("Wallet can't be derived")
     end
   end
 
@@ -524,6 +524,12 @@ defmodule QartWeb.WalletLive do
       "world2"
     ]})
 
+    # Other contract types
+    new_output = OpReturn.lock(1, %{data: [
+      "i am a 1sat ordinal",
+      "heres_a.jpg"
+    ]})
+
     updated_outputs = socket.assigns.tx_builder.outputs ++ [new_output]
 
     tx_builder = %BSV.TxBuilder{
@@ -758,8 +764,6 @@ defmodule QartWeb.WalletLive do
         {:noreply, assign(socket, valid_contract: valid_contract)}
 
       {:error, x }  ->
-        Qart.debug(x)
-        Qart.debug(x.error)
         {:noreply, assign(socket, valid_contract: false, contract_error: x.error)}
     end
 
@@ -767,7 +771,8 @@ defmodule QartWeb.WalletLive do
 
   def handle_event("validate2", _, socket) do
     keypair = BSV.KeyPair.new()
-    address = Qart.Accounts.get_address_keypair(19, "mwqvASigS4AEAWGtHYcgV2xFVrADC4KaG4")
+    wallet = socket.assigns.wallet
+    address = Qart.Accounts.get_address_keypair(wallet.id, socket.assigns.address)
     Qart.debug(address)
     {:ok, addy} = BSV.Address.from_string(address.address)
     # {:ok, keypair2} = BSV.Address.from_string(address.address).keypair
@@ -792,8 +797,6 @@ defmodule QartWeb.WalletLive do
         {:noreply, assign(socket, valid_contract2: valid_contract2)}
 
       {:error, x }  ->
-        Qart.debug(x)
-        Qart.debug(x.error)
         {:noreply, assign(socket, valid_contract2: false, contract_validation_error: x.error, contract_error: x.error)}
     end
 
@@ -802,8 +805,6 @@ defmodule QartWeb.WalletLive do
   @impl true
   def handle_event("open_modal", %{"id" => id}, socket) do
     tx = Enum.find(socket.assigns.transactions, fn tx -> to_string(tx.id) == id end)
-    # Qart.debug(id)
-    # Qart.debug(socket.assigns.transactions |> Enum.at(0))
     {:noreply, assign(socket, show_modal: true, selected_tx: tx)}
   end
 

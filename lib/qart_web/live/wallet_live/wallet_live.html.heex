@@ -106,6 +106,15 @@
         </svg>
         Transactions
       </a>
+      <a href={~p"/utxos"}
+        class="my-2 inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold  shadow-sm ring-1 ring-inset text-slate-800 bg-white hover:bg-gray-50 ring-gray-300">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+          class="size-5 mr-1">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+        </svg>
+        UTXOs
+      </a>
       <.link
         patch={~p"/wallet/utils"}
         class="my-2 inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold  shadow-sm ring-1 ring-inset text-slate-800 bg-orange-100  hover:bg-orange-200 ring-orange-200">
@@ -279,22 +288,7 @@
 </div>
 <% end %>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 <%= if @live_action == :show do %>
-
-
 <div class="max-w-5xl mx-auto">
 
   <div class="mt-4 w-full pb-1">
@@ -349,7 +343,8 @@
           <span class="text-slate-400 text-xs">
             ID
           </span>
-          <span>
+          <span
+            class="text-slate-600">
             <%= @wallet.id %>
           </span>
         </div>
@@ -368,7 +363,8 @@
           <span class="text-slate-400 text-xs">
             Current Derivation Index
           </span>
-          <span>
+          <span
+            class="text-slate-600">
             <%= @wallet.current_derivation %>
           </span>
         </div>
@@ -392,12 +388,12 @@
     </div>
   </div>
 
-
 <%= @mnemonic %>
 <%= if @wallet do %>
   <ul>
   <%= for address <- @addresses do %>
-    <.address address={address} wallet={@wallet} utxos={@utxos2} />
+    <% {:ok, bsv_address} = BSV.Address.from_string(address.address) %>
+    <.address address={address} bsv_address={bsv_address} wallet={@wallet} utxos={@utxos2} />
   <% end %>
   </ul>
 
@@ -644,7 +640,8 @@
       class="w-1/4">
       <div
         class="mt-2 mb-2">
-        Available UTXOs
+        Available
+        <a href="/utxos">UTXOs</a>
       </div>
 
       <%= for utxo <- @utxos do %>
@@ -659,7 +656,6 @@
       <div
         class={"border border-slate-200 rounded mb-2 #{if inputs_include_utxo, do: ' border-green-500'} "}>
         <.tx_out txout={utxo.txout} utxo={utxo} />
-        <.link href=""} >Link</.link>
         <%= if inputs_include_utxo do %>
         <button
           type="button"
