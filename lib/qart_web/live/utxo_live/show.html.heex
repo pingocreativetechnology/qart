@@ -1,7 +1,9 @@
-<% bsv_utxo = @utxo |> Qart.Transactions.Utxo.to_bsv_utxo
-%>
+<% bsv_utxo = @utxo |> Qart.Transactions.Utxo.to_bsv_utxo %>
 
-<.back navigate={~p"/utxos"}>Back to utxos</.back>
+<div
+  class="px-4">
+  <.back navigate={~p"/utxos"}>Back to utxos</.back>
+</div>
 <div
   class="max-w-4xl mx-auto">
 
@@ -14,14 +16,17 @@
     </:actions>
   </.header>
 
+  <div class="mt-2">
+    <.utxo utxo={bsv_utxo} />
+  </div>
+
   <.list>
     <:item title="Txid"><div class="font-mono" style="word-break: break-all;">{@utxo.txid}</div></:item>
-    <:item title="Vout">{@utxo.vout}</:item>
-    <:item title="Satoshis">{@utxo.satoshis}</:item>
     <:item title="Address">{@utxo.address}</:item>
     <:item title="Script"><div class="font-mono" style="word-break: break-all;">{@utxo.script}</div></:item>
-    <:item title="Script .to_asm"><div class="font-mono" style="word-break: break-all;">{bsv_utxo.txout.script |> BSV.Script.to_asm |> inspect}</div></:item>
-    <:item title="Spent">{@utxo.spent}</:item>
+    <:item title="Script .to_asm"><div class="font-mono" style="word-break: break-all;">
+      {bsv_utxo.txout.script |> BSV.Script.to_asm}</div>
+    </:item>
     <:item title="Spent at">{@utxo.spent_at}</:item>
   </.list>
 
@@ -35,11 +40,4 @@
       patch={~p"/utxos/#{@utxo}"}
     />
   </.modal>
-
-
-  <br>
-  <br>
-  <br>
-  <br>
-  <.utxo utxo={bsv_utxo} />
 </div>

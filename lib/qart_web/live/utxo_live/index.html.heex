@@ -1,46 +1,58 @@
-<.header>
-  Listing Utxos
-  <:actions>
-    <.link patch={~p"/utxos/new"}>
-      <.button>New Utxo</.button>
-    </.link>
-  </:actions>
-</.header>
+<div
+  class="px-4">
+  <.header>
+    Listing Utxos
+    <:actions>
+      <.link patch={~p"/utxos/new"}>
+        <.button>New Utxo</.button>
+      </.link>
+    </:actions>
+  </.header>
 
-<.table
-  id="utxos"
-  rows={@streams.utxos}
-  row_click={fn {_id, utxo} -> JS.navigate(~p"/utxos/#{utxo}") end}
->
-  <:col :let={{_id, utxo}} label="Txid">{utxo.txid}</:col>
-  <:col :let={{_id, utxo}} label="Vout">{utxo.vout}</:col>
-  <:col :let={{_id, utxo}} label="Satoshis">{utxo.satoshis}</:col>
-  <:col :let={{_id, utxo}} label="Script">{utxo.script}</:col>
-  <:col :let={{_id, utxo}} label="Spent">{utxo.spent}</:col>
-  <:col :let={{_id, utxo}} label="Spent at">{utxo.spent_at}</:col>
-  <:action :let={{_id, utxo}}>
-    <div class="sr-only">
-      <.link navigate={~p"/utxos/#{utxo}"}>Show</.link>
-    </div>
-    <.link patch={~p"/utxos/#{utxo}/edit"}>Edit</.link>
-  </:action>
-  <:action :let={{id, utxo}}>
-    <.link
-      phx-click={JS.push("delete", value: %{id: utxo.id}) |> hide("##{id}")}
-      data-confirm="Are you sure?"
-    >
-      Delete
-    </.link>
-  </:action>
-</.table>
+  <.table
+    id="utxos"
+    rows={@streams.utxos}
+    row_click={fn {_id, utxo} -> JS.navigate(~p"/utxos/#{utxo}") end}
+  >
+    <:col :let={{_id, utxo}} label="Txid">
+      <span
+        class="font-mono text-slate-400">
+        {utxo.txid}
+      </span>
+    </:col>
+    <:col :let={{_id, utxo}} label="Vout">
+      <span class="font-mono text-slate-400">
+        {utxo.vout}
+      </span>
+    </:col>
+    <:col :let={{_id, utxo}} label="Satoshis">{utxo.satoshis}</:col>
+    <:col :let={{_id, utxo}} label="Spent">{utxo.spent}</:col>
+    <:col :let={{_id, utxo}} label="Spent at">{utxo.spent_at}</:col>
+    <:action :let={{_id, utxo}}>
+      <div class="sr-only">
+        <.link navigate={~p"/utxos/#{utxo}"}>Show</.link>
+      </div>
+      <.link patch={~p"/utxos/#{utxo}/edit"}>Edit</.link>
+    </:action>
+    <:action :let={{id, utxo}}>
+      <.link
+        phx-click={JS.push("delete", value: %{id: utxo.id}) |> hide("##{id}")}
+        data-confirm="Are you sure?"
+      >
+        Delete
+      </.link>
+    </:action>
+  </.table>
 
-<.modal :if={@live_action in [:new, :edit]} id="utxo-modal" show on_cancel={JS.patch(~p"/utxos")}>
-  <.live_component
-    module={QartWeb.UtxoLive.FormComponent}
-    id={@utxo.id || :new}
-    title={@page_title}
-    action={@live_action}
-    utxo={@utxo}
-    patch={~p"/utxos"}
-  />
-</.modal>
+  <.modal :if={@live_action in [:new, :edit]} id="utxo-modal" show on_cancel={JS.patch(~p"/utxos")}>
+    <.live_component
+      module={QartWeb.UtxoLive.FormComponent}
+      id={@utxo.id || :new}
+      title={@page_title}
+      action={@live_action}
+      utxo={@utxo}
+      patch={~p"/utxos"}
+    />
+  </.modal>
+
+</div>

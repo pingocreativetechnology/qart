@@ -10,7 +10,6 @@ defmodule QartWeb.TransactionLive.Show do
     {:ok, assign(socket,
       transaction: nil,
       tx: nil,
-      tx_result: nil,
       hex: nil,
       test: 123,
       utxos: utxos

@@ -25,7 +25,7 @@ defmodule Qart.Transactions.Utxo do
   Convert this Ecto Utxo struct into a BSV.Utxo.
   """
   def to_bsv_utxo(%__MODULE__{} = utxo) do
-    {:ok, utxo } =BSV.UTXO.from_params(%{
+    {:ok, utxo } = BSV.UTXO.from_params(%{
       "txid" => utxo.txid,
       "vout" => utxo.vout,
       "satoshis" => utxo.satoshis,

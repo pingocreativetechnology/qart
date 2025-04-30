@@ -1,25 +1,20 @@
-<div class="text-center flex justify-center my-4">
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-    class="size-6">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
-  </svg>
-</div>
-
 <div name="transaction"
   title="Transaction"
   class="border border-slate-200 p-2 rounded p-2 text-xs rounded"
   style="word-break: break-all;">
 
-<div class="text-xs text-slate-400 mb-2">
-  Parsed Transaction
-</div>
+  <div
+    class="text-xs text-slate-400 mb-1">
+    Parsed Transaction
+  </div>
 
-  <div class="flex justify-between items-center  border-b pb-2">
+  <div
+    class="flex flex-wrap justify-between items-center border-b pb-2">
     <div class="flex">
       <div
         name="txid"
         title="Transaction ID"
-        class="text-lg font-semibold text-blue-700">
+        class="whitespace-nowrap text-lg font-semibold text-blue-700">
         <a
           href={"/transactions/#{@tx |> BSV.Tx.get_txid}"}
         >
@@ -27,42 +22,35 @@
         </a>
       </div>
     </div>
-    <div class="sm-flex font-sans gap-2">
+    <div class="whitespace-nowrap flex font-sans gap-1">
       <div
-        class="inline-flex items-center rounded-full bg-slate-50 px-2 py-1 ring-1 ring-slate-600/20 ring-inset text-slate-500">
+        class="whitespace-nowrap inline-flex items-center rounded-full bg-slate-50 px-2 py-1 ring-1 ring-slate-600/20 ring-inset text-slate-500">
         version <%= @tx.version %>
       </div>
       <div
-        class="inline-flex items-center rounded-full bg-slate-50 px-2 py-1 text-xs ring-1 ring-slate-600/20 ring-inset text-slate-500">
+        class="whitespace-nowrap inline-flex items-center rounded-full bg-slate-50 px-2 py-1 text-xs ring-1 ring-slate-600/20 ring-inset text-slate-500">
         nlocktime <%= @tx.lock_time %>
       </div>
     </div>
   </div>
 
   <div
-    class="mb-1 mt-3">
+    class="mb-1 mt-1">
     <span
-      class="text-slate-400">
+      class="text-slate-600">
       Inputs
       (<span
         class=""><%= @tx.inputs |> length %></span>)
     </span>
   </div>
 
-<%= for tx_input <- @tx.inputs do %>
-  <.tx_input tx_input={tx_input} show_remove_button={false} />
-<% end %>
-
-  <div class="text-center flex justify-center mt-4">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-      class="size-6">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
-    </svg>
-  </div>
+  <%= for tx_input <- @tx.inputs do %>
+    <.tx_input tx_input={tx_input} show_remove_button={false} />
+  <% end %>
 
   <div class="mb-1">
     <span
-      class="text-slate-400">
+      class="text-slate-600">
       Outputs
       (<%= @tx.outputs |> length %>)
     </span>
@@ -72,13 +60,13 @@
   <% end %>
 
   <div
-    class="text-green-600 flex items-center justify-center mt-4 mb-4">
+    class="hidden text-green-600 flex items-center justify-center mt-4 mb-4">
     <span
       class="text-lg">
       Valid transaction
     </span>
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-      class="size-12">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor"
+      class="size-10 ml-1">
       <path stroke-linecap="round" stroke-linejoin="round"
         d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
     </svg>

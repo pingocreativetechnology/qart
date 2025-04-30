@@ -6,14 +6,14 @@
     name="tx_builder-inputs">
   <%= if Enum.any?(@tx_builder.inputs) do %>
     <%= for contract <- @tx_builder.inputs do %>
-      <% tx_input = contract |> BSV.Contract.to_txin %>
-      <.tx_input
-        tx_input={tx_input}
-        show_remove_button={true} />
+    <% {BSV.Contract.P2PKH, :unlocking_script, [%{keypair: keypair}]}  = contract.mfa %>
+    <.tx_builder_contract
+      contract={contract}
+      show_remove_button={true} />
     <% end %>
   <% else %>
   <div
-    class="text-slate-400 border p-2 rounded">
+    class="text-slate-400 bg-white border border-slate-300 p-2 rounded">
     No inputs yet
   </div>
   <% end %>
@@ -21,7 +21,7 @@
 </div>
 
 <div
-  class="">
+class="">
   <%= if @show_add_input  do %>
   <div
     class="bg-white rounded border border-slate-300 mt-2 p-2">
@@ -29,10 +29,6 @@
       class="">
       <div
         class="">
-        <div
-           class="mb-2 text-sm text-slate-400">
-          Add a custom Input
-        </div>
         <textarea
           class="w-full rounded border border-slate-300 font-mono text-sm"
           rows="7"
@@ -41,8 +37,20 @@
       <button
         type="button"
         phx-click="add-input"
-        class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-1 rounded w-full">
+        class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-1 rounded w-full mb-1">
         Add Input
+      </button>
+      <button
+        type="button"
+        phx-click="add-input"
+        class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-1 rounded w-full mb-1">
+        Add 1SAT Input
+      </button>
+      <button
+        type="button"
+        phx-click="add-input"
+        class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-1 rounded w-full mb-1">
+        Add twetch output
       </button>
       <button type="button" phx-click="hide-add-input"
         class="bg-slate-300 hover:bg-slate-400 text-white px-4 py-1 rounded w-full mt-1">
@@ -54,7 +62,7 @@
   <button
     type="button"
     phx-click="show-add-input"
-    class="bg-slate-400 hover:bg-slate-500 text-white px-4 py-1 rounded w-full mt-2">
+    class="bg-slate-300 hover:bg-slate-400 text-slate-600 px-4 py-1 rounded w-full mt-2">
     Add Input
   </button>
   <% end %>

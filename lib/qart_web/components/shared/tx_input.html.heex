@@ -1,45 +1,38 @@
 <div
   name="txinput"
-  class="border bg-blue-50 border-slate-300 px-2 mb-2 rounded text-xs pt-2"
+  class="border bg-white border-slate-300 px-2 mb-2 rounded text-xs"
   style="word-break: break-all;"
 >
 <div>
-  <div name="outpoint" class="border-b border-slate-200 py-2 mb-2 font-mono ">
-    <span class="text-slate-400 font-sans">
-      From
-      TXID
-    </span>
-    <br>
+  <div
+    name="outpoint"
+    class="border-b border-slate-200 mb-2 font-mono"
+  >
+    <div class="hidden text-slate-400 font-sans">
+      From TXID
+    </div>
     <a href={"/transactions/#{@tx_input.outpoint |> BSV.OutPoint.get_txid}"}>
       <.outpoint outpoint={@tx_input.outpoint} /></a>
   </div>
 </div>
   <div class="justify-between border-b pb-1">
-    <div class="items-center p-1">
+    <div class="items-center flex gap-4 py-1">
       <span
-        class="text-slate-400 mr-1 min-w-8">
-        vout
-      </span>
-      <span
-        class="mr-4">
-        {@tx_input.outpoint.vout}
-      </span>
-      &middot;
-      <span name="description"
-        class="ml-2 mr-2 min-w-20">
-        <span name="type" title="Type"
-          class="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs ring-1 ring-blue-600/20 ring-inset text-blue-600 mr-2">
+        name="description"
+        class="">
+        <span
+          name="type"
+          title="Type"
+          class="whitespace-nowrap inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs ring-1 ring-blue-600/20 ring-inset text-blue-600 mr-2">
           <%= Qart.BSV.ScriptPatterns.identify(@tx_input.script) %>
         </span>
       </span>
       <span
         name="sequence"
-        class="text-slate-400 ml-2 min-w-36">
+        class="text-slate-400">
         Sequence
         {@tx_input.sequence}
       </span>
-    </div>
-    <div class="justify-end items-center min-w-36">
       <.coinbase_tag coinbase={@tx_input.script.coinbase} />
     </div>
   </div>
@@ -50,14 +43,23 @@
 
   <%= if @show_remove_button do %>
   <div class="text-right mt-2 mb-1">
-    <button type="button" phx-click="delete-input" value={@tx_input.outpoint |> BSV.OutPoint.get_txid}
+    <button
+      type="button"
+      phx-click="delete-input"
+      value={@tx_input.outpoint |> BSV.OutPoint.get_txid}
       phx-value-vout={@tx_input.outpoint.vout}
-      class="mr-1 my-1 inline-flex justify-center rounded-md px-2 py-1 text-sm
+      class="mr-1 my-1 inline-flex justify-center rounded-md px-2 py-1
       font-semibold shadow-sm ring-1 ring-inset text-white bg-red-500 hover:bg-red-600 ring-red-500 text-xs
       items-center">
-      <svg class="-ml-0.5 mr-1.5 size-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+      <svg
+        class="-ml-0.5 mr-1.5 size-4 text-white"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
         stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round"
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
           d="M15.042 21.672 13.684 16.6m0 0-2.51 2.225.569-9.47 5.227 7.917-3.286-.672ZM12 2.25V4.5m5.834.166-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243-1.59-1.59" />
       </svg>
       <span>Remove</span>

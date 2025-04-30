@@ -91,11 +91,17 @@ defmodule Qart.Wallet.WalletSession do
       derivation_path = "m/44'/236'/0'/0/#{new_derivation}" # BSV derviation path
 
       # Generate address from seed and derivation path
-      {:ok, address_string} = generate_bitcoin_address(wallet.seed, derivation_path)
+      {:ok, keypair} = generate_bitcoin_keypair(wallet.seed, derivation_path)
+
+      address = BSV.Address.from_pubkey(keypair.pubkey)
+      pubkey_hash = address.pubkey_hash |> Base.encode16(case: :lower)
+      address_string = BSV.Address.to_string(address)
+
       new_address = %Address{
         wallet_id: wallet.id,
         address: address_string,
-        derivation_path: derivation_path
+        derivation_path: derivation_path,
+        pubkey_hash: pubkey_hash,
       }
 
       Repo.transaction(fn ->

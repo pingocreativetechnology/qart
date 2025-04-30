@@ -1,13 +1,25 @@
 <div
   name="outpoint"
-  title="Outpoint. A reference to an unspent Output txid and vout."
+  title="Outpoint"
   class="ml-2"
 >
-  <div class="flex justify-left mt-2 mb-2">
-    <span>
+  <div class="flex justify-left my-2">
+    <div
+      title="Outpoint. A reference to an unspent Output's txid and vout."
+    >
       &larr;
-      {@outpoint |> BSV.OutPoint.get_txid }_{@outpoint.vout }
-    </span>
-    <button type="button" class="hidden text-blue-700 ml-4" phx-click="get-txid">Get TXID</button>
+      <a
+        class="ml-2"
+        href={"/transactions/#{@outpoint |> BSV.OutPoint.get_txid }"}>{@outpoint |> BSV.OutPoint.get_txid
+        }</a>_<a
+          class=""
+          href={"/transactions/#{@outpoint |> BSV.OutPoint.get_txid }"}>{@outpoint.vout }</a>
+      <a
+        class="hidden text-xs font-sans text-slate-400"
+        href={"https://test.whatsonchain.com/tx/#{@outpoint |> BSV.OutPoint.get_txid }"}>WhatsOnChain</a>
+      <button
+        type="button"
+        class="hidden text-slate-400 font-sans" phx-click="get-txid">Get TXID</button>
+    </div>
   </div>
 </div>

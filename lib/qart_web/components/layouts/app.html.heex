@@ -11,7 +11,7 @@
     <span
       class="font-semibold text-slate-500">
       BSV network
-      <span class="font-normal">({Application.get_env(:bsv, :network)})</span>
+      <.network_badge network={Application.get_env(:bsv, :network) |> to_string} />
     </span>
   </p>
   <div class="flex flex-1 justify-end">
