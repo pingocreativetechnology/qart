@@ -759,8 +759,6 @@ easy tx
                           {:ok, :op_return}
                       end
                       %>
-                      <% output_types = [ "To address" , "Change address" , "OP_RETURN" ] %>
-
                       <%= if index == 0 && contract_type == :p2pkh do %>
                       To address
                       <% end %>
@@ -805,7 +803,7 @@ easy tx
                       >{to_address |> BSV.Address.to_string}</textarea>
                       <% end %>
 
-                      <%= if index == 1 && contract_type == :p2pkh do %>
+                      <%= if index >= 1 && contract_type == :p2pkh do %>
                       <% {BSV.Contract.P2PKH, :locking_script, [%{address: change_address}]} = output.mfa %>
                       <input
                         id={"content#{index}"}
@@ -901,6 +899,17 @@ easy tx
                   </div>
                 </div>
                 <% end %>
+
+                <div
+                  class="mt-2">
+                  <button
+                    type="button"
+                    phx-click="add_output"
+                    phx-value-output-type="p2pkh"
+                    class="bg-slate-400 hover:text-slate-600 hover:bg-slate-100 text-slate-900 px-4 py-1 rounded w-full border hover:border">
+                    Add P2PKH Output
+                  </button>
+                </div>
 
                 <div
                   class="mt-2">

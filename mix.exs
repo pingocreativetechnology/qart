@@ -40,7 +40,7 @@ defmodule Qart.MixProject do
   defp deps do
     [
       {:bandit, "~> 1.6.10"},
-      {:bcrypt_elixir, "~> 3.0"},
+      {:bcrypt_elixir, "~> 3.3.0"},
       {:bsv, "~> 2.1"},
       {:cloak_ecto, "~> 1.1"},
       {:commanded, "~> 1.4"},
@@ -56,7 +56,7 @@ defmodule Qart.MixProject do
       {:phoenix_live_reload, "~> 1.6.0", only: :dev},
       {:phoenix_live_view, "~> 1.0.10"},
       {:postgrex, ">= 0.20.0"},
-      {:phoenix_live_dashboard, "~> 0.8.3"},
+      {:phoenix_live_dashboard, "~> 0.8.7"},
       {:phoenix_view, ">= 2.0.4"},
       {:phoenix_html_helpers, "~> 1.0"},
       {:tailwind, "~> 0.3.1", runtime: Mix.env() == :dev},
@@ -79,10 +79,10 @@ defmodule Qart.MixProject do
       {:handkit, "~> 0.2", git: "https://github.com/afomi/handkit.git", branch: "wip"},
       {:uuid, "~> 1.1"},
       # For tests
-      {:faker, "~> 0.17"},
+      {:faker, "~> 0.17", only: [:dev, :test]},
       {:tesla, "~> 1.14.1"},
 
-      {:dotenv, "~> 3.1.0"},
+      {:dotenv, "~> 3.1.0", only: [:dev, :test]},
       {:ex_machina, "~> 2.8.0", only: :test},
       {:wallaby, "~> 0.30.0", only: :test},
     ]
