@@ -1,6 +1,6 @@
 <div name="transaction"
   title="Transaction"
-  class="border border-slate-200 p-2 rounded p-2 text-xs rounded"
+  class="border border-slate-200 p-2 rounded text-xs"
   style="word-break: break-all;">
 
   <div
@@ -56,7 +56,11 @@
     </span>
   </div>
   <%= for output <- @tx.outputs do %>
-    <.tx_out txout={output} utxos={@utxos} utxo={nil} />
+    <div
+      class="border border-slate-300 rounded mb-2"
+    >
+      <.tx_out txout={output} utxos={@utxos} utxo={nil} />
+    </div>
   <% end %>
 
   <div

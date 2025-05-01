@@ -15,25 +15,26 @@
       <.outpoint outpoint={@tx_input.outpoint} /></a>
   </div>
 </div>
-  <div class="justify-between border-b pb-1">
-    <div class="items-center flex gap-4 py-1">
-      <span
+  <div
+    class="justify-between border-b pb-1">
+    <div
+      class="items-center flex gap-2 py-1">
+      <.coinbase_tag coinbase={@tx_input.script.coinbase} />
+      <div name="sequence" title="Sequence"
+        class="whitespace-nowrap inline-flex items-center rounded-full bg-white px-2 py-1 text-xs ring-1 ring-slate-600/20 ring-inset text-slate-400">
+        {@tx_input.sequence}
+      </div>
+      <div
         name="description"
         class="">
         <span
           name="type"
-          title="Type"
-          class="whitespace-nowrap inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs ring-1 ring-blue-600/20 ring-inset text-blue-600 mr-2">
+          title="Script Type"
+          class="whitespace-nowrap inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs ring-1 ring-blue-600/20 ring-inset text-blue-600"
+        >
           <%= Qart.BSV.ScriptPatterns.identify(@tx_input.script) %>
         </span>
-      </span>
-      <span
-        name="sequence"
-        class="text-slate-400">
-        Sequence
-        {@tx_input.sequence}
-      </span>
-      <.coinbase_tag coinbase={@tx_input.script.coinbase} />
+      </div>
     </div>
   </div>
 

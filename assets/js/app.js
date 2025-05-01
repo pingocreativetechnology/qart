@@ -25,6 +25,31 @@ import QRCode from 'qrcode';
 
 let Hooks = {};
 
+Hooks.CopyToClipboard = {
+  mounted() {
+    this.el.addEventListener("click", () => {
+      const text = this.el.dataset.text || ""
+      // Use the Clipboard API if available
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).catch(err => {
+          console.error("Copy failed", err)
+        })
+      } else {
+        // Fallback for older browsers
+        const area = document.createElement("textarea")
+        area.value = text
+        document.body.appendChild(area)
+        area.select()
+        document.execCommand("copy")
+        document.body.removeChild(area)
+      }
+      // Give visual feedback
+      this.el.innerText = "Copied!"
+      setTimeout(() => this.el.innerText = "Copy", 1000)
+    })
+  }
+};
+
 Hooks.QRCode = {
   mounted() {
     let paymentAddress = this.el.dataset.address;

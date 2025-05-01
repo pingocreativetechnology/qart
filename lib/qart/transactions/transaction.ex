@@ -23,5 +23,6 @@ defmodule Qart.Transactions.Transaction do
     transaction
     |> cast(attrs, [:txid, :raw, :version, :block_hash, :inputs, :outputs, :merkle_proof, :spent, :addresses, :notes])
     |> validate_required([:txid, :raw])
+    |> unique_constraint([:txid])
   end
 end

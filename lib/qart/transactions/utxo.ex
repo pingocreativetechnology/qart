@@ -18,19 +18,27 @@ defmodule Qart.Transactions.Utxo do
   def changeset(utxo, attrs) do
     utxo
     |> cast(attrs, [:txid, :vout, :satoshis, :script, :address, :spent, :spent_at])
-    |> validate_required([:txid, :vout, :satoshis, :script])
+    |> validate_required([:txid, :vout, :satoshis, :address, :spent])
   end
 
   @doc """
   Convert this Ecto Utxo struct into a BSV.Utxo.
   """
-  def to_bsv_utxo(%__MODULE__{} = utxo) do
-    {:ok, utxo } = BSV.UTXO.from_params(%{
-      "txid" => utxo.txid,
-      "vout" => utxo.vout,
-      "satoshis" => utxo.satoshis,
-      "script" => utxo.script,
-    })
-    utxo
+  def to_bsv_utxo(%__MODULE__{} = u) do
+    case u.script do
+      "" ->
+        false
+
+      nil ->
+        false
+
+      _ -> {:ok, utxo} = BSV.UTXO.from_params(%{
+          "txid" => u.txid,
+          "vout" => u.vout,
+          "satoshis" => u.satoshis,
+          "script" => u.script,
+        })
+        utxo
+    end
   end
 end

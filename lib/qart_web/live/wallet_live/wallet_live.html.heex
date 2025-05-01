@@ -11,15 +11,10 @@
         All Wallets
       </span>
     </.link>
-    <.link
-      patch={~p"/wallet/tx"}
-      class="my-2 inline-flex rounded-md px-3 py-2 text-sm font-semibold text-slate-800"
-    >
-      <span>Transaction</span>
-    </.link>
   </div>
 
   <div>
+    <%= if @wallet != @default_wallet do %>
     <button
       type="button"
       phx-click="make_wallet_active"
@@ -39,6 +34,7 @@
         <span aria-hidden="true">&rarr;</span>
       </span>
     </.link>
+    <% end %>
   </div>
 </div>
 <% end %>
@@ -127,16 +123,6 @@
         </svg>
         Utilities
       </.link>
-      <.link
-        patch={~p"/wallet/tx"}
-        class="my-2 inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold  shadow-sm ring-1 ring-inset text-slate-800 bg-white  hover:bg-gray-50 ring-gray-300">
-        <svg class="-ml-0.5 mr-1.5 size-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-          stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M15.042 21.672 13.684 16.6m0 0-2.51 2.225.569-9.47 5.227 7.917-3.286-.672ZM12 2.25V4.5m5.834.166-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243-1.59-1.59" />
-        </svg>
-        <span>Craft a Tx</span>
-      </.link>
     </div>
   </div>
 
@@ -156,15 +142,18 @@
       as={:words}
       phx-submit="restore_wallet"
       phx-change2="validate"
-      class="space-y-4 border border-slate-600 bg-white rounded p-2 mb-8">
+      class="space-y-4 border border-slate-300 bg-white rounded p-2 mb-6">
       <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
         <%= for {word, i} <- Enum.with_index(@words) do %>
           <div>
-            <label class="block text-sm font-medium text-slate-300 mb-1">
-              Word {i + 1}
-            </label>
-            <input type="text" name={"words[#{word}]"} value={word} required autocomplete="off"
-              class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <.input
+              label={"Word #{i + 1}"}
+              type="text"
+              name={"words[#{word}]"}
+              value={word}
+              required autocomplete="off"
+              class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
           <% end %>
       </div>
@@ -173,6 +162,12 @@
         <button type="submit"
           class="w-full inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold  shadow-sm ring-1 ring-inset text-white bg-blue-600 hover:bg-blue-400 ring-blue-700 hover:ring-blue-400">
           Restore Wallet
+        </button>
+        <button
+          type="button"
+          phx-click="hide_restore_wallet_form"
+          class="w-full inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold  shadow-sm text-slate-600 bg-slate-200 hover:bg-slate-300 mt-1">
+          Cancel
         </button>
       </div>
     </.form>
@@ -431,6 +426,9 @@ easy tx
 <% end %>
 
 <%= if @live_action == :tx do %>
+<div class="text-4xl sm:text-5xl px-4 mb-6 mt-2 text-slate-300">
+  Create a transaction
+</div>
 <div class="flex flex-col mx-4">
   <div class="mx-auto w-full grow lg:flex border-b">
     <div
@@ -748,21 +746,32 @@ easy tx
                   class="bg-white border border-gray-300 rounded-lg w-full mb-2">
                   <div class="flex items-center justify-between p-2 pb-0">
                     <div class="text-sm font-semibold text-slate-600">
-                      <%= if index == 0 do %>
+                      <%
+                      {:ok, contract_type} = case output.mfa do
+                        {BSV.Contract.P2PKH, :locking_script, [%{address: address}]} ->
+                          Qart.debug("this is P2PKH")
+                          Qart.debug(address)
+                          {:ok, :p2pkh}
+
+                        {BSV.Contract.OpReturn, :locking_script, [%{data: data}]} ->
+                          Qart.debug("this is an OpReturn")
+                          Qart.debug(data)
+                          {:ok, :op_return}
+                      end
+                      %>
+                      <% output_types = [ "To address" , "Change address" , "OP_RETURN" ] %>
+
+                      <%= if index == 0 && contract_type == :p2pkh do %>
                       To address
                       <% end %>
-                      <%= if index == 1 do %>
+                      <%= if index == 1 && contract_type == :p2pkh do %>
                       Change address
-                      <% output_types = [
-                        "To address",
-                        "Change address",
-                        "OP_RETURN"
-                      ] %>
                       <% end %>
-                      <%= if index > 1 && index <= 4 do %>
+                      <%# TODO: FIX THIS UP. THESE ARE JUST EXAMPLES %>
+                      <%= if contract_type == :op_return do %>
                       OP_RETURN output
                       <% end %>
-                      <%= if index > 4 do %>
+                      <%= if contract_type == :one_sat do %>
                       1Sat output
                       <% end %>
                     </div>
@@ -776,17 +785,17 @@ easy tx
                     <%= if index == 0 do %>
                       <% {BSV.Contract.P2PKH, :locking_script, [%{address: to_address}]} = output.mfa  %>
                       <input
-                        id="content3"
+                        id={"content#{index}"}
                         type="number"
-                        name="output-0-satoshis"
+                        name={"output-#{index}-satoshis"}
                         placeholder="100"
                         value={output.subject}
                         phx-value-vout={index}
                         phx-blur="update_satoshis"
                         class="text-sm block w-full border-gray-200 focus:ring-slate-500 focus:border-indigo-500 font-mono rounded-t-lg border-b-0" />
                       <textarea
-                        id="content2"
-                        name="content-"
+                        id={"content-#{index}"}
+                        name={"content-#{index}"}
                         rows="2"
                         cols="50"
                         placeholder="Enter text here..."
@@ -796,31 +805,57 @@ easy tx
                       >{to_address |> BSV.Address.to_string}</textarea>
                       <% end %>
 
-                      <%= if index == 1 do %>
+                      <%= if index == 1 && contract_type == :p2pkh do %>
                       <% {BSV.Contract.P2PKH, :locking_script, [%{address: change_address}]} = output.mfa %>
                       <input
-                        id="content3"
+                        id={"content#{index}"}
                         type="number"
-                        name="output-0-satoshis"
+                        name={"output-#{index}-satoshis"}
                         placeholder="100"
                         value={output.subject}
                         phx-blur="update_satoshis"
                         phx-value-vout={index}
                         class="text-sm block w-full border-gray-200 focus:ring-slate-500 focus:border-indigo-500 font-mono rounded-t-lg border-b-0" />
                       <textarea
-                        id="content3"
-                        name="content-3"
+                        id={"content-#{index}"}
+                        name={"content-#{index}"}
                         rows="2"
                         cols="50"
                         placeholder="Enter text here..."
                         phx-blur="update-output"
                         phx-value-vout={index}
                         class="text-sm block w-full border-gray-200 focus:ring-slate-500 focus:border-indigo-500 font-mono">{change_address |> BSV.Address.to_string }</textarea>
+                        <div
+                        class="text-right">
+                        <button
+                          type="button"
+                          phx-click="delete-output"
+                          value={index}
+                          class="mt-1 inline-flex justify-center
+                          font-semibold text-red-500 text-xs hover:text-red-600
+                          items-center">
+                          <svg
+                            class="size-6"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                          </svg>
+                          <span
+                            class="sr-only">Delete</span>
+                        </button>
+                      </div>
                       <% end %>
-                      <%= if index > 1 do %>
+
+                      <%= if contract_type == :op_return do %>
                       <% {BSV.Contract.OpReturn, :locking_script, [%{data: arr}]} = output.mfa %>
                       <input
-                        id="content5"
+                        id={"content#{index}"}
                         type="number"
                         name={"output-#{index}-satoshis"}
                         placeholder="100"
@@ -828,7 +863,11 @@ easy tx
                         phx-blur="update_satoshis"
                         phx-value-vout={index}
                         class="text-sm mt-1 block w-full border-gray-200 focus:ring-slate-500 focus:border-indigo-500 font-mono rounded-t-lg border-b-0" />
-                      <textarea id={"content-#{index}"} name="content-3" rows="2" cols="50"
+                      <textarea
+                        id={"content-#{index}"}
+                        name={"content-#{index}"}
+                        rows="2"
+                        cols="50"
                         placeholder="Enter text here..."
                         phx-blur="update-opreturn"
                         phx-value-vout={index}
@@ -839,14 +878,23 @@ easy tx
                             type="button"
                             phx-click="delete-output"
                             value={index}
-                            class="mt-2 inline-flex justify-center rounded px-2 py-1
-                            font-semibold ring-1 ring-inset text-white bg-red-500 hover:bg-red-600 ring-red-500 text-xs items-center">
-                            <svg class="-ml-0.5 mr-1 size-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                              stroke-width="1.5" stroke="currentColor" class="size-6">
-                              <path stroke-linecap="round" stroke-linejoin="round"
-                                d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            class="mt-1 inline-flex justify-center
+                            font-semibold text-red-500 text-xs hover:text-red-600
+                            items-center">
+                            <svg
+                              class="size-6"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke-width="1.5"
+                              stroke="currentColor"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                             </svg>
-                            <span>Delete</span>
+                            <span
+                              class="sr-only">Delete</span>
                           </button>
                         </div>
                       <% end %>
@@ -859,15 +907,15 @@ easy tx
                   <button
                     type="button"
                     phx-click="add_output"
-                    class="bg-white hover:text-slate-600 hover:bg-slate-200 text-slate-900 px-4 py-1 min-h-36 rounded w-full border hover:border">
-                    Add Output
+                    class="bg-slate-400 hover:text-slate-600 hover:bg-slate-100 text-slate-900 px-4 py-1 rounded w-full border hover:border">
+                    Add op_return Output
                   </button>
                 </div>
 
                 <div
-                  class="hidden">
+                  class="">
                   <div
-                    class="mt-8">
+                    class="mt-1">
                     <button
                       type="button"
                       phx-click="add_output"
@@ -936,14 +984,10 @@ easy tx
     <div
       name="display-transaction-column"
       class="w-1/4">
-      <div class="flex justify-between text-2xl items-center">
+      <div class="flex justify-between text-2xl items-center mt-2">
         <div
           class="mb-4">
           Remainder
-          <span
-          class="text-sm text-slate-400">
-            satoshis go to miners
-          </span>
         </div>
         <div class="font-mono font-semibold text-yellow-600">
           {(@tx_builder |> BSV.TxBuilder.input_sum) - (@tx_builder |> BSV.TxBuilder.output_sum)}
@@ -990,9 +1034,12 @@ easy tx
           </div>
 
           <!-- TODO: before broadcast, validate the transaction (with an animation) -->
-          <button type="button"
-            class="inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset text-slate-600 bg-white  hover:bg-gray-50 ring-gray-300 mt-2 items-center"
-            phx-click="broadcastTx">
+          <button
+            type="button"
+            id="copy-to-clipboard"
+            phx-hook="CopyToClipboard"
+            data-text={@tx |> BSV.Tx.to_binary(encoding: :hex)}
+            class="inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset text-slate-600 bg-white  hover:bg-gray-50 ring-gray-300 mt-2 items-center">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
               stroke="currentColor" class="size-4 mr-1">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -1177,18 +1224,30 @@ easy tx
             phx-submit="clickwrap">
             <div>
               <%= for {output, index} <- Enum.with_index(@tx_builder.outputs) do %>
+              <%
+                {:ok, contract_type} = case output.mfa do
+                  {BSV.Contract.P2PKH, :locking_script, [%{address: address}]} ->
+                    Qart.debug("this is P2PKH")
+                    Qart.debug(address)
+                    {:ok, :p2pkh}
+
+                  {BSV.Contract.OpReturn, :locking_script, [%{data: data}]} ->
+                    Qart.debug("this is an OpReturn")
+                    Qart.debug(data)
+                    {:ok, :op_return}
+                end
+                %>
                 <div name="output" class="bg-white border border-gray-300 rounded-lg w-full mb-2">
                   <div
                     class="flex items-center justify-between p-2 pb-1">
                     <div
                       class="text-sm font-semibold text-gray-800">
-                      <%= if index == 0 do %>
+                      <%= if index == 0 && contract_type == :p2pkh do %>
                       To address
                       <% end %>
-                      <%= if index == 1 do %>
+                      <%= if index == 1 && contract_type == :p2pkh do %>
                         Change address
                       <% end %>
-
                       <%= if index > 1 do %>
                         OP_RETURN Output
                       <% end %>
@@ -1275,7 +1334,8 @@ easy tx
                 <% end %>
 
                   <div class="mt-6">
-                    <button type="button" phx-click="add_output"
+                    <button type="button"
+                      phx-click="add_output"
                       class="bg-slate-400 hover:bg-slate-500 text-white px-4 py-1 rounded w-full">
                       Add Output
                     </button>

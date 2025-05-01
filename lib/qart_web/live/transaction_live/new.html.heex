@@ -10,26 +10,10 @@
     </.link>
   </div>
   <div>
-    <.link
-      patch={~p"/transactions/#{@transaction}/show/edit"}
-      phx-click={JS.push_focus()}
-      class="text-sm text-slate-400"
-    >
-      <span>Edit</span>
-    </.link>
+
   </div>
 </div>
 
-<.modal :if={@live_action == :edit} id="transaction-modal" show on_cancel={JS.patch(~p"/transactions/#{@transaction}")}>
-  <.live_component
-    module={QartWeb.TransactionLive.FormComponent}
-    id={@transaction.id}
-    title={@page_title}
-    action={@live_action}
-    transaction={@transaction}
-    patch={~p"/transactions/#{@transaction}"}
-  />
-</.modal>
 
 <div
   name="tx-viewer"
@@ -42,26 +26,26 @@
       <div
         name="transaction"
         title="Transaction"
-        class="border border-slate-200 p-2 rounded text-xs mb-2"
+        class="border border-slate-200 p-2 rounded text-xs"
         style="word-break: break-all;">
 
         <div
           class="text-xs text-slate-400 mb-2">
           Raw Transaction (Hex)
           &middot;
-          {@transaction.raw |> String.length} bytes
-          &middot;
-          <a
-            href={"https://test.whatsonchain.com/tx/#{@transaction.txid}"}
-            class="text-slate-600"
-          >WhatsOnChain</a>
+          {@raw_tx |> String.length} bytes
         </div>
 
         <div
           class="text-xs font-mono text-slate-900"
           style="word-break: break-all;">
-          {@transaction.raw}
-          <br>
+          <.input
+            name="raw_tx"
+            field={@raw_tx}
+            phx-blur="generateTx"
+            type="textarea"
+            value={@raw_tx}
+            abel="Raw Tx" />
         </div>
       </div>
       <div class="text-center flex justify-center my-4 items-center">

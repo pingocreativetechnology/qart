@@ -3,7 +3,6 @@ defmodule QartWeb.AvatarUploadLive do
   alias Qart.Repo
   alias Qart.Accounts.User
   alias Qart.Uploads
-  import UUID
 
   @impl true
   def mount(_params, _session, socket) do
@@ -44,10 +43,7 @@ defmodule QartWeb.AvatarUploadLive do
         }}
       end)
 
-    # Qart.debug(uploaded_files)
-
     case uploaded_files do
-      # [avatar_url] ->
       [%{full: avatar_url}] ->
         user = socket.assigns.current_user
         changeset = User.changeset(user, %{avatar_url: avatar_url})
