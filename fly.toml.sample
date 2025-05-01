@@ -13,8 +13,10 @@ kill_signal = 'SIGTERM'
   release_command = '/app/bin/migrate'
 
 [env]
+  BSV_NETWORK = 'test' # 'main' or 'test'
   PHX_HOST = 'YOUR-FLY-APP-NAME-GOES-HERE.fly.dev'
   PORT = '8080'
+  TEST_12_WORDS='we must design technical architecture aligning humanity economics with planetary ecological symbiosis'
 
 [http_service]
   internal_port = 8080

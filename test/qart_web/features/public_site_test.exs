@@ -217,7 +217,7 @@ defmodule QartWeb.PublicSiteTest do
     |> assert_has(css("body", text: "Current Derivation Index: 0"))
     |> click(button("Generate New Address"))
 
-    |> click(link("Craft a Tx"))
+    |> click(link("Tx"))
     # On /wallet/tx page
     |> assert_has(css("body", text: "Wallet ID"))
     |> assert_has(css("body", text: "Derivation Path"))
@@ -242,10 +242,10 @@ defmodule QartWeb.PublicSiteTest do
   test "items", %{session: session} do
     user = user_fixture()
     cart = cart_fixture()
-    item = item_fixture()
+    item_fixture() # item
     item2 = item_fixture()
     item3 = item_fixture()
-    item4 = item_fixture()
+    item_fixture() # item4
     item_fixture()
     item_fixture()
     item_fixture()

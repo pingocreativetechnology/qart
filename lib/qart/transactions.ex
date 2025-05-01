@@ -38,6 +38,23 @@ defmodule Qart.Transactions do
   def get_transaction!(id), do: Repo.get!(Transaction, id)
 
 
+  def get_or_create_transaction(txid) do
+    case Repo.get_by(Transaction, txid: txid) do
+      %Transaction{} = tx ->
+        {:ok, tx}
+
+      nil ->
+        case Qart.WhatsOnChain.get_txid(txid) do
+          {:ok, tx} ->
+            {:ok, tx}
+
+          {:error, reason} ->
+            {:error, reason}
+        end
+    end
+  end
+
+
   def get_transaction_by_txid!(txid), do: Repo.get_by(Transaction, txid: txid)
 
   @doc """
@@ -115,7 +132,11 @@ defmodule Qart.Transactions do
 
   """
   def list_utxos do
-    Repo.all(Utxo)
+    query =
+    from u in Utxo,
+      order_by: [asc: u.id]
+
+    Repo.all(query)
   end
 
   def list_utxos_by_address(address) do
