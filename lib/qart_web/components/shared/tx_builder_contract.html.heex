@@ -1,0 +1,62 @@
+<div
+  name="txinput"
+  class="border px-2 mb-2 rounded text-xs bg-white"
+  style="word-break: break-all;">
+  <div class="border-b pb-1 ">
+    <div class="items-center justify-between flex flex-wrap mt-1">
+      <div class="flex flex-wrap gap-2">
+        <.coinbase_tag coinbase={@contract.subject.txout.script.coinbase} />
+        <div name="type"
+          class="whitespace-nowrap inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs ring-1 ring-blue-600/20 ring-inset text-blue-600">
+          <%= Qart.BSV.ScriptPatterns.identify(@contract.subject.txout.script) %>
+        </div>
+      </div>
+      <div class="justify-right whitespace-nowrap font-mono text-lg text-right">
+        {@contract.subject.txout.satoshis}
+      </div>
+    </div>
+  </div>
+
+  <div
+    name="script"
+    class="border-slate-200 my-2 text-slate-600">
+    <.tx_script tx_script={@contract.subject.txout.script} />
+  </div>
+
+  <div name="outpoint" class="border-t border-slate-200 font-mono ">
+    <div class="hidden text-slate-400 font-sans text-xs">
+      From TXID
+    </div>
+    <a href={"/transactions/#{@contract.subject.outpoint |> BSV.OutPoint.get_txid}"}>
+      <.outpoint outpoint={@contract.subject.outpoint} />
+    </a>
+  </div>
+
+<%= if @show_remove_button do %>
+  <div class="text-right mt-2 mb-1">
+    <button
+      type="button"
+      phx-click="delete-input"
+      value={@contract.subject.outpoint |> BSV.OutPoint.get_txid}
+      phx-value-vout={@contract.subject.outpoint.vout}
+      class="my-1 inline-flex justify-center py-1
+      font-semibold text-red-500 text-xs hover:text-red-600
+      items-center">
+      <svg
+        class="size-6"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+      </svg>
+      <span
+        class="sr-only">Remove</span>
+    </button>
+  </div>
+  <% end %>
+</div>

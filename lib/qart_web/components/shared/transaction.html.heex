@@ -9,12 +9,12 @@
   </div>
 
   <div
-    class="flex flex-wrap justify-between items-center border-b pb-2">
+    class="flex flex-wrap justify-between items-center border-b pb-2 font-mono">
     <div class="flex">
       <div
         name="txid"
         title="Transaction ID"
-        class="whitespace-nowrap text-lg font-semibold text-blue-700">
+        class="text-lg font-semibold text-blue-700">
         <a
           href={"/transactions/#{@tx |> BSV.Tx.get_txid}"}
         >

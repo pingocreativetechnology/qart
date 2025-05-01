@@ -91,8 +91,7 @@ defmodule Qart.Accounts do
       display_name: Qart.Accounts.User.display_name(user),
       try_handle: Qart.Accounts.User.try_handle(user),
       gradient: Qart.Accounts.User.gradient(user),
-      role: Qart.Accounts.User.role(user),
-      default_wallet_id: Qart.Accounts.User.default_wallet_id(user),
+      role: Qart.Accounts.User.role(user)
     }
   end
 
@@ -395,11 +394,25 @@ defmodule Qart.Accounts do
     |> Repo.all()
   end
 
+  def has_pubkey_hash?(pubkey_hash) do
+    true
+    # Wallet
+    # |> where(user_id: ^user_id)
+    # |> order_by(asc: :id)
+    # |> Repo.all()
+  end
+
   def preload_utxos(address) do
     utxos = Qart.Transactions.list_utxos_by_address(address.address)
     %{address |
       utxos: utxos
     }
+  end
+
+  def set_default_wallet(%User{} = user, wallet_id) do
+    user
+    |> Ecto.Changeset.change(default_wallet_id: wallet_id)
+    |> Repo.update()
   end
 
   def get_wallet_addresses(wallet_id) do
@@ -418,6 +431,14 @@ defmodule Qart.Accounts do
     Repo.delete(wallet)
   end
 
+  def get_address_by_pubkey_hash(pubkey_hash) do
+    query =
+      from f in Address,
+        where: f.pubkey_hash == ^pubkey_hash
+
+    address = Repo.one(query)
+    address
+  end
 
   def get_address_keypair(wallet_id, address) do
     query =

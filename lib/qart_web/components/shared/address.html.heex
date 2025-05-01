@@ -27,9 +27,16 @@ total_utxo_satoshis = Enum.reduce(utxo2_for_address, 0, fn %Qart.Transactions.Ut
         <span
           name="address-pubkey-hash"
           title="Address PubKey hash"
-          class="text-slate-400"
+          class="hidden text-slate-400 text-sm"
           comment="this is referenceed in a UTXO's P2PKH script">
           <%= @bsv_address.pubkey_hash |> Base.encode16(case: :lower) %>
+          <div
+            class="hidden">
+            <%# "Is this spendable?" %>
+            <%#= "can the wallet generate pubkey_hash for this?" %>
+            <%#= Qart.Accounts.has_pubkey_hash?(@bsv_address.pubkey_hash |> Base.encode16(case: :lower)) %>
+            <%#= "What arguments does a contract require? --> (:pubkey_hash)" %>
+          </div>
         </span>
       </div>
     </div>

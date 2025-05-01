@@ -907,6 +907,7 @@ easy tx
                   <button
                     type="button"
                     phx-click="add_output"
+                    phx-value-output-type="op_return"
                     class="bg-slate-400 hover:text-slate-600 hover:bg-slate-100 text-slate-900 px-4 py-1 rounded w-full border hover:border">
                     Add op_return Output
                   </button>
@@ -919,7 +920,7 @@ easy tx
                     <button
                       type="button"
                       phx-click="add_output"
-                      phx-value-output-type="1sat"
+                      phx-value-output-type="one_sat"
                       class="bg-yellow-400 hover:bg-orange-200 text-white px-4 py-1 rounded w-full">
                       Add 1Sat Output
                     </button>
@@ -930,7 +931,7 @@ easy tx
                     <button
                       type="button"
                       phx-click="add_output"
-                      phx-value-output-type="op_return"
+                      phx-value-output-type="bitcoin_schema"
                       class="bg-slate-400 hover:bg-slate-500 text-white px-4 py-1 rounded w-full">
                       Add Bitcoin Schema object
                     </button>
@@ -940,7 +941,17 @@ easy tx
                     <button
                       type="button"
                       phx-click="add_output"
-                      phx-value-output-type="op_return"
+                      phx-value-output-type="one_sat_html_inscription"
+                      class="bg-yellow-400 hover:bg-yellow-200 text-white px-4 py-1 rounded w-full">
+                      1Sat HTML Inscription
+                    </button>
+                  </div>
+                  <div
+                    class="mt-1">
+                    <button
+                      type="button"
+                      phx-click="add_output"
+                      phx-value-output-type="twetch_post"
                       class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-1 rounded w-full">
                       Add Twetch Post
                     </button>
@@ -951,14 +962,17 @@ easy tx
                     <button
                       type="button"
                       phx-click="add_output"
-                      phx-value-output-type="op_return"
+                      phx-value-output-type="brc_20"
                       class="bg-orange-400 hover:bg-orange-500 text-white px-4 py-1 rounded w-full">
                       Add BRC-20 Output
                     </button>
                   </div>
 
                   <div class="mt-1">
-                    <button type="button" phx-click="add_output" phx-value-output-type="op_return"
+                    <button
+                      type="button"
+                      phx-click="add_output"
+                      phx-value-output-type="custom"
                       class="bg-slate-300 hover:bg-slate-500 text-slate-900 px-4 py-1 rounded w-full">
                       Add Custom Output
                     </button>
