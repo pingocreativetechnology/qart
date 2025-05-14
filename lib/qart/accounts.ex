@@ -378,6 +378,12 @@ defmodule Qart.Accounts do
     |> Repo.update()
   end
 
+  def update_wallet_kind(%Wallet{} = wallet, %{kind: kind} = attrs) do
+    wallet
+    |> Wallet.kind_changeset(%{kind: kind})
+    |> Repo.update()
+  end
+
   def get_user_active_wallet(user_id) do
     query =
       from f in Wallet,
