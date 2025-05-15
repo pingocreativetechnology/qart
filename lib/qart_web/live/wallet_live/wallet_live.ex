@@ -14,12 +14,17 @@ defmodule QartWeb.WalletLive do
     # TODO: Fix the flow for the user's first wallet
     # this implementation assumes a wallet.
     # but the user should get to an empty state, and be able to generate or restore a wallet.
-    first_wallet = if wallets |> length == 0 do
-      {:ok, wallet, _} = WalletSession.generate_wallet(user_id)
-      {:ok, updated_user} = Qart.Accounts.set_default_wallet(user, wallet.id)
-      wallet
-    else
-      wallet = Qart.Accounts.get_user_wallet(user_id, default_wallet_id)
+    first_wallet = case (wallets |> length) do
+      0 ->
+        {:ok, wallet, _} = WalletSession.generate_wallet(user_id)
+        WalletSession.derive_new_address(wallet.id)
+        WalletSession.derive_new_address(wallet.id)
+        {:ok, updated_user} = Qart.Accounts.set_default_wallet(user, wallet.id)
+        wallet
+      1 ->
+        Qart.Accounts.get_user_wallets(user_id) |> Enum.at(0)
+      _ ->
+        Qart.Accounts.get_user_wallet(user_id, default_wallet_id)
     end
 
     # wallet_id = socket.assigns.current_user.default_wallet_id
@@ -29,9 +34,28 @@ defmodule QartWeb.WalletLive do
     addresses = Qart.Accounts.get_wallet_addresses(wallet.id)
     addresses = Enum.filter(addresses, fn a -> a end)
     address = Enum.at(addresses, 0, nil) # return the first address or nil
+    address2 = Enum.at(addresses, 1, nil) # return the first address or nil
 
-    {:ok, to_address} = address.address |> BSV.Address.from_string
-    {:ok, change_address} = addresses |> Enum.at(1) |> Map.get(:address)|> BSV.Address.from_string
+    to_address =
+      case address do
+        nil ->
+          nil
+
+        address ->
+          {:ok, address} = BSV.Address.from_string(address.address)
+          address
+      end
+
+    change_address =
+      case address2 do
+        nil ->
+          nil
+
+        address ->
+          {:ok, address} = BSV.Address.from_string(address2.address)
+          address
+      end
+
 
     derivation_path = "m/44'/236'/0'/0/0"
 
@@ -74,7 +98,6 @@ defmodule QartWeb.WalletLive do
           content: "",
           encrypted: false,
           address: address, # Ecto object
-          address_string: to_address |> BSV.Address.to_string, # string
           addresses: addresses,
           bsv_address: to_address, # BSV object
           current_derivation: nil,
@@ -87,7 +110,9 @@ defmodule QartWeb.WalletLive do
           mnemonic: nil,
           mnemonic_shown: false,
           outputs: outputs,
+          raw_tx: "",
           show_add_input: false,
+          show_import_tx: false,
           show_restore_wallet_form: false,
           # satoshis: nil,
           total_wallet_satoshis: 0,
@@ -100,7 +125,6 @@ defmodule QartWeb.WalletLive do
           utxos: utxos,
           utxos2: utxos2,
           valid_contract: false,
-          valid_contract2: false,
           version: 1,
           wallet: wallet,
           wallet_id: wallet.id,
@@ -150,7 +174,13 @@ defmodule QartWeb.WalletLive do
     wallet = socket.assigns.default_wallet
     addresses = Qart.Accounts.get_wallet_addresses(wallet.id)
     address = Enum.at(addresses, 0, nil)
-    {:ok, bsv_address} = address.address |> BSV.Address.from_string
+    bsv_address = case address do
+      nil ->
+        nil
+      address ->
+        {:ok, address} = address.address |> BSV.Address.from_string
+        address
+    end
 
     socket =
       case socket.assigns.live_action do
@@ -193,12 +223,11 @@ defmodule QartWeb.WalletLive do
     derivation_path = "m/44/0/0/1"
     child = BSV.ExtKey.derive(extkey, derivation_path)
     address = BSV.Address.from_pubkey(child.pubkey)
-    address_string = BSV.Address.to_string(address)
     socket =
       socket
       |> assign(mnemonic: mnemonic)
       |> assign(derivation_path: derivation_path)
-      |> assign(address_string: address_string)
+      |> assign(address: address)
     {:noreply, socket}
   end
 
@@ -226,6 +255,19 @@ defmodule QartWeb.WalletLive do
       end)
 
     {:noreply, assign(socket, wallet: updated_wallet, wallets: updated_wallets, show_wallet_name_editing: false)}
+  end
+
+  def handle_event("update-wallet-kind", %{"kind" => kind}, socket) do
+    {:ok, updated_wallet} = Qart.Accounts.update_wallet_kind(socket.assigns.wallet, %{kind: kind})
+    id = updated_wallet.id
+
+    updated_wallets =
+      Enum.map(socket.assigns.wallets, fn
+        %{id: ^id} -> updated_wallet
+        other -> other
+      end)
+
+    {:noreply, assign(socket, wallet: updated_wallet, wallets: updated_wallets)}
   end
 
   def handle_event("generate_mnemonic", _, socket) do
@@ -278,14 +320,29 @@ defmodule QartWeb.WalletLive do
     {:noreply, assign(socket, words: word_array)}
   end
 
+  @impl true
+  def handle_event("importTx", _params, socket) do
+    {:noreply, assign(socket, show_import_tx: true)}
+  end
+
+  @impl true
+  def handle_event("hideImportTx", _params, socket) do
+    {:noreply, assign(socket, show_import_tx: false)}
+  end
+
   ### NEW WALLET STUFF
   @impl true
   def handle_event("generate_wallet", _params, socket) do
 
     case WalletSession.generate_wallet(socket.assigns.user_id) do
       {:ok, wallet, mnemonic} ->
-        socket = socket |> put_flash(:info, "Wallet generated successfully")
-        {:noreply, assign(socket, wallet: wallet, mnemonic: mnemonic, wallets: socket.assigns.wallets  ++ [wallet])}
+        socket = assign(socket, wallet: wallet, mnemonic: mnemonic, wallets: socket.assigns.wallets  ++ [wallet])
+        |> put_flash(:info, "Wallet generated successfully")
+
+        {:noreply,
+        push_patch(socket,
+          to: ~p"/wallets/#{wallet.id}"
+        )}
 
       {:ok, wallet} ->
         {:noreply, assign(socket, wallet: wallet, wallets: socket.assigns.wallets  ++ [wallet])}
@@ -430,7 +487,7 @@ defmodule QartWeb.WalletLive do
     # vout_as_int = Integer.parse("3")
 
     params2 = %{
-      "outpoint" => outpoint,
+      "outpoint" => _,
       "txid" => txid,
       "vout" => vout_as_int,
       "script" => script,
@@ -874,11 +931,11 @@ defmodule QartWeb.WalletLive do
 
     case BSV.Contract.simulate(P2PKH, lock_params, unlock_params) do
       {:ok, vm} ->
-        valid_contract2 = BSV.VM.valid?(vm)
-        {:noreply, assign(socket, valid_contract2: valid_contract2)}
+        valid_contract = BSV.VM.valid?(vm)
+        {:noreply, assign(socket, valid_contract: valid_contract)}
 
       {:error, x }  ->
-        {:noreply, assign(socket, valid_contract2: false, contract_validation_error: x.error, contract_error: x.error)}
+        {:noreply, assign(socket, valid_contract: false, contract_validation_error: x.error, contract_error: x.error)}
     end
   end
 
@@ -891,6 +948,32 @@ defmodule QartWeb.WalletLive do
   @impl true
   def handle_event("close_modal", _params, socket) do
     {:noreply, assign(socket, show_modal: false)}
+  end
+
+  @impl true
+  def handle_event("generateTx", %{"value" => ""}, socket) do
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("generateTx", %{"value" => raw_tx}, socket) do
+    tx = BSV.Tx.from_binary(raw_tx, encoding: :hex)
+
+    case BSV.Tx.from_binary(raw_tx, encoding: :hex) do
+      {:error, {:invalid_encoding, :hex}} ->
+        "errrr"
+
+        {:noreply, socket}
+
+      {:ok, tx} ->
+        "do this with tx"
+
+        {:noreply, assign(socket,
+            raw_tx: raw_tx,
+            tx: tx
+          )
+        }
+    end
   end
 
   # DATA

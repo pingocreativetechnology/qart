@@ -35,11 +35,11 @@ defmodule Qart.TransactionsFixtures do
       attrs
       |> Enum.into(%{
         satoshis: 42,
-        script: "some script",
+        script: "76a9144d7eb7ce5ce099dd218383f3f81d3c2f1e48113f88ac",
         spent: true,
         spent_at: ~U[2025-04-18 21:13:00Z],
-        txid: "some txid",
-        vout: 42
+        txid: "9f797ad1ca0a8796a2f3464565d3cb34835725c81bc01ed3d9bfea67f733a4ab",
+        vout: 7
       })
       |> Qart.Transactions.create_utxo()
 

@@ -50,7 +50,7 @@ defmodule QartWeb.TransactionLive.Show do
     test = chunks |> Qart.BSV.ScriptPatterns.is_2sat_ordinal?
 
     payload = nil
-    payload_base64 = nil
+    payload_base64 = ""
 
     case output.script.chunks |> Qart.BSV.ScriptPatterns.is_2sat_ordinal? do
       {:ok, :one_sat, %{

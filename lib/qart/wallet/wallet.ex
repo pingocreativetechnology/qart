@@ -11,6 +11,7 @@ defmodule Qart.Wallet.Wallet do
     field :name, :string # a user-provided name
     field :description, :string # a user-provided description
     field :notes, :string # a user-provided notes
+    field :kind, :string # what type of wallet? :single_address, :hd_paths
     field :code, :string # a user-provided code, maybe a gist to augment a wallet
 
     has_many :addresses, Qart.Wallet.Address
@@ -20,7 +21,7 @@ defmodule Qart.Wallet.Wallet do
 
   def changeset(wallet, attrs) do
     wallet
-    |> cast(attrs, [:user_id, :seed, :current_derivation, :network])
+    |> cast(attrs, [:user_id, :seed, :current_derivation, :network, :kind])
     |> validate_required([:user_id, :seed, :network])
   end
 
@@ -28,5 +29,11 @@ defmodule Qart.Wallet.Wallet do
     wallet
     |> cast(attrs, [:name])
     |> validate_required([:name])
+  end
+
+  def kind_changeset(wallet, attrs) do
+    wallet
+    |> cast(attrs, [:kind])
+    |> validate_required([:kind])
   end
 end

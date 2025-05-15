@@ -20,6 +20,7 @@ defmodule QartWeb.PublicSiteTest do
     |> fill_in(text_field("Email"), with: "user1@lvh.me")
     |> fill_in(text_field("Password"), with: "passwordpassword")
     |> click(button("Create an account"))
+    # |> QartWeb.FeatureCase.pause_here(50_000)
     |> assert_has(css("body", text: "Account created successfully")) # or whatever
 
     |> visit("/")
@@ -30,7 +31,7 @@ defmodule QartWeb.PublicSiteTest do
     |> click(link("Wallet"))
 
     |> assert_has(css("body", text: "Wallet"))
-    |> assert_has(css("body", link: "All Wallets"))
+    |> assert_has(css("body", link: "Wallets"))
 
     |> visit("/")
     |> click(link("Public"))
@@ -77,8 +78,6 @@ defmodule QartWeb.PublicSiteTest do
     |> assert_has(css("body", text: "peer to peer commerce"))
     |> assert_has(css("body", text: "Your social network starts with you."))
 
-    # |> QartWeb.FeatureCase.pause_here(30_000)
-
     # http://localhost:4002/items
 
     # |> fill_in(text_field("Email"), with: "user1@lvh.me")
@@ -99,7 +98,6 @@ defmodule QartWeb.PublicSiteTest do
     |> click(link("Log in"))
     |> fill_in(text_field("Email"), with: user.email)
     |> fill_in(text_field("Password"), with: "passwordpassword")
-
     |> click(button("Log in"))
     |> assert_has(css("body", text: "Welcome back!"))
   end
@@ -107,28 +105,18 @@ defmodule QartWeb.PublicSiteTest do
   test "when logged in", %{session: session} do
     user = user_fixture()
 
-    QartWeb.PublicSiteTest.login_user(session, user)
+    login_user(session, user)
     |> visit("/")
   end
 
   test "set handle", %{session: session} do
     user = user_fixture()
 
-    session
-    |> visit("/users/log_in")
-    |> fill_in(text_field("Email"), with: user.email)
-    |> fill_in(text_field("Password"), with: "passwordpassword")
-    |> click(button("Log in"))
-
-    # |> QartWeb.FeatureCase.pause_here()
+    login_user(session, user)
     |> visit("/handle/set")
     |> fill_in(text_field("Handle"), with: "broomstick")
     |> click(button("Save"))
     |> assert_has(css("body", text: "Handle set successfully!"))
-
-    # |> QartWeb.FeatureCase.pause_here
-    # |> QartWeb.FeatureCase.pause_here(30_000)
-
   end
 
   test "generate wallet", %{session: session} do
@@ -136,9 +124,8 @@ defmodule QartWeb.PublicSiteTest do
 
     session = login_user(session, user)
     |> visit("/")
-    |> click(link("Wallet"))
-    |> click(link("All Wallets"))
-    |> click(button("Generate First Wallet"))
+    |> click(link("Wallets"))
+    |> click(button("Generate Wallet"))
     |> assert_has(css("body", text: "Wallet generated successfully"))
 
     div = find(session, css("div[name='mnemonic']"))
@@ -154,40 +141,39 @@ defmodule QartWeb.PublicSiteTest do
     # refresh the page to see the wallet
     session
     |> visit("/wallets")
-    |> click(css("a[name='wallet']"))
-    |> assert_has(css("body", text: "Current Derivation Index: 0"))
+    |> click(css("div[name='wallet']:first-of-type a"))
+    |> assert_has(css("body", text: "Current Derivation Index 2"))
     |> click(button("Generate New Address"))
     |> click(button("Generate New Address"))
     |> click(button("Generate New Address"))
-    |> assert_has(css("li[name='address']", count: 3))
+    |> assert_has(css("li[name='address']", count: 5))
     # Refresh the page
     # Assert 3 addresses are showing
-    |> assert_has(css("li[name='address']", count: 3))
+    |> assert_has(css("li[name='address']", count: 5))
     session
   end
 
   test "restore wallet and generate keys", %{session: session} do
     user = user_fixture()
 
-
-    session = login_user(session, user)
+    login_user(session, user)
     |> assert_has(css("body", text: "Welcome back!"))
     |> assert_has(css("body", text: "peer to peer commerce"))
-    |> click(link("Wallet"))
-    |> click(link("All Wallets"))
+    |> click(css("a[title='Default wallet']"))
+    |> click(link("Wallets"))
     |> click(button("Restore Wallet"))
     |> assert_has(css("body", text: "Load Test 12 words"))
-    |> click(button("Load Test 12 words"))
-    |> click(button("Submit"))
     # Restore wallet
+    |> click(button("Load Test 12 words"))
+    |> click(css("button[type='submit']", text: "Restore Wallet"))
     |> assert_has(css("body", text: "Wallet restored successfully"))
     |> visit("/wallets")
-    |> click(link("Active Wallet"))
-    |> click(link("All Wallets"))
-    |> click((css("div[name='wallets'] a[name='wallet']")))
 
+    |> click(css("a[title='Default wallet']"))
+    |> click(link("Wallets"))
+    |> click((css("div[name='wallets'] div[name='wallet']:last-of-type a")))
     # Make the wallet the default wallet
-    |> click(button("Make this wallet default"))
+    |> click(button("Set wallet as default"))
     |> assert_has(css("body", text: "is now the default Wallet"))
 
     # Generate Keys
@@ -200,9 +186,6 @@ defmodule QartWeb.PublicSiteTest do
     |> assert_has(css("body", text: "m/44'/236'/0'/0/2"))
     |> assert_has(css("body", text: "myWhTtnRavhzkGzAcyBygMT88o3wX4D7mh"))
     |> assert_has(css("body", text: "m/44'/236'/0'/0/3"))
-    |> QartWeb.FeatureCase.pause_here(50_000)
-
-    session
   end
 
   test "craft tx", %{session: session} do
@@ -210,33 +193,35 @@ defmodule QartWeb.PublicSiteTest do
 
     login_user(session, user)
     |> visit("/wallets/")
-    |> click(button("Generate First Wallet"))
+    |> click(button("Generate Wallet"))
     |> assert_has(css("body", text: "Wallet generated successfully"))
     |> visit("/wallets")
-    |> click(css("a[name='wallet']"))
-    |> assert_has(css("body", text: "Current Derivation Index: 0"))
+    |> click(css("div[name='wallet']:first-of-type a"))
+    |> assert_has(css("body", text: "Current Derivation Index 2"))
     |> click(button("Generate New Address"))
 
     |> click(link("Tx"))
     # On /wallet/tx page
-    |> assert_has(css("body", text: "Wallet ID"))
-    |> assert_has(css("body", text: "Derivation Path"))
+    |> assert_has(css("body", text: "Create a transaction"))
+    |> assert_has(css("body", text: "Name this wallet"))
+    |> assert_has(css("body", text: "Import a TX"))
+    |> assert_has(css("body", text: "Available utxos"))
     |> assert_has(css("body", text: "Inputs"))
     |> assert_has(css("body", text: "Outputs"))
-    |> assert_has(css("body", text: "1satOrdinal"))
-    |> assert_has(css("body", text: "Additional Custom Outputs"))
-    |> click(button("Update tx / Clickwrap"))
-    |> assert_has(css("body", text: "Lock_time"))
-    |> assert_has(css("body", text: "Outpoint"))
-    |> assert_has(css("body", text: "Script"))
-    |> assert_has(css("body", text: "Unsigned BSV Transaction"))
+    |> assert_has(css("body", text: "Add P2PKH Output"))
+    |> assert_has(css("body", text: "Add op_return Output"))
+    |> assert_has(css("body", text: "Add 1Sat Output"))
+    |> assert_has(css("body", text: "Add Custom Output"))
+    # |> assert_has(css("body", text: "Lock_time"))
+    # |> assert_has(css("body", text: "Outpoint"))
+    # |> assert_has(css("body", text: "Script"))
+    # |> assert_has(css("body", text: "Unsigned BSV Transaction"))
 
     # Contract validation
     |> assert_has(css("body", text: "Valid contract?"))
     |> assert_has(css("body", text: "false"))
     |> click(button("Validate"))
     |> assert_has(css("body", text: "true"))
-    # |> QartWeb.FeatureCase.pause_here(50_000)
   end
 
   test "items", %{session: session} do
@@ -250,9 +235,8 @@ defmodule QartWeb.PublicSiteTest do
     item_fixture()
     item_fixture()
 
-    session = login_user(session, user)
+    login_user(session, user)
     |> visit("/catalog/")
-
     |> assert_has(css("div[name='item']", count: 7))
     |> click(css("div[name='item'][id='item-#{item2.id}'] a"))
     |> assert_has(css("body", text: "some name"))
@@ -285,7 +269,6 @@ defmodule QartWeb.PublicSiteTest do
     |> click(css("li[name='cart-item'][item-id='item-#{item2.id}'] button[phx-click='remove_from_cart']"))
 
     # After removing an item
-    # |> QartWeb.FeatureCase.pause_here(50_000)
     |> assert_has(css("body", text: "Cost of goods"))
     |> assert_has(css("body", text: "$120.50"))
     |> assert_has(css("body", text: "Sales tax"))
@@ -296,7 +279,6 @@ defmodule QartWeb.PublicSiteTest do
     |> assert_has(css("body", text: "5.00"))
     |> assert_has(css("body", text: "Total"))
     |> assert_has(css("body", text: "152.62"))
-    # |> QartWeb.FeatureCase.pause_here(50_000)
 
     # Empty cart
     |> click(button("Remove all items from cart"))
@@ -323,7 +305,6 @@ defmodule QartWeb.PublicSiteTest do
     # With the public key's private key, the User can sign a message showing they own the address. ...
     # They 2nd user can verify a message based on the public address. --> Message + Key
 
-
     #
     # Bitcoin is sent from user's fungible UXTOs
     # A bitcoin transaction is built (using TxBuilder) by Qart for the Item(s) in the ShoppingCartTransaction
@@ -338,7 +319,6 @@ defmodule QartWeb.PublicSiteTest do
     # Qart should have the full transaction, and not need to sync it from chain
     #
     # Qart could be refreshing addresses
-    |> QartWeb.FeatureCase.pause_here(50_000)
 
     # Convert a Cart into a Transaction/Receipt / Object?
     # Person
@@ -346,8 +326,5 @@ defmodule QartWeb.PublicSiteTest do
     # each Item has price
     # the price per User is subject to tax
     #
-
-    # session
-    # |> QartWeb.FeatureCase.pause_here(50_000)
   end
 end

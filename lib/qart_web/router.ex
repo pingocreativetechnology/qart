@@ -130,7 +130,6 @@ defmodule QartWeb.Router do
 
       live "/transactions", TransactionLive.Index, :index
       live "/transactions/new", TransactionLive.Index, :new
-      live "/transactions/new/hex", TransactionLive.New, :show
       live "/transactions/:id/edit", TransactionLive.Index, :edit
 
       live "/transactions/:id", TransactionLive.Show, :show

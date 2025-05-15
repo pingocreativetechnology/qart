@@ -3,17 +3,9 @@
   name="top-navigation"
   class="flex justify-between items-center">
   <div>
-    <.link
-      class="my-2 inline-flex rounded-md px-3 py-2 text-sm font-semibold text-slate-800"
-      patch={~p"/wallets"}>
-      <span>
-        <span aria-hidden="true">&larr;</span>
-        All Wallets
-      </span>
-    </.link>
   </div>
 
-  <div>
+  <div class="px-4">
     <%= if @wallet != @default_wallet do %>
     <button
       type="button"
@@ -21,19 +13,6 @@
       class="text-xs text-slate-400 hover:text-slate-700">
       <span>Set wallet as default</span>
     </button>
-    <.link
-      patch={~p"/wallet/"}
-      class="my-2 rounded-md px-3 py-2 text-sm font-semibold text-slate-800">
-      <span>
-        Active Wallet
-        <%= if @default_wallet.name do %>
-        ({@default_wallet.name})
-        <% else %>
-        ({@default_wallet_id})
-        <% end %>
-        <span aria-hidden="true">&rarr;</span>
-      </span>
-    </.link>
     <% end %>
   </div>
 </div>
@@ -51,7 +30,7 @@
 
 <div
   name="wallets"
-  class="max-w-xl mx-auto">
+  class="max-w-2xl mx-auto">
 
   <div class="mt-4 flex justify-between items-center w-full border-b">
 
@@ -253,39 +232,12 @@
     </button>
   </div>
 </div>
-
 <% end %>
-
-  <hr
-    class="mt-24">
-  <div>
-    <div
-      class="text-xs mt-4">
-      Mnemonic:
-      <br>
-      <div
-        name="mnemonic"
-        class="bg-gray-100 p-2"><%= @mnemonic %></div>
-      <hr>
-      <div
-        class="mt-2">
-        Derivation path:
-        <br>
-        <div class="bg-gray-100 p-2 font-mono"><%= @derivation_path %></div>
-      </div>
-      <hr>
-      <div class="mt-2">
-        Address string:
-        <br>
-        <div class="bg-gray-100 p-2"><%= @address_string %></div>
-      </div>
-    </div>
-  </div>
 </div>
 <% end %>
 
 <%= if @live_action == :show do %>
-<div class="max-w-5xl mx-auto">
+<div class="max-w-3xl mx-auto">
 
   <div class="mt-4 w-full pb-1">
     <div class="flex items-baseline justify-between">
@@ -380,7 +332,15 @@
     </div>
   </div>
 
-<%= @mnemonic %>
+  <%= if @mnemonic do %>
+  <div
+    name="mnemonic"
+    class="bg-gray-100 p-2 font-mono"
+  >
+    <%= @mnemonic %>
+  </div>
+  <% end %>
+
 <%= if @wallet do %>
   <ul>
   <%= for address <- @addresses do %>
@@ -426,9 +386,39 @@ easy tx
 <% end %>
 
 <%= if @live_action == :tx do %>
-<div class="text-4xl sm:text-5xl px-4 mb-6 mt-2 text-slate-300">
-  Create a transaction
+<div class="px-4 mb-6 mt-2">
+  <div
+    class="text-6xl text-slate-200">
+    <span
+      class="font-semibold">
+      Create a transaction
+    </span>
+  <%= if !@show_import_tx do %>
+  <button
+    phx-click="importTx"
+    class="mt-2 text-slate-400 text-xs">
+    Import a TX
+  </button>
+  <% end %>
+  </div>
 </div>
+<%= if @show_import_tx do %>
+<div
+  class="px-4">
+  <.input
+    name="raw_tx"
+    field={@raw_tx}
+    phx-blur="generateTx"
+    type="textarea"
+    value={@raw_tx}
+    label="Raw Tx" />
+  <button
+    phx-click="hideImportTx"
+    class="mt-2 text-slate-300 text-xs">
+    Cancel
+  </button>
+</div>
+<% end %>
 <div class="flex flex-col mx-4">
   <div class="mx-auto w-full grow lg:flex border-b">
     <div
@@ -470,81 +460,6 @@ easy tx
                 Name this wallet
               </span>
             <% end %>
-          <% end %>
-        </div>
-
-      </div>
-      <div
-        class="mr-2">
-        <div>
-          <span
-            class="text-slate-400 text-xs">
-            Derivation Path
-          </span>
-          <%= if @editing_derivation_path do %>
-            <form
-              phx-submit="save-derivation-path"
-              class="flex items-center space-x-1 text-sm">
-              <%
-                derivation_elements = ["44'", "236'", "0'", "0", "1"]
-              %>
-
-              <%= for {seg, idx} <- Enum.with_index(derivation_elements) do %>
-                <input
-                  type="text"
-                  name={"segments[#{idx}]"}
-                  value={seg}
-                  class="w-12 p-1 text-center border rounded text-sm"/>
-                <input
-                  type="checkbox"
-                  name={"segments[#{idx}]"}
-                  value={seg}
-                  class="hidden p-1 text-center border rounded"/>
-              <% end %>
-
-              <button
-                type="submit"
-                class="px-2 py-1 bg-blue-500 text-white rounded text-xs">
-                OK
-              </button>
-            </form>
-          <% else %>
-            <span
-              phx-click="edit-derivation-path"
-              class="cursor-pointer text-blue-600 hover:underline text-sm">
-              {@derivation_path}
-            </span>
-          <% end %>
-          &nbsp;
-        </div>
-      </div>
-      <div
-        class="">
-        <div>
-          <span
-            class="text-slate-400 text-xs">
-            Address
-          </span>
-
-          <span
-            class="font-mono text-sm">
-            {@bsv_address |> BSV.Address.to_string}
-          </span>
-          <% wallet_recently_synced = DateTime.diff(DateTime.utc_now(), @wallet_last_synced_at, :second) %>
-          <%= if wallet_recently_synced >= 0 && wallet_recently_synced <= 10 do %>
-          <button type="button"
-          phx-click="sync-address"
-          phx-value-address={@bsv_address |> BSV.Address.to_string}
-            class="text-xs bg-slate-300 hover:bg-slate-400 text-slate-600 px-3 py-1 rounded">
-            Updated {@wallet_last_synced_at |> inspect}
-          </button>
-          <% else %>
-          <button type="button"
-          phx-click="sync-address"
-          phx-value-address={@bsv_address |> BSV.Address.to_string}
-            class="text-xs bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">
-            Sync address
-          </button>
           <% end %>
         </div>
       </div>
@@ -590,9 +505,6 @@ easy tx
         >Transactions</a>
       </div>
       <%= for {tx, index} <- Enum.with_index(@transactions) do %>
-        <% tx_utxos = Enum.find(@utxos, fn txout ->
-          utxo_txid = txout.outpoint |> BSV.OutPoint.get_txid
-          utxo_txid == tx.txid end) %>
         <% tx_has_utxos = Enum.any?(@utxos, fn txout ->
           utxo_txid = txout.outpoint |> BSV.OutPoint.get_txid
           utxo_txid == tx.txid end) %>
@@ -699,7 +611,7 @@ easy tx
             Inputs
           </div>
           <div
-            class="font-mono font-semibold text-green-600">
+            class="font-mono font-semibold text-green-600 mr-2">
             {@tx_builder |> BSV.TxBuilder.input_sum}
           </div>
         </div>
@@ -734,7 +646,7 @@ easy tx
               <div>
                 Outputs
               </div>
-              <div class="font-mono font-semibold text-red-600">
+              <div class="font-mono font-semibold text-red-600 mr-2">
                 {@tx_builder |> BSV.TxBuilder.output_sum}
               </div>
             </div>
@@ -745,7 +657,7 @@ easy tx
                   name="output"
                   class="bg-white border border-gray-300 rounded-lg w-full mb-2">
                   <div class="flex items-center justify-between p-2 pb-0">
-                    <div class="text-sm font-semibold text-slate-600">
+                    <div class="text-sm font-semibold text-slate-400">
                       <%
                       {:ok, contract_type} = case output.mfa do
                         {BSV.Contract.P2PKH, :locking_script, [%{address: address}]} ->
@@ -906,13 +818,13 @@ easy tx
                     type="button"
                     phx-click="add_output"
                     phx-value-output-type="p2pkh"
-                    class="bg-slate-400 hover:text-slate-600 hover:bg-slate-100 text-slate-900 px-4 py-1 rounded w-full border hover:border">
+                    class="bg-slate-300 hover:text-slate-800 hover:bg-slate-100 text-slate-900 px-4 py-1 rounded w-full border hover:border">
                     Add P2PKH Output
                   </button>
                 </div>
 
                 <div
-                  class="mt-2">
+                  class="mt-1">
                   <button
                     type="button"
                     phx-click="add_output"
@@ -1007,12 +919,13 @@ easy tx
     <div
       name="display-transaction-column"
       class="w-1/4">
-      <div class="flex justify-between text-2xl items-center mt-2">
+      <div class="flex justify-between text-2xl items-center mt-2 mb-2">
         <div
-          class="mb-4">
+          class="">
           Remainder
         </div>
-        <div class="font-mono font-semibold text-yellow-600">
+        <div
+          class="font-mono font-semibold text-yellow-600">
           {(@tx_builder |> BSV.TxBuilder.input_sum) - (@tx_builder |> BSV.TxBuilder.output_sum)}
         </div>
       </div>
@@ -1108,22 +1021,8 @@ easy tx
       >Validate
     </button>
 
-    <%= @valid_contract2 %>
-    <%= @contract_validation_error %>
-  </div>
-
-  <div
-  name="contract-validation">
-  Valid contract?
-
-  <button
-    class="inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset text-gray-900 bg-white  hover:bg-gray-50 ring-gray-300"
-    type="submit"
-    phx-click="validate"
-    >Validate
-  </button>
-
     <%= @valid_contract %>
+    <%= @contract_validation_error %>
   </div>
 
 </div>
@@ -1290,6 +1189,8 @@ easy tx
                     class="p-2">
                     <%= if index == 0 do %>
                       <% {BSV.Contract.P2PKH, :locking_script,[%{address: to_address}]} = output.mfa %>
+                      <% Qart.debug "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" %>
+                      <% Qart.debug to_address %>
                         <input id="content3" type="number" name="output-0-satoshis"
                           placeholder="100"
                           value={output.subject}
@@ -1422,7 +1323,7 @@ easy tx
       type="submit" phx-click="validate2">Validate
     </button>
 
-    <%= @valid_contract2 %>
+    <%= @valid_contract %>
       <%= @contract_validation_error %>
   </div>
 
@@ -1447,7 +1348,7 @@ easy tx
 
 
 <div class="min-h-screen bg-gray-100 p-8 hidden">
-  <div class="max-w-6xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+  <div class="max-w-26xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
     <div class="flex">
       <!-- Inputs Column -->
       <div class="w-1/2 p-4 border-r border-gray-200">

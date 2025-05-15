@@ -3,9 +3,11 @@ defmodule QartWeb.UtxoLiveTest do
 
   import Phoenix.LiveViewTest
   import Qart.TransactionsFixtures
+  import Qart.AccountsFixtures
+  alias QartWeb.UserAuth
 
-  @create_attrs %{script: "some script", txid: "some txid", vout: 42, satoshis: 42, spent: true, spent_at: "2025-04-18T21:13:00Z"}
-  @update_attrs %{script: "some updated script", txid: "some updated txid", vout: 43, satoshis: 43, spent: false, spent_at: "2025-04-19T21:13:00Z"}
+  @create_attrs %{script: "76a914b3182303bb218b771cc7cbf84d9ddacfbd6180b088ac", txid: "4f349749c5e86aa95a92341d6f3c0138aa8359d47c278a1d1195c34baba7144e", vout: 42, satoshis: 42, spent: true, spent_at: "2025-04-18T21:13:00Z"}
+  @update_attrs %{script: "76a914c565e265052ccec4d1dd7bed4600c7e82a28cb3388ac", txid: "9f797ad1ca0a8796a2f3464565d3cb34835725c81bc01ed3d9bfea67f733a4ab", vout: 43, satoshis: 43, spent: false, spent_at: "2025-04-19T21:13:00Z"}
   @invalid_attrs %{script: nil, txid: nil, vout: nil, satoshis: nil, spent: false, spent_at: nil}
 
   defp create_utxo(_) do
@@ -13,17 +15,29 @@ defmodule QartWeb.UtxoLiveTest do
     %{utxo: utxo}
   end
 
+  defp log_user_in(_) do
+      user = user_fixture()
+      conn = build_conn() |> log_in_user(user)
+      %{conn: conn, user: user}
+    end
+
   describe "Index" do
-    setup [:create_utxo]
+    setup [:create_utxo, :log_user_in]
 
     test "lists all utxos", %{conn: conn, utxo: utxo} do
       {:ok, _index_live, html} = live(conn, ~p"/utxos")
 
       assert html =~ "Listing Utxos"
-      assert html =~ utxo.script
+      assert html =~ "Txid"
+      assert html =~ "Vout"
+      assert html =~ "Satoshis"
+      assert html =~ "Spent"
+      assert html =~ utxo.txid
     end
 
-    test "saves new utxo", %{conn: conn} do
+    test "saves new utxo", %{conn: conn, user: user} do
+      conn = build_conn() |> log_in_user(user)
+
       {:ok, index_live, _html} = live(conn, ~p"/utxos")
 
       assert index_live |> element("a", "New Utxo") |> render_click() =~
@@ -43,10 +57,12 @@ defmodule QartWeb.UtxoLiveTest do
 
       html = render(index_live)
       assert html =~ "Utxo created successfully"
-      assert html =~ "some script"
+      assert html =~ "4f349749c5e86aa95a92341d6f3c0138aa8359d47c278a1d1195c34baba7144e"
     end
 
-    test "updates utxo in listing", %{conn: conn, utxo: utxo} do
+    test "updates utxo in listing", %{conn: conn, utxo: utxo, user: user} do
+      conn = build_conn() |> log_in_user(user)
+
       {:ok, index_live, _html} = live(conn, ~p"/utxos")
 
       assert index_live |> element("#utxos-#{utxo.id} a", "Edit") |> render_click() =~
@@ -66,7 +82,8 @@ defmodule QartWeb.UtxoLiveTest do
 
       html = render(index_live)
       assert html =~ "Utxo updated successfully"
-      assert html =~ "some updated script"
+
+      assert html =~ "9f797ad1ca0a8796a2f3464565d3cb34835725c81bc01ed3d9bfea67f733a4ab"
     end
 
     test "deletes utxo in listing", %{conn: conn, utxo: utxo} do
@@ -78,7 +95,7 @@ defmodule QartWeb.UtxoLiveTest do
   end
 
   describe "Show" do
-    setup [:create_utxo]
+    setup [:create_utxo, :log_user_in]
 
     test "displays utxo", %{conn: conn, utxo: utxo} do
       {:ok, _show_live, html} = live(conn, ~p"/utxos/#{utxo}")
@@ -107,7 +124,7 @@ defmodule QartWeb.UtxoLiveTest do
 
       html = render(show_live)
       assert html =~ "Utxo updated successfully"
-      assert html =~ "some updated script"
+      assert html =~ "9f797ad1ca0a8796a2f3464565d3cb34835725c81bc01ed3d9bfea67f733a4ab"
     end
   end
 end

@@ -34,7 +34,7 @@ defmodule QartWeb.TransactionLiveTest do
       {:ok, _index_live, html} = live(conn, ~p"/transactions")
 
       assert html =~ "Listing Transactions"
-      assert html =~ transaction.raw |> String.slice(0, 100)
+      assert html =~ transaction.txid
     end
 
     test "saves new transaction", %{conn: conn} do
@@ -57,7 +57,7 @@ defmodule QartWeb.TransactionLiveTest do
 
       html = render(index_live)
       assert html =~ "Transaction created successfully"
-      assert html =~ "AQAAAAFYjpS29sCiqSWw2Acrf7a0qucKdIfwAkl"
+      assert html =~ "3a34b6c5e49cfa9841631cf6aa7120d044c0916f1a7f2d1bb0d95841df54b700"
     end
 
     test "updates transaction in listing", %{conn: conn, transaction: transaction} do
@@ -80,7 +80,7 @@ defmodule QartWeb.TransactionLiveTest do
 
       html = render(index_live)
       assert html =~ "Transaction updated successfully"
-      assert html =~ "AQAAAAFYjpS29sCiqSWw2Acrf7a0qucKdIfwAklchldIAy19pUgAAAB"
+      assert html =~ "3a34b6c5e49cfa9841631cf6aa7120d044c0916f1a7f2d1bb0d95841df54b700"
     end
 
     test "deletes transaction in listing", %{conn: conn, transaction: transaction} do

@@ -29,7 +29,7 @@ defmodule QartWeb.WalletUtilsComponent do
           placeholder="Add your comment..." />
         <button
           type="submit"
-          class="my-2 inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset text-slate-800 bg-green-50  hover:bg-gray-50 ring-gray-300">
+          class="my-2 inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset text-slate-800 bg-white hover:bg-gray-100 ring-gray-300">
           Download TXID from WhatsOnChain
         </button>
       </form>

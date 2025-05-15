@@ -214,4 +214,26 @@ defmodule Qart.BSV do
     utxo
   end
 
+  def tx_builder_from_hex(raw_hex) do
+    tx =
+      raw_hex
+      |> Tx.from_binary!(encoding: :hex)
+
+    # start with an empty builder
+    %BSV.TxBuilder{}
+    # add each input as a “raw unlock” contract
+    |> Enum.reduce(tx.inputs, fn txin, b ->
+      # grab the raw scriptSig bytes
+      script_sig = txin.script  # a %BSV.Script{} struct
+      # build a raw unlock contract
+      Raw.unlock(txin, %{script: script_sig})
+      |> TxBuilder.add_input(b)
+    end)
+    # add each output as a “raw lock” contract
+    |> Enum.reduce(tx.outputs, fn txout, b ->
+      Raw.lock(txout.satoshis, %{script: txout.script})
+      |> TxBuilder.add_output(b)
+    end)
+  end
+
 end

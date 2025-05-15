@@ -18,7 +18,7 @@ defmodule Qart.Transactions.Utxo do
   def changeset(utxo, attrs) do
     utxo
     |> cast(attrs, [:txid, :vout, :satoshis, :script, :address, :spent, :spent_at])
-    |> validate_required([:txid, :vout, :satoshis, :address, :spent])
+    |> validate_required([:txid, :vout, :satoshis, :spent])
   end
 
   @doc """
