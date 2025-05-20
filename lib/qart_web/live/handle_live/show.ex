@@ -2,9 +2,8 @@ defmodule QartWeb.HandleLive.Show do
   use QartWeb, :live_view
   alias Qart.Accounts
   alias Qart.Follows
-  alias Qart.Posts
-
   import QartWeb.Post
+  alias Qart.Posts
 
   @impl true
   def mount(_params, _session, socket) do
@@ -81,7 +80,10 @@ defmodule QartWeb.HandleLive.Show do
   end
 
   # def handle_event("create_post", %{"content" => content, "attachments" => attachments, "payment_amount" => payment} = params, socket) do
-  def handle_event("create_post", %{"content" => content, "payment_amount" => payment}, socket) do
+  def handle_event("create_post", %{
+      "content" => content,
+      "payment_amount" => payment
+    }, socket) do
       user_id = socket.assigns.current_user.id
 
       # Convert attachments to a list of file paths or URLs
@@ -95,7 +97,7 @@ defmodule QartWeb.HandleLive.Show do
 
       case Posts.create_post(attrs) do
         {:ok, _post} ->
-          {:noreply, put_flash(socket, :info, "Post created successfully")}
+          {:noreply, push_navigate(put_flash(socket, :info, "Post created successfully"), to: ~p"/#{socket.assigns.current_user.handle}")}
 
         {:error, _changeset} ->
           {:noreply, put_flash(socket, :error, "Failed to create post")}

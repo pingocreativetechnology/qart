@@ -16,12 +16,15 @@
         <div class="mt-6 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
 
         <%= if @current_user do %>
+          <%= if @current_user.id != @user.id do %>
           <.live_component
             module={QartWeb.FollowButtonComponent}
             id="follow-user"
             current_user={@current_user}
             profile_user_id={@user.id} />
+          <% end %>
 
+          <%= if @current_user.id == @user.id do %>
           <.live_component
             module={QartWeb.PostButtonComponent}
             current_user={@current_user}
@@ -29,6 +32,14 @@
             open={false}
             id="post-button" />
 
+          <.link
+            href={~p"/users/settings"}
+            class="inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold  shadow-sm ring-1 ring-inset text-gray-900 bg-white hover:bg-gray-50 ring-gray-300">
+            Settings
+          </.link>
+          <% end %>
+
+          <%= if @current_user.id !=@user.id do %>
           <.live_component
             module={QartWeb.AskButtonComponent}
             current_user={@current_user}
@@ -41,8 +52,10 @@
             target_user={@user}
             open={false}
             id="tip-user" />
+          <% end %>
         <% end %>
 
+          <%= if @current_user.id !=@user.id do %>
           <.link href={"/#{@user.try_handle}/shop"}
             class="inline-flex justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
           >
@@ -53,6 +66,7 @@
             </svg>
             Shop
           </.link>
+          <% end %>
         </div>
       </div>
     </div>
@@ -79,13 +93,14 @@
   </div>
 
   <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 mt-6">
-
     <div class="sm:flex w-full min-h-screen">
       <div
         name="left-column"
         class="w-full md:w-3/4 lg:w-2/3 p-4">
         <%= for post <- @posts do %>
-          <.post current_user={@current_user} post={post} />
+          <.post
+            current_user={@current_user}
+            post={post} />
         <% end %>
       </div>
 
@@ -95,10 +110,10 @@
         <div id="mutuals">
           <h2 class="text-lg mb-2">Mutuals</h2>
           <%= for user <- @mutuals do %>
-            <a href={"/#{user.try_handle}"}>
-              <.user_avatar user={user} />
-            </a>
-            <% end %>
+          <a href={"/#{user.try_handle}"}>
+            <.user_avatar user={user} />
+          </a>
+          <% end %>
         </div>
 
         <div

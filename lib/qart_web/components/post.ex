@@ -1,5 +1,6 @@
 defmodule QartWeb.Post do
   use Phoenix.Component
+  import QartWeb.UserAvatar
 
   attr :current_user, Qart.Accounts.User, required: true
   attr :payment_amount, :float, default: 0.0
@@ -8,7 +9,7 @@ defmodule QartWeb.Post do
     ~H"""
     <div class="flex items-start space-x-4">
       <div class="shrink-0">
-        <img class="inline-block size-10 rounded-full" src="https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="">
+        <.user_avatar user={@current_user} />
       </div>
       <div class="min-w-0 flex-1">
         <form
@@ -199,9 +200,7 @@ defmodule QartWeb.Post do
     <div class="bg-white px-4 pt-5 sm:px-6 border-b border-gray-100">
       <div class="flex space-x-3">
         <div class="shrink-0">
-          <img class="size-10 rounded-full"
-            src={"/images/profile-avatar.png"}
-            alt="">
+          <.user_avatar user={@current_user} />
         </div>
         <div class="min-w-0 flex-1">
           <p class="text-sm font-semibold text-gray-900">
@@ -297,7 +296,9 @@ defmodule QartWeb.Post do
 
         <input type="file" name="attachments" multiple class="block mt-2 border rounded" />
 
-        <input type="number" name="payment_amount" step="0.01" value={@payment_amount} class="w-full mt-2 p-2 border rounded" />
+        <input
+          type="number"
+          name="payment_amount" step="0.01" value={@payment_amount} class="w-full mt-2 p-2 border rounded" />
 
         <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded mt-2">
           Post

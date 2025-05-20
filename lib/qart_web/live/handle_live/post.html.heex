@@ -27,12 +27,14 @@
             current_user={@current_user}
             profile_user_id={@user.id} />
 
+          <%= if @current_user.id != @user.id do %>
           <.live_component
             module={QartWeb.PostButtonComponent}
             current_user={@current_user}
             target_user={@user}
             open={false}
             id="post-button" />
+          <% end %>
 
           <.live_component
             module={QartWeb.AskButtonComponent}

@@ -35,7 +35,7 @@ defmodule QartWeb.PublicSiteTest do
 
     |> visit("/")
     |> click(link("Public"))
-    |> assert_has(css("body", text: "Connect with other public users"))
+    |> assert_has(css("body", text: "Connect with others"))
 
 
     |> visit("/")

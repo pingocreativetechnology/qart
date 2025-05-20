@@ -20,7 +20,7 @@ defmodule QartWeb.ItemLive.Index do
         {:ok, stream(socket, :items, items, view_template: view_template)}
 
       _ ->
-        items = Inventory.list_items()
+        items = Inventory.list_items(socket.assigns.current_user)
         {:ok, stream(socket, :items, items, view_template: view_template)}
     end
   end

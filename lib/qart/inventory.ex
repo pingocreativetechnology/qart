@@ -7,6 +7,7 @@ defmodule Qart.Inventory do
   alias Qart.Repo
 
   alias Qart.Inventory.Item
+  alias Qart.Accounts.{User}
 
   @doc """
   Returns the list of items.
@@ -17,6 +18,14 @@ defmodule Qart.Inventory do
       [%Item{}, ...]
 
   """
+  def list_items(%User{id: user_id}) do
+    Item
+    |> where(user_id: ^user_id)
+    |> Repo.all()
+    |> Repo.preload(:user)
+    |> Enum.map(&maybe_compute_user_virtuals/1)
+  end
+
   def list_items do
     Repo.all(Item)
       |> Repo.preload(:user)
