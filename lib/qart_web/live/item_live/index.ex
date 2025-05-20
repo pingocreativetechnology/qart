@@ -38,7 +38,7 @@ defmodule QartWeb.ItemLive.Index do
 
   defp apply_action(socket, :new, _params) do
     socket
-    |> assign(:page_title, "New Item")
+    |> assign(:page_title, "Add an Item")
     |> assign(:item, %Item{})
   end
 
