@@ -14,6 +14,8 @@ defmodule QartWeb.PublicSiteTest do
   end
 
   test "User registers", %{session: session} do
+    user2 = user_fixture()
+
     session
     |> visit("/")
     |> click(link("Register"))
@@ -25,7 +27,7 @@ defmodule QartWeb.PublicSiteTest do
 
     |> visit("/")
     |> click(link("Items"))
-    |> assert_has(css("body", text: "Listing Items"))
+    |> assert_has(css("h1", text: "Items"))
 
     |> visit("/")
     |> click(link("Wallet"))
@@ -34,7 +36,7 @@ defmodule QartWeb.PublicSiteTest do
     |> assert_has(css("body", link: "Wallets"))
 
     |> visit("/")
-    |> click(link("Public"))
+    |> click(link("Users"))
     |> assert_has(css("body", text: "Connect with others"))
 
 
@@ -42,6 +44,8 @@ defmodule QartWeb.PublicSiteTest do
     |> click(link("Catalog"))
 
     |> visit("/")
+    |> click(link("user1@lvh.me"))
+    |> click(link("Settings"))
     |> click(link("Activity stream"))
     |> assert_has(css("body", text: "created the invoice."))
 
@@ -54,12 +58,13 @@ defmodule QartWeb.PublicSiteTest do
     |> click(link("user1@lvh.me"))
     |> assert_has(css("body", text: "user1@lvh.me"))
 
-
+    |> click(link("Users"))
+    |> click(link(user2.id))
     |> click(link("Shop"))
-    |> assert_has(css("body", text: "user1@lvh.me's Store"))
+    |> assert_has(css("body", text: "#{user2.email}'s Store"))
 
     |> click(button("Tip"))
-    |> assert_has(css("body", text: "Pay user1@lvh.me"))
+    |> assert_has(css("body", text: "Pay #{user2.email}"))
 
     |> click(button("Ask"))
     |> assert_has(css("textarea[phx-blur='submit_ask']"))
@@ -71,6 +76,9 @@ defmodule QartWeb.PublicSiteTest do
     |> click(link("Map"))
     |> assert_has(css("body", text: "Full screen"))
 
+
+
+    |> click(link("user1@lvh.me"))
     |> click(link("Settings"))
     |> assert_has(css("body", text: "Account Settings"))
 
@@ -123,7 +131,7 @@ defmodule QartWeb.PublicSiteTest do
     user = user_fixture()
 
     session = login_user(session, user)
-    |> visit("/")
+    |> click(css("#flash-info button"))
     |> click(link("Wallets"))
     |> click(button("Generate Wallet"))
     |> assert_has(css("body", text: "Wallet generated successfully"))
@@ -160,6 +168,7 @@ defmodule QartWeb.PublicSiteTest do
     |> assert_has(css("body", text: "Welcome back!"))
     |> assert_has(css("body", text: "peer to peer commerce"))
     |> click(css("a[title='Default wallet']"))
+    |> click(css("#flash-info button"))
     |> click(link("Wallets"))
     |> click(button("Restore Wallet"))
     |> assert_has(css("body", text: "Load Test 12 words"))
@@ -192,9 +201,11 @@ defmodule QartWeb.PublicSiteTest do
     user = user_fixture()
 
     login_user(session, user)
+    |> visit("/")
     |> visit("/wallets/")
     |> click(button("Generate Wallet"))
     |> assert_has(css("body", text: "Wallet generated successfully"))
+    |> assert_has(css("div[name='mnemonic']"))
     |> visit("/wallets")
     |> click(css("div[name='wallet']:first-of-type a"))
     |> assert_has(css("body", text: "Current Derivation Index 2"))

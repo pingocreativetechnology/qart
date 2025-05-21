@@ -13,6 +13,39 @@
           </a>
         </div>
 
+        <form
+          phx-submit="search"
+          phx-change="search"
+          class="mb-6">
+          <div
+            class="flex justify-between"
+          >
+            <div>
+              <.input
+                name="q"
+                type="text"
+                placeholder="Search description"
+                value={@filters["q"]}
+                class="p-2 border rounded" />
+            </div>
+            <div>
+              <.input
+                name="price_min"
+                type="number"
+                placeholder="Min price"
+                value={@filters["price_min"]}
+                class="p-2 border rounded" />
+              <.input
+                name="price_max"
+                type="number"
+                placeholder="Max price"
+                value={@filters["price_max"]}
+                class="p-2 border rounded" />
+            </div>
+          </div>
+
+        </form>
+
         <div class="grid grid-cols-1 gap-x-8 gap-y-8 sm:grid-cols-2 sm:gap-y-10 lg:grid-cols-4">
         <%= for item <- @items do %>
           <div
@@ -29,16 +62,17 @@
                   View Product</div>
               </div>
             </div>
-            <div class="mt-4 flex items-center justify-between space-x-8 text-base font-medium text-gray-900">
-              <h3>
+            <div class="mt-4 flex items-start justify-between space-x-8 text-base font-medium text-slate-800">
+              <div
+                class="text-xs">
                 <a href={~p"/items/#{item}"}>
                   <span aria-hidden="true" class="absolute inset-0"></span>
                   {item.name}
                 </a>
-              </h3>
-              <p>${item.price}</p>
+              </div>
+              <p
+                class="text-slate-400 text-lg">${item.price}</p>
             </div>
-            <p class="mt-1 text-sm text-gray-500">UI Kit</p>
           </div>
         <% end %>
         </div>

@@ -24,7 +24,6 @@ defmodule QartWeb.Router do
 
     get "/about", PageController, :about
     get "/public", PageController, :public
-    get "/catalog", PageController, :catalog
     get "/map", PageController, :map
     get "/handcash_auth", PageController, :handcash_auth
     get "/", PageController, :home
@@ -119,6 +118,7 @@ defmodule QartWeb.Router do
       live "/stream", StreamLive, :index
       live "/cart", CartLive, :index
 
+      live "/catalog", ItemLive.Catalog, :catalog
       live "/items", ItemLive.Index, :index
       live "/items/list", ItemLive.Index, :list
       live "/items/new", ItemLive.Index, :new

@@ -1,0 +1,133 @@
+<div
+  id="swipe-button-holder"
+  class="border border-slate-300 p-1 rounded-full inline-block bg-slate-200">
+  <div id="swipe-button"
+    class="relative w-48 h-12 bg-gray-100 rounded-full overflow-hidden select-none border border-blue-500">
+
+    <!-- Final success curtain -->
+    <div id="curtain"
+      class="absolute inset-0 bg-green-500 text-white flex items-center justify-center text-md font-semibold rounded-full opacity-0 pointer-events-none transition-all duration-500 z-30">
+      Paid
+    </div>
+
+    <!-- Progress curtain (during hold) -->
+    <div id="progress-curtain"
+      class="absolute top-0 bottom-0 right-0 bg-blue-200 opacity-80 -z-40 w-full transition-[width] duration-[2000ms] rounded-r-full">
+    </div>
+
+    <span class="absolute inset-0 flex items-center justify-center text-gray-700 font-semibold z-10">
+      Pay 0.01 BSV
+    </span>
+
+    <!-- Drag target indicator -->
+    <div id="drag-target"
+      class="absolute right-2 top-2 w-8 h-8 bg-gray-300 rounded-full opacity-0 transition-opacity duration-200 z-0 hover:animate-slow-pulse">
+    </div>
+
+    <!-- Swipe handle -->
+    <div id="slider"
+      class="absolute left-2 top-2 w-8 h-8 bg-blue-500 rounded-full shadow-md cursor-pointer z-10 flex items-center justify-center transition-all duration-300 ease-out border-4 border-white">
+      <div id="slider-content" class="text-white font-bold transition-opacity duration-150">&nbsp;</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const slider = document.getElementById('slider');
+    const swipeButton = document.getElementById('swipe-button');
+    const dragTarget = document.getElementById('drag-target');
+    const curtain = document.getElementById('curtain');
+    const progressCurtain = document.getElementById('progress-curtain');
+
+    let isDragging = false;
+    let startX = 0;
+    let currentX = 0;
+    let holdTimeout = null;
+    let confirmed = false;
+
+    const maxX = swipeButton.offsetWidth - slider.offsetWidth - 8; // account for left-2/right-1 spacing
+
+    const onSwipeConfirm = () => {
+      confirmed = true;
+      curtain.classList.remove('opacity-0');
+      curtain.classList.add('opacity-100');
+      curtain.textContent = '✅ Paid!';
+    };
+
+    const onSwipeCancel = () => {
+      progressCurtain.style.transition = 'none';
+      progressCurtain.style.width = '100%';
+    };
+
+    const updateSlider = () => {
+      slider.style.transform = `translateX(${currentX}px)`;
+    };
+
+    const resetSlider = () => {
+      slider.style.transition = 'transform 0.3s ease';
+      slider.style.transform = 'translateX(0)';
+      dragTarget.classList.replace('opacity-100', 'opacity-0');
+      onSwipeCancel();
+    };
+
+    slider.addEventListener('pointerdown', (e) => {
+      if (confirmed) return;
+      dragTarget.classList.add('pulse');
+      isDragging = true;
+      startX = e.clientX;
+      slider.setPointerCapture(e.pointerId);
+      dragTarget.classList.replace('opacity-0', 'opacity-100');
+    });
+
+    slider.addEventListener('pointermove', (e) => {
+      if (!isDragging || confirmed) return;
+
+      const dx = e.clientX - startX;
+      currentX = Math.max(0, Math.min(dx, maxX));
+      updateSlider();
+
+      // Rectangle overlap check
+      const sliderRect = slider.getBoundingClientRect();
+      const targetRect = dragTarget.getBoundingClientRect();
+
+      const isOverlapping = !(
+        sliderRect.right < targetRect.left ||
+        sliderRect.left > targetRect.right ||
+        sliderRect.bottom < targetRect.top ||
+        sliderRect.top > targetRect.bottom
+      );
+
+      if (isOverlapping && !holdTimeout) {
+        dragTarget.classList.add('pulse');
+        progressCurtain.style.transition = 'width 2s linear';
+        progressCurtain.style.width = '0%';
+
+        holdTimeout = setTimeout(() => {
+          onSwipeConfirm();
+        }, 600);
+      }
+
+      if (!isOverlapping && holdTimeout) {
+        clearTimeout(holdTimeout);
+        holdTimeout = null;
+        dragTarget.classList.remove('pulse');
+        onSwipeCancel();
+      }
+    });
+
+    slider.addEventListener('pointerup', () => {
+      if (!isDragging || confirmed) return;
+      isDragging = false;
+      dragTarget.classList.remove('pulse');
+
+      dragTarget.classList.replace('opacity-100', 'opacity-0');
+
+      if (!confirmed) {
+        clearTimeout(holdTimeout);
+        holdTimeout = null;
+        onSwipeCancel();
+        resetSlider();
+      }
+    });
+</script>

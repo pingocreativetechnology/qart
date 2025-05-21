@@ -7,4 +7,3 @@ Code.require_file("support/feature_case.ex", __DIR__)
 {:ok, _} = Application.ensure_all_started(:wallaby)
 
 Application.put_env(:wallaby, :base_url, QartWeb.Endpoint.url())
-Application.put_env(:wallaby, :base_url, QartWeb.Endpoint.url())

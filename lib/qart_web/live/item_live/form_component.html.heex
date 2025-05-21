@@ -12,6 +12,7 @@
     <%= unless @action == :new do %>
     <.input field={@form[:status]} type="text" label="Status" />
     <% end %>
+    <.input field={@form[:user_id]} type="hidden" value={@current_user.id} />
 
     <label>Upload Images</label>
     <.live_file_input upload={@uploads.images} />

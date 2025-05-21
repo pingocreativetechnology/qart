@@ -47,6 +47,66 @@ defmodule Qart.Inventory do
     |> Enum.map(&maybe_compute_user_virtuals/1)
   end
 
+
+  # Filtered items
+  def list_items(filters \\ %{}) do
+    Item
+    |> maybe_filter_by_text(filters["q"])
+    |> maybe_filter_by_price(filters["price_min"], filters["price_max"])
+    |> maybe_filter_by_color(filters["color"])
+    |> maybe_filter_by_zipcode(filters["zipcode"])
+    |> Repo.all()
+  end
+
+  defp maybe_filter_by_text(query, nil), do: query
+  defp maybe_filter_by_text(query, ""), do: query
+  defp maybe_filter_by_text(query, text) do
+    where(query, [i], ilike(i.description, ^"%#{text}%"))
+  end
+
+  defp maybe_filter_by_price(query, nil, nil), do: query
+  defp maybe_filter_by_price(query, min, max) do
+    query
+    |> maybe_min_price(min)
+    |> maybe_max_price(max)
+  end
+
+  defp maybe_min_price(query, nil), do: query
+  defp maybe_min_price(query, ""), do: query
+  defp maybe_min_price(query, min) do
+    where(query, [i], i.price >= ^String.to_integer(min))
+  end
+
+  defp maybe_max_price(query, nil), do: query
+  defp maybe_max_price(query, ""), do: query
+  defp maybe_max_price(query, max) do
+    where(query, [i], i.price <= ^String.to_integer(max))
+  end
+
+  defp maybe_filter_by_color(query, nil), do: query
+  defp maybe_filter_by_color(query, ""), do: query
+  defp maybe_filter_by_color(query, color) do
+    where(query, [i], ilike(i.color, ^"%#{color}%"))
+  end
+
+  defp maybe_filter_by_zipcode(query, nil), do: query
+  defp maybe_filter_by_zipcode(query, ""), do: query
+  defp maybe_filter_by_zipcode(query, zipcode) do
+    where(query, [i], i.zipcode == ^zipcode)
+  end
+
+
+
+
+
+
+
+
+
+
+
+
+
   @doc """
   Gets a single item.
 

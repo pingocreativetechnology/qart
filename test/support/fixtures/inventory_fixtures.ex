@@ -10,12 +10,18 @@ defmodule Qart.InventoryFixtures do
   Generate a item.
   """
   def item_fixture(attrs \\ %{}) do
-    user = user_fixture(:user)
+    user_id = case attrs do
+      %{user: user} ->
+        user.id
+
+      _ ->
+        user_fixture(:user).id
+    end
 
     {:ok, item} =
       attrs
       |> Enum.into(%{
-        user_id: user.id,
+        user_id: user_id,
         description: "some description",
         name: "some name",
         price: "120.5",

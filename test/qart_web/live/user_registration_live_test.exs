@@ -51,8 +51,10 @@ defmodule QartWeb.UserRegistrationLiveTest do
       conn = get(conn, "/")
       response = html_response(conn, 200)
       assert response =~ email
-      assert response =~ "Settings"
-      assert response =~ "Log out"
+      assert response =~ "Users"
+      assert response =~ "Catalog"
+      assert response =~ "Map"
+      assert response =~ "Wallets"
     end
 
     test "renders errors for duplicated email", %{conn: conn} do

@@ -21,8 +21,9 @@ defmodule QartWeb.UserSessionControllerTest do
       conn = get(conn, ~p"/")
       response = html_response(conn, 200)
       assert response =~ user.email
-      assert response =~ ~p"/users/settings"
-      assert response =~ ~p"/users/log_out"
+      assert response =~ ~p"/catalog"
+      assert response =~ ~p"/map"
+      assert response =~ ~p"/wallets"
     end
 
     test "logs the user in with remember me", %{conn: conn, user: user} do
