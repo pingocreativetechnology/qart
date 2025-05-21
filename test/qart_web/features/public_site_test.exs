@@ -121,6 +121,7 @@ defmodule QartWeb.PublicSiteTest do
     user = user_fixture()
 
     login_user(session, user)
+    |> visit("/items")
     |> visit("/handle/set")
     |> fill_in(text_field("Handle"), with: "broomstick")
     |> click(button("Save"))
@@ -256,12 +257,12 @@ defmodule QartWeb.PublicSiteTest do
     |> click(button("Add to Cart"))
     |> assert_has(css("body", text: "Added to cart!"))
 
-    |> visit("/catalog/")
+    |> visit("/catalog")
     |> click(css("div[name='item'][id='item-#{item3.id}'] a"))
     |> click(button("Add to Cart"))
 
     # View Cart
-    |> visit("/cart/")
+    |> visit("/cart")
     |> assert_has(css("body", text: "Cart"))
     |> assert_has(css("body", text: "some name"))
     |> assert_has(css("body", text: "Order summary"))

@@ -233,7 +233,7 @@ defmodule Qart.Shopping do
   end
 
   # Get all cart items for a user
-  def get_cart_items(user_id) do
+  def get_user_cart_items(user_id) do
     cart = get_or_create_cart(user_id)
 
     Repo.all(

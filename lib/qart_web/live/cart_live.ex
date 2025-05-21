@@ -9,7 +9,7 @@ defmodule QartWeb.CartLive do
       do: socket.assigns.current_user.id,
       else: nil
 
-    cart_items = Shopping.get_cart_items(user_id)
+    cart_items = Shopping.get_user_cart_items(user_id)
     cart = Shopping.get_or_create_cart(user_id)
     cart_total = Shopping.get_cart_total(cart.id)
 
@@ -26,7 +26,7 @@ defmodule QartWeb.CartLive do
   @impl true
   def handle_event("add_item", %{"item_id" => item_id}, socket) do
     Shopping.add_to_cart(socket.assigns.user_id, item_id)
-    {:noreply, assign(socket, cart_items: Shopping.get_cart_items(socket.assigns.user_id))}
+    {:noreply, assign(socket, cart_items: Shopping.get_user_cart_items(socket.assigns.user_id))}
   end
 
   @impl true
@@ -34,7 +34,7 @@ defmodule QartWeb.CartLive do
     %{payees: payees} = Shopping.get_cart_total(socket.assigns.cart.id)
 
     {:noreply, assign(socket,
-      cart_items: Shopping.get_cart_items(socket.assigns.user_id),
+      cart_items: Shopping.get_user_cart_items(socket.assigns.user_id),
       checkout: true,
       payees: payees,
       transaction_id: 123243443
@@ -46,7 +46,7 @@ defmodule QartWeb.CartLive do
       {:ok, _cart_item_id} ->
         socket = socket
           |> put_flash(:info, "Item removed from cart")
-          |> assign(cart_items: Shopping.get_cart_items(socket.assigns.user_id))
+          |> assign(cart_items: Shopping.get_user_cart_items(socket.assigns.user_id))
           |> assign(item_in_cart: false)
           |> assign(cart_total: Shopping.get_cart_total(socket.assigns.cart.id))
 

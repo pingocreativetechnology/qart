@@ -5,12 +5,16 @@ defmodule QartWeb.ItemLiveTest do
   import Qart.InventoryFixtures
   import Qart.AccountsFixtures
 
-  def create_attrs(user_id) do
-   %{name: "some name", status: "some status", description: "some description", price: "120.5", tags: %{}, user_id: user_id}
+  def create_attrs() do
+   %{name: "some name", description: "some description", price: "120.5", tags: %{}}
   end
 
+  # def create_attrs(user_id) do
+  #  %{name: "some name", description: "some description", price: "120.5", tags: %{}, user_id: user_id}
+  # end
+
   @update_attrs %{name: "some updated name", status: "some updated status", description: "some updated description", price: "456.7", tags: %{}}
-  @invalid_attrs %{name: nil, status: nil, description: nil, tags: nil}
+  @invalid_attrs %{name: nil, description: nil, tags: nil}
 
   defp create_item(_) do
     item = item_fixture()
@@ -19,18 +23,21 @@ defmodule QartWeb.ItemLiveTest do
 
   defp log_user_in(_) do
     user = user_fixture()
+    user_item = item_fixture(%{user_id: user.id})
     conn = build_conn() |> log_in_user(user)
-    %{conn: conn, user: user}
+    %{conn: conn, user: user, user_item: user_item}
   end
 
   describe "Index" do
     setup [:create_item, :log_user_in]
 
-    test "lists all items", %{conn: conn, item: item} do
+    test "lists a user's items", %{conn: conn, user_item: user_item} do
       {:ok, _index_live, html} = live(conn, ~p"/items")
 
-      assert html =~ "Listing Items"
-      assert html =~ item.name
+      assert html =~ "Items"
+      assert html =~ user_item.name
+      assert html =~ "Edit"
+      assert html =~ "Delete"
     end
 
     test "saves new item", %{conn: conn, user: user} do
@@ -47,7 +54,7 @@ defmodule QartWeb.ItemLiveTest do
              |> render_change() =~ "can&#39;t be blank"
 
       assert index_live
-             |> form("#item-form", item: create_attrs(user.id))
+             |> form("#item-form", item: create_attrs())
              |> render_submit()
 
       assert_patch(index_live, ~p"/items")
@@ -57,14 +64,14 @@ defmodule QartWeb.ItemLiveTest do
       assert html =~ "some name"
     end
 
-    test "updates item in listing", %{conn: conn, item: item} do
+    test "updates item in listing", %{conn: conn, user_item: user_item} do
       {:ok, index_live, _html} = live(conn, ~p"/items")
 
       assert index_live
-        |> element("#items-#{item.id} a", "Edit")
-        |> render_click() =~ "Edit Item"
+        |> element("#items-#{user_item.id} a", "Edit")
+        |> render_click() =~ "Save Item"
 
-      assert_patch(index_live, ~p"/items/#{item}/edit")
+      assert_patch(index_live, ~p"/items/#{user_item}/edit")
 
       assert index_live
              |> form("#item-form", item: @invalid_attrs)
@@ -81,11 +88,11 @@ defmodule QartWeb.ItemLiveTest do
       assert html =~ "some updated name"
     end
 
-    test "deletes item in listing", %{conn: conn, item: item} do
+    test "deletes item in listing", %{conn: conn, user_item: user_item} do
       {:ok, index_live, _html} = live(conn, ~p"/items")
 
-      assert index_live |> element("#items-#{item.id} a", "Delete") |> render_click()
-      refute has_element?(index_live, "#items-#{item.id}")
+      assert index_live |> element("#items-#{user_item.id} a", "Delete") |> render_click()
+      refute has_element?(index_live, "#items-#{user_item.id}")
     end
   end
 

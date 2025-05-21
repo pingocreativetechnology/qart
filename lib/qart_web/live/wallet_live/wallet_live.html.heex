@@ -435,15 +435,15 @@ easy tx
           <form
             phx-submit="update-wallet-name"
             phx-value-id={@wallet.id}
-            class="flex space-x-2">
+            class="inline">
             <input
               type="text"
               name="name"
               value={@wallet.name}
-              class="border p-1 rounded" />
+              class="border border-slate-300 p-1 rounded" />
             <button
               type="submit"
-              class="px-2 py-1 bg-blue-500 text-white rounded text-sm">
+              class="px-2 py-1 bg-slate-200 border border-slate-300 text-slate-500 rounded text-xs">
               Save
             </button>
           </form>
