@@ -10,19 +10,15 @@ defmodule QartWeb.UtxoLiveTest do
   @update_attrs %{script: "76a914c565e265052ccec4d1dd7bed4600c7e82a28cb3388ac", txid: "9f797ad1ca0a8796a2f3464565d3cb34835725c81bc01ed3d9bfea67f733a4ab", vout: 43, satoshis: 43, spent: false, spent_at: "2025-04-19T21:13:00Z"}
   @invalid_attrs %{script: nil, txid: nil, vout: nil, satoshis: nil, spent: false, spent_at: nil}
 
-  defp create_utxo(_) do
-    utxo = utxo_fixture()
-    %{utxo: utxo}
+  defp create_utxo_and_login(_) do
+    user = user_fixture()
+    utxo = utxo_fixture(%{user_id: user.id})
+    conn = build_conn() |> log_in_user(user)
+    %{conn: conn, user: user, utxo: utxo}
   end
 
-  defp log_user_in(_) do
-      user = user_fixture()
-      conn = build_conn() |> log_in_user(user)
-      %{conn: conn, user: user}
-    end
-
   describe "Index" do
-    setup [:create_utxo, :log_user_in]
+    setup [:create_utxo_and_login]
 
     test "lists all utxos", %{conn: conn, utxo: utxo} do
       {:ok, _index_live, html} = live(conn, ~p"/utxos")
@@ -95,7 +91,7 @@ defmodule QartWeb.UtxoLiveTest do
   end
 
   describe "Show" do
-    setup [:create_utxo, :log_user_in]
+    setup [:create_utxo_and_login]
 
     test "displays utxo", %{conn: conn, utxo: utxo} do
       {:ok, _show_live, html} = live(conn, ~p"/utxos/#{utxo}")

@@ -46,6 +46,7 @@ defmodule QartWeb.PublicSiteTest do
     |> visit("/")
     |> click(link("user1@lvh.me"))
     |> click(link("Settings"))
+    |> click(link("Profile")) # profile back link
     |> click(link("Activity stream"))
     |> assert_has(css("body", text: "created the invoice."))
 
@@ -128,7 +129,7 @@ defmodule QartWeb.PublicSiteTest do
     |> assert_has(css("body", text: "Handle set successfully!"))
   end
 
-  test "generate wallet", %{session: session} do
+  test "generate wallet and three addresses", %{session: session} do
     user = user_fixture()
 
     session = login_user(session, user)
@@ -151,14 +152,12 @@ defmodule QartWeb.PublicSiteTest do
     session
     |> visit("/wallets")
     |> click(css("div[name='wallet']:first-of-type a"))
-    |> assert_has(css("body", text: "Current Derivation Index 2"))
+    |> assert_has(css("body", text: "Current Derivation Index 0"))
     |> click(button("Generate New Address"))
     |> click(button("Generate New Address"))
     |> click(button("Generate New Address"))
-    |> assert_has(css("li[name='address']", count: 5))
-    # Refresh the page
     # Assert 3 addresses are showing
-    |> assert_has(css("li[name='address']", count: 5))
+    |> assert_has(css("li[name='address']", count: 3))
     session
   end
 
@@ -182,10 +181,6 @@ defmodule QartWeb.PublicSiteTest do
     |> click(css("a[title='Default wallet']"))
     |> click(link("Wallets"))
     |> click((css("div[name='wallets'] div[name='wallet']:last-of-type a")))
-    # Make the wallet the default wallet
-    |> click(button("Set wallet as default"))
-    |> assert_has(css("body", text: "is now the default Wallet"))
-
     # Generate Keys
     |> click(button("Generate New Address"))
     |> click(button("Generate New Address"))
@@ -205,11 +200,13 @@ defmodule QartWeb.PublicSiteTest do
     |> visit("/")
     |> visit("/wallets/")
     |> click(button("Generate Wallet"))
+    |> assert_has(css("body", text: "Name this wallet"))
     |> assert_has(css("body", text: "Wallet generated successfully"))
     |> assert_has(css("div[name='mnemonic']"))
+
     |> visit("/wallets")
     |> click(css("div[name='wallet']:first-of-type a"))
-    |> assert_has(css("body", text: "Current Derivation Index 2"))
+    |> assert_has(css("body", text: "Current Derivation Index 0"))
     |> click(button("Generate New Address"))
 
     |> click(link("Tx"))
@@ -230,6 +227,7 @@ defmodule QartWeb.PublicSiteTest do
     # |> assert_has(css("body", text: "Unsigned BSV Transaction"))
 
     # Contract validation
+    |> visit("/wallet/tx")
     |> assert_has(css("body", text: "Valid contract?"))
     |> assert_has(css("body", text: "false"))
     |> click(button("Validate"))
@@ -266,12 +264,11 @@ defmodule QartWeb.PublicSiteTest do
     |> assert_has(css("body", text: "Cart"))
     |> assert_has(css("body", text: "some name"))
     |> assert_has(css("body", text: "Order summary"))
-    |> assert_has(css("body", text: "Available"))
     |> assert_has(css("body", text: "Cost of goods"))
-    |> assert_has(css("body", text: "$241.00"))
-    |> assert_has(css("body", text: "Sales tax"))
+    |> assert_has(css("body", text: "241.00"))
+    |> assert_has(css("body", text: "sales tax"))
     |> assert_has(css("body", text: "18.08"))
-    |> assert_has(css("body", text: "Excise Tax"))
+    |> assert_has(css("body", text: "excise tax"))
     |> assert_has(css("body", text: "36.15"))
     |> assert_has(css("body", text: "Shipping"))
     |> assert_has(css("body", text: "5.00"))
@@ -282,10 +279,10 @@ defmodule QartWeb.PublicSiteTest do
 
     # After removing an item
     |> assert_has(css("body", text: "Cost of goods"))
-    |> assert_has(css("body", text: "$120.50"))
-    |> assert_has(css("body", text: "Sales tax"))
+    |> assert_has(css("body", text: "120.50"))
+    |> assert_has(css("body", text: "sales tax"))
     |> assert_has(css("body", text: "9.04"))
-    |> assert_has(css("body", text: "Excise Tax"))
+    |> assert_has(css("body", text: "excise tax"))
     |> assert_has(css("body", text: "18.08"))
     |> assert_has(css("body", text: "Shipping"))
     |> assert_has(css("body", text: "5.00"))

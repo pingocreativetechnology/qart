@@ -25,6 +25,7 @@ defmodule QartWeb.UtxoLive.FormComponent do
         <.input field={@form[:script]} type="text" label="Script" />
         <.input field={@form[:spent]} type="checkbox" label="Spent" />
         <.input field={@form[:address]} type="text" label="Address" />
+        <.input field={@form[:user_id]} type="text" label="User ID" />
         <.input field={@form[:spent_at]} type="datetime-local" label="Spent at" />
         <:actions>
           <.button phx-disable-with="Saving...">Save Utxo</.button>

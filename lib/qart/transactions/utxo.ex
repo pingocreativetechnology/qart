@@ -3,6 +3,8 @@ defmodule Qart.Transactions.Utxo do
   import Ecto.Changeset
 
   schema "utxos" do
+    belongs_to :user, Qart.Accounts.User
+
     field :script, :string
     field :txid, :string
     field :vout, :integer
@@ -17,7 +19,7 @@ defmodule Qart.Transactions.Utxo do
   @doc false
   def changeset(utxo, attrs) do
     utxo
-    |> cast(attrs, [:txid, :vout, :satoshis, :script, :address, :spent, :spent_at])
+    |> cast(attrs, [:txid, :vout, :satoshis, :script, :address, :spent, :spent_at, :user_id])
     |> validate_required([:txid, :vout, :satoshis, :spent])
   end
 

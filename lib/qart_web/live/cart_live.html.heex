@@ -60,7 +60,7 @@
                           <p>No items available</p>
                       <% end %>
                     </div>
-                    <p class="mt-1 text-sm font-medium text-gray-900">${cart_item.item.price}</p>
+                    <p class="mt-1 text-sm font-medium text-gray-900">{cart_item.item.price}</p>
                   </div>
 
                   <div class="mt-4 sm:mt-0 sm:pr-9">
@@ -84,7 +84,7 @@
                   </div>
                 </div>
 
-                <p class="mt-4 flex space-x-2 text-sm text-gray-700">
+                <p class="mt-4 flex space-x-2 text-sm text-gray-700 hidden">
                   <svg class="size-5 shrink-0 text-green-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"
                     data-slot="icon">
                     <path fill-rule="evenodd"
@@ -100,11 +100,11 @@
         </ul>
 
         <%= unless length(@cart_items) == 0 do %>
-        <div class="text-right">
+        <div class="">
           <button
             type="button"
             phx-click="empty_cart"
-            class="mt-4 bg-red-500 text-white px-4 py-2 rounded">
+            class="mt-8 bg-red-500 text-white px-4 py-2 rounded">
             Remove all items from cart
           </button>
         </div>
@@ -112,18 +112,21 @@
       </section>
 
       <!-- Order summary -->
+
       <%= if @checkout == true do %>
-        Well done, mate!
-        <%= if @payees do %>
-          {@payees |> inspect }
-        <% end %>
+        <section aria-labelledby="summary-heading"
+          class="mt-16 rounded-lg bg-gray-50 px-4 py-6 sm:p-6 lg:col-span-5 lg:mt-0 lg:p-8">
+          <%= if @cart_total[:tx_to_pay] do %>
+            <.transaction tx={@cart_total[:tx_to_pay]} utxos={[]} />
+          <% end %>
+        </section>
       <% else %>
       <section aria-labelledby="summary-heading"
         class="mt-16 rounded-lg bg-gray-50 px-4 py-6 sm:p-6 lg:col-span-5 lg:mt-0 lg:p-8">
         <h2 id="summary-heading" class="text-lg font-medium text-gray-900">Order summary</h2>
 
         <dl class="mt-6 space-y-4">
-          <%= if length(@cart_items)==0 do %>
+          <%= if length(@cart_items) == 0 do %>
             <p class="my-4">
               No items in cart
             </p>
@@ -141,8 +144,8 @@
                   {cart_item.item.user.email}
                 </span>
               </dt>
-              <dd class="text-sm font-medium text-gray-900">
-                ${cart_item.item.price}
+              <dd class="text-sm font-medium text-slate-900">
+                {cart_item.item.price}
               </dd>
             </div>
             <% end %>
@@ -150,14 +153,18 @@
         </dl>
         <dl class="mt-6 space-y-4">
           <div class="flex items-center justify-between">
-            <dt class="text-sm text-slate-900">Cost of goods</dt>
+            <dt class="text-sm text-slate-900">Cost of goods (subtotal)</dt>
             <dd class="text-sm font-semibold text-slate-900">
-              ${@cart_total.subtotal}
+              {@cart_total.subtotal}
             </dd>
           </div>
           <div class="flex items-center justify-between border-t border-gray-200 pt-4">
             <dt class="flex text-sm text-gray-600">
-              <span>Sales tax</span>
+              <span>
+                <%= @cart_total[:sales_tax_rate] * 100 %>%
+              </span>
+              &nbsp;
+              <span>City sales tax</span>
               <a href="#" class="ml-2 shrink-0 text-gray-400 hover:text-gray-500">
                 <span class="sr-only">Learn more about how tax is calculated</span>
                 <svg class="size-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
@@ -167,11 +174,13 @@
                 </svg>
               </a>
             </dt>
-            <dd class="text-sm font-medium text-red-500">${@cart_total.sales_tax}</dd>
+            <dd class="text-sm font-medium text-red-500">{@cart_total.sales_tax}</dd>
           </div>
           <div class="flex items-center justify-between border-t border-gray-200 pt-4">
             <dt class="flex text-sm text-gray-600">
-              <span>Excise Tax</span>
+              <%= @cart_total[:excise_tax_rate] * 100 %>%
+              &NonBreakingSpace;
+              <span>State excise tax</span>
               <a href="#" class="ml-2 shrink-0 text-gray-400 hover:text-gray-500">
                 <span class="sr-only">Learn more about how excise tax is calculated</span>
                 <svg class="size-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
@@ -181,7 +190,7 @@
                 </svg>
               </a>
             </dt>
-            <dd class="text-sm font-medium text-red-500">${@cart_total.excise_tax}</dd>
+            <dd class="text-sm font-medium text-red-500">{@cart_total.excise_tax}</dd>
           </div>
           <div class="flex items-center justify-between border-t border-gray-200 pt-4">
             <dt class="flex items-center text-sm text-gray-600">
@@ -195,11 +204,11 @@
                 </svg>
               </a>
             </dt>
-            <dd class="text-sm font-medium text-blue-700">$5.00</dd>
+            <dd class="text-sm font-medium text-slate-900">5.00</dd>
           </div>
           <div class="flex items-center justify-between border-t border-gray-200 pt-4">
-            <dt class="text-base font-medium text-gray-900">Total</dt>
-            <dd class="text-base font-medium text-gray-900">${@cart_total.total}</dd>
+            <dt class="text-base font-medium text-slate-900">Total</dt>
+            <dd class="text-base font-medium text-slate-900">{@cart_total.total}</dd>
           </div>
         </dl>
 

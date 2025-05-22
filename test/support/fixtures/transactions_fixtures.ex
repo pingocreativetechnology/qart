@@ -39,7 +39,7 @@ defmodule Qart.TransactionsFixtures do
         spent: true,
         spent_at: ~U[2025-04-18 21:13:00Z],
         txid: "9f797ad1ca0a8796a2f3464565d3cb34835725c81bc01ed3d9bfea67f733a4ab",
-        vout: 7
+        vout: 7,
       })
       |> Qart.Transactions.create_utxo()
 

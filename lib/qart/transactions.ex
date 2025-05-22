@@ -139,6 +139,10 @@ defmodule Qart.Transactions do
     Repo.all(query)
   end
 
+  def list_utxos_by_user(user_id) do
+    Repo.all(from i in Utxo, where: i.user_id == ^user_id)
+  end
+
   def list_utxos_by_address(address) do
     Repo.all(from i in Utxo, where: i.address == ^address)
   end

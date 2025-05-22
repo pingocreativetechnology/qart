@@ -703,6 +703,7 @@ easy tx
                         phx-value-vout={index}
                         phx-blur="update_satoshis"
                         class="text-sm block w-full border-gray-200 focus:ring-slate-500 focus:border-indigo-500 font-mono rounded-t-lg border-b-0" />
+                    <%= if to_address do %>
                       <textarea
                         id={"content-#{index}"}
                         name={"content-#{index}"}
@@ -713,6 +714,7 @@ easy tx
                         phx-blur="update-output"
                         phx-value-vout={index}
                       >{to_address |> BSV.Address.to_string}</textarea>
+                    <% end %>
                       <% end %>
 
                       <%= if index >= 1 && contract_type == :p2pkh do %>
@@ -726,15 +728,17 @@ easy tx
                         phx-blur="update_satoshis"
                         phx-value-vout={index}
                         class="text-sm block w-full border-gray-200 focus:ring-slate-500 focus:border-indigo-500 font-mono rounded-t-lg border-b-0" />
-                      <textarea
-                        id={"content-#{index}"}
-                        name={"content-#{index}"}
-                        rows="2"
-                        cols="50"
-                        placeholder="Enter text here..."
-                        phx-blur="update-output"
-                        phx-value-vout={index}
+                      <%= if change_address do %>
+                        <textarea
+                          id={"content-#{index}"}
+                          name={"content-#{index}"}
+                          rows="2"
+                          cols="50"
+                          placeholder="Enter text here..."
+                          phx-blur="update-output"
+                          phx-value-vout={index}
                         class="text-sm block w-full border-gray-200 focus:ring-slate-500 focus:border-indigo-500 font-mono">{change_address |> BSV.Address.to_string }</textarea>
+                      <% end %>
                         <div
                         class="text-right">
                         <button
