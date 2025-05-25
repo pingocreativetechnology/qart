@@ -95,32 +95,22 @@ defmodule Qart.WhatsOnChain do
 
   def get_tx(txid) do
     bsv_network = Application.get_env(:bsv, :network)
-    url = "https://api.whatsonchain.com/v1/bsv/#{bsv_network}/tx/hash/#{txid}"
+    url = "https://api.whatsonchain.com/v1/bsv/#{bsv_network}/tx/#{txid}/hex"
 
     case Tesla.get(url) do
       {:error, %Mint.TransportError{reason: :nxdomain}} ->
-        {:error, nil}
+        {:error, :nxdomain}
 
-      # What's on Chain response
       {:ok, response} ->
-        # Convert hex to base64
-        base64 = response.body # |> hex_to_base64()
+        raw = response.body |> hex_to_base64()
 
         new_tx = %{
           txid: txid,
-          raw: base64,
+          raw: raw,
         }
 
         Qart.Transactions.create_transaction(new_tx)
     end
-
-    # # Write the JungleBus response to the Transactions table
-    # new_tx = %{
-    #   txid: json["id"],
-    #   raw: json["transaction"],
-    #   # outputs: json["outputs"],
-    #   addresses: json["addresses"],
-    # }
   end
 
   def hex_to_base64(hex) do

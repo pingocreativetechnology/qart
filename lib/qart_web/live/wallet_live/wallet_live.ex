@@ -440,52 +440,45 @@ defmodule QartWeb.WalletLive do
           "result" => results
         } = response
 
+        case results do
+          [] ->
+            {:noreply, socket}
 
-        # get the transaction
-        # find the N vout
-        # return the vout
-        # get the hex from the vout
+          _ ->
+            x = script_string |> BSV.Script.from_binary(encoding: :hex)
 
-        x = script_string |> BSV.Script.from_binary(encoding: :hex)
+            for result <- results do
+              vout = result["tx_pos"]
+              txid = result["tx_hash"]
 
-        for result <- results do
-          vout = result["tx_pos"]
+              utxo = %{
+                script: "",
+                spent: result["isSpentInMempoolTx"],
+                txid: txid,
+                vout: vout,
+                satoshis: result["value"],
+                address: address,
+                user_id: socket.assigns.current_user.id
+              }
 
-          utxo = %{
-            script: "",
-            spent: result["isSpentInMempoolTx"],
-            # status: result["status"],
-            txid: result["tx_hash"],
-            vout: vout,
-            satoshis: result["value"],
-            address: address,
-            user_id: socket.assigns.current_user.id
-          }
+              # get the utxo's transaction, to get the Script
+              {:ok, tx} = Qart.WhatsOnChain.get_or_fetch_transaction(txid)
+              # Cast the WhatsOnChain hex response to a BSV Tx object. Get the hex for the vout.
+              {:ok, bsv_tx} = tx.raw |> BSV.Tx.from_binary(encoding: :base64)
+              tx_out = bsv_tx.outputs |> Enum.at(vout)
+              script_text = tx_out.script |> BSV.Script.to_binary(encoding: :hex)
 
+              utxo = utxo |> Map.put(:script, script_text)
+              # TODO: Create it if it doesn't exist.
+              # TODO: Update "certain fields" like Spent, if it does exist
+              Qart.Transactions.get_or_create_utxo(utxo)
+            end
 
-          # get the utxo's transaction, to get the Script
-          {:ok, tx} = Qart.WhatsOnChain.get_or_fetch_transaction(result["tx_hash"])
+            satoshis = Enum.reduce(results, 0, fn result, acc -> acc + result["value"] end)
 
-          # get the hex for the vout
-          {:ok, bsv_tx} = tx.raw |> BSV.Tx.from_binary(encoding: :base64)
-          tx_out = bsv_tx.outputs |> Enum.at(vout)
-          script_text = tx_out.script |> BSV.Script.to_binary(encoding: :hex)
+            {:noreply, assign(socket, response: response, satoshis: satoshis)}
 
-          utxo = utxo |> Map.put(:script, script_text)
-
-
-          # TODO: create it if it doesn't exist
-          # update "certain fields" like Spent, if it does exist
-          Qart.Transactions.create_utxo(utxo)
         end
-
-        # Write these results to the UTXOs table
-        satoshis = Enum.reduce(results, 0, fn result, acc -> acc + result["value"] end)
-
-        {:noreply, assign(socket, response: response, satoshis: satoshis)}
-
-       _ ->
-        {:noreply, socket}
     end
   end
 

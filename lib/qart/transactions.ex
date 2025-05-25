@@ -181,6 +181,18 @@ defmodule Qart.Transactions do
     |> Repo.insert()
   end
 
+  def get_or_create_utxo(attrs) do
+    case Repo.get_by(Utxo, attrs) do
+      nil  ->
+        %Utxo{}
+        |> Utxo.changeset(attrs)
+        |> Repo.insert()
+
+      utxo ->
+        {:ok, utxo}
+    end
+  end
+
   @doc """
   Updates a utxo.
 
