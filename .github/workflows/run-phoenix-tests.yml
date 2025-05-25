@@ -46,6 +46,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Setup ChromeDriver
+        uses: nanasess/setup-chromedriver@v2
+        with:
+          chromedriver-version: latest
+
       # ------- Install Elixir & OTP -------
       - name: Set up BEAM toolchain
         uses: erlef/setup-beam@v1
