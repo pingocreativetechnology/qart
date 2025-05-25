@@ -40,7 +40,7 @@ config :phoenix, :plug_init_mode, :runtime
 
 config :wallaby,
   driver: Wallaby.Chrome,
-  chromedriver: [headless: false]
+  chromedriver: [headless: true]
 
 config :wallaby, otp_app: :qart
 

@@ -52,13 +52,6 @@ jobs:
           install-dependencies: true
           install-chromedriver: true
 
-      # - name: Setup ChromeDriver
-      #   uses: nanasess/setup-chromedriver@v2
-      #   with:
-          # chromedriver-version: latest
-          # chromedriver-version: stable
-          # chromedriver-version: "136.0.7103.113"
-
       # ------- Install Elixir & OTP -------
       - name: Set up BEAM toolchain
         uses: erlef/setup-beam@v1
