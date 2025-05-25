@@ -11,136 +11,137 @@ defmodule QartWeb.WalletLive do
     wallets = Accounts.get_user_wallets(user_id)
     default_wallet_id = user.default_wallet_id
 
-    # TODO: Fix the flow for the user's first wallet
-    # this implementation assumes a wallet.
-    # but the user should get to an empty state, and be able to generate or restore a wallet.
-    first_wallet = case (wallets |> length) do
-      0 ->
-        {:ok, wallet, _} = WalletSession.generate_wallet(user_id)
-        WalletSession.derive_new_address(wallet.id)
-        WalletSession.derive_new_address(wallet.id)
-        {:ok, updated_user} = Qart.Accounts.set_default_wallet(user, wallet.id)
-        wallet
-      1 ->
-        Qart.Accounts.get_user_wallets(user_id) |> Enum.at(0)
+    {wallet, to_address, change_address, addresses, words, transactions, transaction, utxos, utxos2, tx_builder, inputs, outputs} = case wallets do
+      [] ->
+        {nil, nil, nil, [], [], nil, nil, nil, nil, nil, nil, nil}
       _ ->
-        Qart.Accounts.get_user_wallet(user_id, default_wallet_id)
-    end
+        wallet =
+          case Enum.find(wallets, &(&1.id == default_wallet_id)) do
+            nil -> List.first(wallets)
+            w -> w
+          end
 
-    # wallet_id = socket.assigns.current_user.default_wallet_id
-    default_wallet = first_wallet
-    wallet = default_wallet
+        default_wallet = wallet
+        wallet = default_wallet
 
-    addresses = Qart.Accounts.get_wallet_addresses(wallet.id)
-    addresses = Enum.filter(addresses, fn a -> a end)
-    address = Enum.at(addresses, 0, nil) # return the first address or nil
-    address2 = Enum.at(addresses, 1, nil) # return the first address or nil
+        addresses = Qart.Accounts.get_wallet_addresses(wallet.id)
+        # addresses = Enum.filter(addresses, fn a -> a end)
+        address = Enum.at(addresses, 0, nil) # return the first address or nil
+        address2 = Enum.at(addresses, 1, nil) # return the first address or nil
 
-    to_address =
-      case address do
-        nil ->
-          nil
+        to_address =
+          case address do
+            nil ->
+              nil
 
-        address ->
-          {:ok, address} = BSV.Address.from_string(address.address)
-          address
-      end
+            address ->
+              {:ok, address} = BSV.Address.from_string(address.address)
+              address
+          end
 
-    change_address =
-      case address2 do
-        nil ->
-          nil
+        change_address =
+          case address2 do
+            nil ->
+              nil
 
-        address ->
-          {:ok, address} = BSV.Address.from_string(address2.address)
-          address
-      end
+            address ->
+              {:ok, address} = BSV.Address.from_string(address2.address)
+              address
+          end
 
+        derivation_path = "m/44'/236'/0'/0/0"
 
-    derivation_path = "m/44'/236'/0'/0/0"
+        {transactions, transaction, utxos, utxos2, tx_builder, inputs, outputs} = case WalletSession.derive_keypair(wallet.id, derivation_path) do
+          {:ok, keypair} ->
+            inputs = [
+              # P2PKH.unlock(utxo, %{keypair: keypair})
+            ]
 
-     # TX Builder
-    case WalletSession.derive_keypair(wallet.id, derivation_path) do
-      {:ok, keypair} ->
-        inputs = [
-          # P2PKH.unlock(utxo, %{keypair: keypair})
-        ]
+            # All sorts of different data patterns can go here
+            #
+            # This is a basic transaction that sends coins `to_address` AND change (unspent satoshis) back to `change_address`
 
-        # All sorts of different data patterns can go here
-        #
-        # This is a basic transaction that sends coins `to_address` AND change (unspent satoshis) back to `change_address`
+            # This transaction's OP_RETURN output is prunable because it holds 0 satoshis
+            outputs = Qart.BSV.standard_transaction_with_change_outputs(to_address, change_address, [
+              "hello",
+              "world"
+            ])
 
-        # This transaction's OP_RETURN output is prunable because it holds 0 satoshis
-        outputs = Qart.BSV.standard_transaction_with_change_outputs(to_address, change_address, [
-          "hello",
-          "world"
-        ])
+            # Translate to BSV.UTXO params
+            utxos2 = Qart.Transactions.list_utxos_by_user(socket.assigns.current_user.id)
+            utxos = utxos2 |> Enum.map(fn utxo ->
+              Qart.Transactions.Utxo.to_bsv_utxo(utxo)
+            end)
 
-        # Translate to BSV.UTXO params
-        utxos2 = Qart.Transactions.list_utxos
-        utxos = utxos2 |> Enum.map(fn utxo ->
-          Qart.Transactions.Utxo.to_bsv_utxo(utxo)
-        end)
+            # given a UTXO (txid, vout), get the corresponding Transaction(txid) Output[vout]
 
-        # given a UTXO (txid, vout), get the corresponding Transaction(txid) Output[vout]
+            tx_builder = %BSV.TxBuilder{
+              inputs: inputs,
+              outputs: outputs
+            }
 
-        tx_builder = %BSV.TxBuilder{
-          inputs: inputs,
-          outputs: outputs
-        }
+            transactions = Qart.Transactions.list_transactions
+            transaction = Qart.Transactions.list_transactions |> Enum.at(0)
+
+            {transactions, transaction, utxos, utxos2, tx_builder, inputs, outputs}
+
+          _ ->
+            Qart.debug("Wallet can't be derived")
+            {[], [], nil, [], [], nil, [], []}
+        end
 
         words = Enum.map(0..11, fn _ -> " " end) # 12 blank words in an array
 
-        transactions = Qart.Transactions.list_transactions
-        transaction = Qart.Transactions.list_transactions |> Enum.at(0)
-
-        {:ok, assign(socket,
-          content: "",
-          encrypted: false,
-          address: address, # Ecto object
-          addresses: addresses,
-          bsv_address: to_address, # BSV object
-          current_derivation: nil,
-          contract_validation_error: nil,
-          default_wallet: default_wallet,
-          default_wallet_id: default_wallet_id,
-          derivation_path: derivation_path,
-          editing_derivation_path: false,
-          json: nil,
-          mnemonic: nil,
-          mnemonic_shown: false,
-          outputs: outputs,
-          raw_tx: "",
-          show_add_input: false,
-          show_import_tx: false,
-          show_restore_wallet_form: false,
-          # satoshis: nil,
-          total_wallet_satoshis: 0,
-          transactions: transactions,
-          transaction: transaction,
-          tx: nil,
-          tx_builder: tx_builder,
-          user: user,
-          user_id: user_id,
-          utxos: utxos,
-          utxos2: utxos2,
-          valid_contract: false,
-          version: 1,
-          wallet: wallet,
-          wallet_id: wallet.id,
-          wallets: wallets,
-          wallet_last_synced_at: DateTime.utc_now() |> DateTime.add(-3 * 60 * 60, :second), #
-          words: words,
-          show_wallet_name_editing: false,
-
-          # Modal
-          show_modal: false,
-          selected_tx: nil
-        )}
-
-      _ ->
-        Qart.debug("Wallet can't be derived")
+        {wallet, to_address, change_address, addresses, words, transactions, transaction, utxos, utxos2, tx_builder, inputs, outputs}
     end
+
+    derivation_path = "m/44'/236'/0'/0/0"
+
+    {:ok, assign(socket,
+      content: "",
+      encrypted: false,
+      address: Enum.at(addresses, 0, nil),
+      addresses: addresses,
+      bsv_address: to_address, # BSV object
+      current_derivation: nil,
+      contract_validation_error: nil,
+      default_wallet: wallet,
+      default_wallet_id: default_wallet_id,
+      derivation_path: derivation_path,
+      editing_derivation_path: false,
+      json: nil,
+      mnemonic: nil,
+      mnemonic_shown: false,
+      outputs: outputs,
+      raw_tx: "",
+      show_add_input: false,
+      show_import_tx: false,
+      show_restore_wallet_form: false,
+      # satoshis: nil,
+      total_wallet_satoshis: 0,
+      transactions: transactions,
+      transaction: transaction,
+      tx: nil,
+      tx_builder: tx_builder,
+      user: user,
+      user_id: user_id,
+      utxos: utxos,
+      utxos2: utxos2,
+      valid_contract: false,
+      version: 1,
+      wallet: wallet,
+      wallet_id: wallet && wallet.id,
+      wallets: wallets,
+      wallet_last_synced_at: DateTime.utc_now() |> DateTime.add(-3 * 60 * 60, :second), #
+      words: words,
+      show_wallet_name_editing: false,
+
+      # Modal
+      show_modal: false,
+      selected_tx: nil
+    )}
+
+
   end
 
   # used for any Wallet - /wallets/:id
@@ -172,7 +173,14 @@ defmodule QartWeb.WalletLive do
   @impl true
   def handle_params(params, _uri, socket) do
     wallet = socket.assigns.default_wallet
-    addresses = Qart.Accounts.get_wallet_addresses(wallet.id)
+    addresses = case wallet do
+      nil ->
+        []
+
+      wallet ->
+        Qart.Accounts.get_wallet_addresses(wallet.id)
+    end
+    # addresses = Qart.Accounts.get_wallet_addresses(wallet.id)
     address = Enum.at(addresses, 0, nil)
     bsv_address = case address do
       nil ->
@@ -426,22 +434,6 @@ defmodule QartWeb.WalletLive do
 
       {:ok, response} ->
 
-        # response = %{
-        #   "address" => "mpVjxzWwqLSgMnD2a6sfq64q24Vk2LTkBa",
-        #   "error" => "",
-        #   "result" => [
-        #     %{
-        #       "hex" => "76a914627e6cb63c8759336b39784d75b3f328c65f5b6088ac",
-        #       "isSpentInMempoolTx" => false,
-        #       "status" => "unconfirmed",
-        #       "tx_hash" => "31dfaa860debd39af28776d1037e0c76980a5c9d844db06c188122f1aa3c93a7",
-        #       "tx_pos" => 0,
-        #       "value" => 99904
-        #     }
-        #   ],
-        #   "script" => "9eb2c075dec7e794c54b6113ee3fb020b75fb8fbe8c91e4f6f7cc6b60f5ce9c1"
-        # }
-
         %{
           "address" => address,
           "script" => script_string, # scripthash
@@ -457,16 +449,34 @@ defmodule QartWeb.WalletLive do
         x = script_string |> BSV.Script.from_binary(encoding: :hex)
 
         for result <- results do
-          q = %{
+          vout = result["tx_pos"]
+
+          utxo = %{
             script: "",
             spent: result["isSpentInMempoolTx"],
             # status: result["status"],
             txid: result["tx_hash"],
-            vout: result["tx_pos"],
+            vout: vout,
             satoshis: result["value"],
             address: address,
+            user_id: socket.assigns.current_user.id
           }
-          Qart.Transactions.create_utxo(q)
+
+
+          # get the utxo's transaction, to get the Script
+          {:ok, tx} = Qart.WhatsOnChain.get_or_fetch_transaction(result["tx_hash"])
+
+          # get the hex for the vout
+          {:ok, bsv_tx} = tx.raw |> BSV.Tx.from_binary(encoding: :base64)
+          tx_out = bsv_tx.outputs |> Enum.at(vout)
+          script_text = tx_out.script |> BSV.Script.to_binary(encoding: :hex)
+
+          utxo = utxo |> Map.put(:script, script_text)
+
+
+          # TODO: create it if it doesn't exist
+          # update "certain fields" like Spent, if it does exist
+          Qart.Transactions.create_utxo(utxo)
         end
 
         # Write these results to the UTXOs table
@@ -591,10 +601,7 @@ defmodule QartWeb.WalletLive do
 
   def handle_event("delete-output", %{"value" => vout}, socket) do
     idx = String.to_integer(vout)
-    # List.delete_at(socket.assigns.outputs, idx) |> Qart.debug
     new_outputs = List.delete_at(socket.assigns.tx_builder.outputs, idx)
-
-    new_outputs |> Qart.debug
 
     tx_builder = %BSV.TxBuilder{
       inputs: socket.assigns.tx_builder.inputs,
@@ -758,9 +765,6 @@ defmodule QartWeb.WalletLive do
       "script" => "e01cccd61cd2a18101172ec0d0bc6f3fe63236dbc052fa6058b4949bc4fc5a94"
     })
     # Qart.debug("utxo from INPUTutxo from INPUTutxo from INPUTutxo from INPUTutxo from INPUT")
-    # Qart.debug(socket.assigns.utxos)
-    # utxo =
-
     # utxo from INPUT
 
     # TODO: sign with which key?
@@ -916,27 +920,44 @@ defmodule QartWeb.WalletLive do
 
   def handle_event("validate2", _, socket) do
     wallet = socket.assigns.wallet
-    address = Qart.Accounts.get_address_keypair(wallet.id, socket.assigns.address.address)
 
-    {:ok, bsv_address} = BSV.Address.from_string(address.address)
-    {:ok, keypair} = WalletSession.derive_keypair(wallet.id, address.derivation_path)
-    lock_params = %{address: bsv_address}
-    unlock_params = %{keypair: keypair}
+    case socket.assigns.address do
+      nil ->
+        IO.puts "no address for validate2"
+        {:noreply, socket}
 
-    # case BSV.Contract.simulate(BSV.Contract.OneSatOrdinal, one_sat_ordinal_lock_params, one_sat_ordinal_lock_params) do
-    # end
+      x ->
+        Qart.Accounts.get_address_keypair(wallet.id, socket.assigns.address.address)
+        {:ok, bsv_address} = BSV.Address.from_string(socket.assigns.address.address)
+        {:ok, keypair} = WalletSession.derive_keypair(wallet.id, socket.assigns.address.derivation_path)
+        lock_params = %{address: bsv_address}
+        unlock_params = %{keypair: keypair}
 
-    # case BSV.Contract.simulate(BSV.Contract.CustomContract, custom_lock_params, custom_unlock_params) do
-    # end
+        # case BSV.Contract.simulate(BSV.Contract.OneSatOrdinal, one_sat_ordinal_lock_params, one_sat_ordinal_lock_params) do
+        # end
 
-    case BSV.Contract.simulate(P2PKH, lock_params, unlock_params) do
-      {:ok, vm} ->
-        valid_contract = BSV.VM.valid?(vm)
-        {:noreply, assign(socket, valid_contract: valid_contract)}
+        # case BSV.Contract.simulate(BSV.Contract.CustomContract, custom_lock_params, custom_unlock_params) do
+        # end
 
-      {:error, x }  ->
-        {:noreply, assign(socket, valid_contract: false, contract_validation_error: x.error, contract_error: x.error)}
+        {socket.assigns.address.address, bsv_address}
+        case BSV.Contract.simulate(P2PKH, lock_params, unlock_params) do
+          {:ok, vm} ->
+            valid_contract = BSV.VM.valid?(vm)
+            {:noreply, assign(socket, valid_contract: valid_contract)}
+
+          {:error, x }  ->
+            {:noreply, assign(socket, valid_contract: false, contract_validation_error: x.error, contract_error: x.error)}
+        end
+
     end
+  end
+
+  @impl true
+  def handle_event("refresh-address", %{"id" => address}, socket) do
+    # get it from Whats on Chain if it doesn't exist
+    # get it from Whats on Chain and update it if it doesn't exist
+    # get the transaction if not already stored
+    {:noreply, assign(socket, address: address)}
   end
 
   @impl true
@@ -968,7 +989,16 @@ defmodule QartWeb.WalletLive do
       {:ok, tx} ->
         "do this with tx"
 
+        # tx_builder = %BSV.TxBuilder{
+        #   inputs: inputs,
+        #   outputs: outputs
+        # }
+
+        tx_builder = Qart.BSV.builder_from_hex(raw_tx)
+
+
         {:noreply, assign(socket,
+            tx_builder: tx_builder,
             raw_tx: raw_tx,
             tx: tx
           )
@@ -1038,14 +1068,5 @@ defmodule QartWeb.WalletLive do
 
     utxos
   end
-
-
-
-
-
-
-
-
-
 
 end

@@ -16,13 +16,27 @@ total_utxo_satoshis = Enum.reduce(utxo2_for_address, 0, fn %Qart.Transactions.Ut
         <%= @address.id %>
       </div>
       <div class="font-mono">
-        <span name="address-address" title="Address" class="text-slate-900">
+        <span
+          name="address-address"
+          title="Address"
+          class="text-slate-900">
           <%= @address.address %>
         </span>
-        <span name="address-derivation-path" title="Derivation path" class="text-slate-400 ml-4"><a
+        <span
+          name="address-derivation-path"
+          title="Derivation path"
+          class="text-slate-400 ml-4">
+          <a
             href={"/wallets/#{@wallet.id}?path=#{Qart.Utils.parameterize_derivation_path(@address.derivation_path)}"}>
             <%= @address.derivation_path %>
-          </a></span>
+          </a>
+          <button
+            phx-click="get-utxos"
+            phx-value-address={@address.address}
+            class="text-xs font-sans">
+            Refresh
+          </button>
+        </span>
         <br>
         <span
           name="address-pubkey-hash"
@@ -33,7 +47,7 @@ total_utxo_satoshis = Enum.reduce(utxo2_for_address, 0, fn %Qart.Transactions.Ut
           <div
             class="hidden">
             <%# "Is this spendable?" %>
-            <%#= "can the wallet generate pubkey_hash for this?" %>
+            <%# "can the wallet generate pubkey_hash for this?" %>
             <%#= Qart.Accounts.has_pubkey_hash?(@bsv_address.pubkey_hash |> Base.encode16(case: :lower)) %>
             <%#= "What arguments does a contract require? --> (:pubkey_hash)" %>
           </div>

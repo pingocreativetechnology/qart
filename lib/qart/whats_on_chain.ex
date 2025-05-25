@@ -95,7 +95,7 @@ defmodule Qart.WhatsOnChain do
 
   def get_tx(txid) do
     bsv_network = Application.get_env(:bsv, :network)
-    url = "https://api.whatsonchain.com/v1/bsv/#{bsv_network}/tx/#{txid}/hex"
+    url = "https://api.whatsonchain.com/v1/bsv/#{bsv_network}/tx/hash/#{txid}"
 
     case Tesla.get(url) do
       {:error, %Mint.TransportError{reason: :nxdomain}} ->

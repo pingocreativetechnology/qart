@@ -6,7 +6,8 @@ defmodule QartWeb.UtxoLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, stream(socket, :utxos, Transactions.list_utxos_by_user(socket.assigns.current_user.id))}
+    utxos = Transactions.list_utxos_by_user(socket.assigns.current_user.id)
+    {:ok, stream(socket, :utxos, utxos)}
   end
 
   @impl true

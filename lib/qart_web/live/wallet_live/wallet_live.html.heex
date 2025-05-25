@@ -669,6 +669,14 @@ easy tx
                           Qart.debug("this is an OpReturn")
                           Qart.debug(data)
                           {:ok, :op_return}
+
+                        {BSV.Contract.Raw, :locking_script, [%{script: script}]} ->
+                          Qart.debug("this is a Contract")
+                          Qart.debug(script)
+                          {:ok, :bsv_contract}
+
+                        x ->
+                          {:ok, :other}
                       end
                       %>
                       <%= if index == 0 && contract_type == :p2pkh do %>
@@ -692,7 +700,7 @@ easy tx
                     </div>
                   </div>
                   <div class="p-2">
-                    <%= if index == 0 do %>
+                    <%= if index == 0 && contract_type != :bsv_contract do %>
                       <% {BSV.Contract.P2PKH, :locking_script, [%{address: to_address}]} = output.mfa  %>
                       <input
                         id={"content#{index}"}
@@ -857,7 +865,7 @@ easy tx
                       type="button"
                       phx-click="add_output"
                       phx-value-output-type="bitcoin_schema"
-                      class="bg-slate-400 hover:bg-slate-500 text-white px-4 py-1 rounded w-full">
+                      class="bg-slate-600 hover:bg-slate-500 text-white px-4 py-1 rounded w-full">
                       Add Bitcoin Schema object
                     </button>
                   </div>
@@ -867,7 +875,7 @@ easy tx
                       type="button"
                       phx-click="add_output"
                       phx-value-output-type="one_sat_html_inscription"
-                      class="bg-yellow-400 hover:bg-yellow-200 text-white px-4 py-1 rounded w-full">
+                      class="bg-yellow-200 hover:bg-yellow-00 text-yellow-700 px-4 py-1 rounded w-full">
                       1Sat HTML Inscription
                     </button>
                   </div>
@@ -898,7 +906,7 @@ easy tx
                       type="button"
                       phx-click="add_output"
                       phx-value-output-type="custom"
-                      class="bg-slate-300 hover:bg-slate-500 text-slate-900 px-4 py-1 rounded w-full">
+                      class="bg-slate-100 hover:bg-slate-500 text-slate-900 px-4 py-1 rounded w-full">
                       Add Custom Output
                     </button>
                   </div>
