@@ -10,11 +10,11 @@ permissions:
   contents: read
 
 jobs:
-  build:
-
-    name: Build and test
+  test:
+    name: Mix tests
     runs-on: ubuntu-latest
 
+    # ---------- Postgres service ----------
     services:
       db:
         image: postgres:15
@@ -29,24 +29,58 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
+    # ---------- Job-wide env ----------
+    env:
+      MIX_ENV: test
+      # Ecto can consume DATABASE_URL directly; hostname = 'db'
+      DATABASE_URL: ecto://postgres:postgres@db:5432/qart_test
+      PGHOST: db
+      PGPASSWORD: postgres
+      PGUSER: postgres
+      BSV_NETWORK: ${{ secrets.BSV_NETWORK }}
+      HANDCASH_API_KEY: ${{ secrets.HANDCASH_API_KEY }}
+      HANDCASH_API_SECRET: ${{ secrets.HANDCASH_API_SECRET }}
+      TEST_12_WORDS: ${{ secrets.TEST_12_WORDS }}
+      VAULT_KEY: ${{ secrets.VAULT_KEY }}
+
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Elixir
-      uses: erlef/setup-beam@v1
-      with:
-        elixir-version: '1.15.2' # [Required] Define the Elixir version
-        otp-version: '26.0'      # [Required] Define the Erlang/OTP version
-    - name: Restore dependencies cache
-      uses: actions/cache@v3
-      with:
-        path: deps
-        key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
-        restore-keys: ${{ runner.os }}-mix-
-    - name: Install dependencies
-      run: mix deps.get
-    - name: Prepare the database
-      run: |
-        mix ecto.create
-        mix ecto.migrate
-    - name: Run tests
-      run: mix test
+      - uses: actions/checkout@v4
+
+      # ------- Install Elixir & OTP -------
+      - name: Set up BEAM toolchain
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: '1.15.2'
+          otp-version: '26.0'
+
+      # ------- Restore caches -------
+      - name: Cache Mix deps
+        uses: actions/cache@v3
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-mix-
+
+      - name: Cache _build
+        uses: actions/cache@v3
+        with:
+          path: _build
+          key: ${{ runner.os }}-build-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-build-
+
+      # ------- Install deps & compile -------
+      - name: Install dependencies
+        run: mix deps.get
+
+      - name: Compile (warnings = errors)
+        # run: mix compile --warnings-as-errors
+        run: mix compile
+
+      # ------- Prepare DB & run tests -------
+      - name: Prepare database
+        run: |
+          mix ecto.create
+          mix ecto.migrate
+
+      - name: Run tests
+        run: mix test --color
