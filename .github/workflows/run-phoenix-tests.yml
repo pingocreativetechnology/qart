@@ -44,15 +44,17 @@ jobs:
       VAULT_KEY: ${{ secrets.VAULT_KEY }}
 
     steps:
-      - uses: actions/checkout@v4
-
       - name: Setup Chrome
         uses: browser-actions/setup-chrome@v1
+
+      - uses: actions/checkout@v2
 
       - name: Setup ChromeDriver
         uses: nanasess/setup-chromedriver@v2
         with:
           chromedriver-version: latest
+
+      - uses: actions/checkout@v4
 
       # ------- Install Elixir & OTP -------
       - name: Set up BEAM toolchain
