@@ -39,18 +39,9 @@ config :logger, level: :warning
 config :phoenix, :plug_init_mode, :runtime
 
 config :wallaby,
-  driver: Wallaby.Chrome
-
-config :wallaby, :chrome,
-  headless: false,
-  capabilities: %{
-    chromeOptions: %{
-      # these two flags keep Chrome stable inside GitHub's container
-      args: ["--no-sandbox", "--disable-dev-shm-usage"]
-    }
-  }
-
-config :wallaby, otp_app: :qart
+  driver: Wallaby.Chrome,
+  chromedriver: [headless: true],
+  otp_app: :qart
 
 config :qart, :sandbox, Qart.Sandbox
 
