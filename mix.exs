@@ -1,6 +1,17 @@
 defmodule Qart.MixProject do
   use Mix.Project
 
+  defp deps do
+    [
+      # Remove or comment out postgrex
+      # {:postgrex, ">= 0.0.0"},
+      
+      # Add SQLite
+      {:ecto_sqlite3, "~> 0.12"},
+      # ... other dependencies
+    ]
+  end
+
   def project do
     [
       app: :qart,
