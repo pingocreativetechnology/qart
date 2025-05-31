@@ -15,6 +15,7 @@ config :qart,
 config :qart, QartWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
+  adapter: Ecto.Adapters.SQLite3,
   render_errors: [
     formats: [html: QartWeb.ErrorHTML, json: QartWeb.ErrorJSON],
     layout: false
