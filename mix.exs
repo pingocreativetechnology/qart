@@ -1,16 +1,16 @@
 defmodule Qart.MixProject do
   use Mix.Project
 
-  defp deps do
-    [
+#  defp deps do
+#    [
       # Remove or comment out postgrex
       # {:postgrex, ">= 0.0.0"},
       
       # Add SQLite
-      {:ecto_sqlite3, "~> 0.12"},
+      # {:ecto_sqlite3, "~> 0.12"},
       # ... other dependencies
-    ]
-  end
+#    ]
+#  end
 
   def project do
     [
@@ -43,6 +43,7 @@ defmodule Qart.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:ecto_sqlite3, "~> 0.12"},      
       {:bandit, "~> 1.6.7"},
       {:ecto_sql, "~> 3.10"},
       {:esbuild, "~> 0.9", runtime: Mix.env() == :dev},
